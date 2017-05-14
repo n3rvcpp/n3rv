@@ -1,0 +1,7 @@
+{
+    "version": "7.0.0",
+    "command": "./buildctl",
+    "isShellCommand": true,
+    "showOutput": "always",
+    "args": ["buildall"]
+}
