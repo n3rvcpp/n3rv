@@ -3,13 +3,9 @@
 
 #include <map>
 #include <zmq.hpp>
+#include "n3rvcommon.hpp"
 
 namespace n3rv {
-
-  typedef struct qserv_ {
-     std::string host;
-     unsigned int port;
-  } qserv;
 
   class service {
 

@@ -3,6 +3,8 @@
 
 #include <zmq.hpp>
 #include <sstream>
+#include <map>
+#include "n3rvcommon.hpp"
 
 namespace n3rv {
 
@@ -31,7 +33,8 @@ namespace n3rv {
       unsigned int binding_port;
       zmq::context_t zctx;
       zmq::socket_t* zmsock;
-   
+      std::map<std::string, n3rv::qserv> registered_services;
+
   };
 
 }
