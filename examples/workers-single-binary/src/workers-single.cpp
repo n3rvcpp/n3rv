@@ -23,12 +23,16 @@ int main(int argc, char** argv) {
     std::cout << "Running Service Controller.." << std::endl;
 
     n3rv::servicecontroller sc("0.0.0.0", atoi(argv[4]));
+    sc.recv();
 
   }
 
   else {
 
     std::cout << "Running Worker.." << std::endl;
+
+    n3rv::service w1(argv[2],argv[4], atoi(argv[6]), 11001);
+    w1.subscribe();
 
   }
 
