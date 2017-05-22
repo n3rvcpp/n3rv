@@ -24,6 +24,7 @@ namespace n3rv {
 
         std::stringstream ss;
         ss << "tcp://" << this->binding_addr << ":" << this->binding_port;
+        std::cout << "Binding service Controller on " << ss.str() << ".." << std::endl;
 
         zmsock->bind(ss.str().c_str());
 
@@ -33,8 +34,9 @@ namespace n3rv {
       void recv() {
 
         zmq::message_t reply;
-        while(  zmsock->recv(&reply) ) {
-            std::cout << (char*) reply.data() << std::endl;
+        while(true) {
+            zmsock->recv(&reply);
+            std::cout << "OUTP:" << (char*) reply.data() << std::endl;
         }
 
       }

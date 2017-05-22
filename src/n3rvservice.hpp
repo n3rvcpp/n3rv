@@ -29,6 +29,9 @@ namespace n3rv {
         //connects to controller.
         std::stringstream ss;
         ss << "tcp://" << controller_host << ":" << controller_port;
+
+        std::cout << "Connecting to " << ss.str() << " controller.." << std::endl;
+
         this->connections["controller"]->connect(ss.str().c_str());
 
     }
@@ -42,12 +45,14 @@ namespace n3rv {
       std::stringstream ss;
       ss << "SUBSCRIBE " << this->service_class << " " << this->service_port << "\n";
 
-      const char* to_send = ss.str().c_str();
+      std::string to_send = ss.str();
       
-      zmq::message_t req (strlen(to_send));
-      memcpy (req.data(), to_send , strlen(to_send));
+      zmq::message_t req (to_send.size());
+      memcpy (req.data(), to_send.data() , to_send.size());
 
       this->connections["controller"]->send(req);
+
+      return 0;
 
     }
 
