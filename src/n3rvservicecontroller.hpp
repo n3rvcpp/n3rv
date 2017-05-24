@@ -7,6 +7,7 @@
 
 #include <map>
 #include "n3rvcommon.hpp"
+#include "n3rvproto.hpp"
 
 namespace n3rv {
 
