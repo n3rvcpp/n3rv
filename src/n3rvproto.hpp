@@ -18,6 +18,22 @@ namespace n3rv {
 
   } n3rvresponse;
 
+  /**
+   * Serializes query for later sending over the net.
+   */
+  std::string serialize_query(n3rv::n3rvquery& query) {
+    
+    rapidjson::PrettyWriter writer;
+
+    writer.String("action");
+    writer.String(query.action);
+
+    writer.String("payload");
+    writer.String(query.payload);
+
+    return writer.str();
+
+  }
 
   /**
    * Parses a raw query comming from a service and 
@@ -37,6 +53,10 @@ namespace n3rv {
 
     query_.action = d["action"].GetString();
     query_.payload = d["payload"].GetString();
+
+    for (int i=0;i< d["args"].Size();i++) {
+      query_.args.emplace_back( d["args"][i].GetString() );
+    }
 
     return query_;
 
