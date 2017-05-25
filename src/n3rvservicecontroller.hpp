@@ -14,34 +14,9 @@ namespace n3rv {
   class servicecontroller {
 
     public:
-
-      servicecontroller(std::string binding_addr, unsigned int binding_port) {
-
-        this->zctx = zmq::context_t(1);
-        this->zmsock = new zmq::socket_t(this->zctx, ZMQ_REP);
-
-        this->binding_addr = binding_addr;
-        this->binding_port = binding_port;
-
-        std::stringstream ss;
-        ss << "tcp://" << this->binding_addr << ":" << this->binding_port;
-        std::cout << "Binding service Controller on " << ss.str() << ".." << std::endl;
-
-        zmsock->bind(ss.str().c_str());
-
-      }
-
-
-      void recv() {
-
-        zmq::message_t reply;
-        while(true) {
-            zmsock->recv(&reply);
-            std::cout << "OUTP:" << (char*) reply.data() << std::endl;
-        }
-
-      }
-
+    
+      servicecontroller(std::string binding_addr, unsigned int binding_port);
+      void recv();
 
     protected:
 

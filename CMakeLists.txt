@@ -12,7 +12,8 @@ add_definitions(-DQATE_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 add_library(
 	n3rv SHARED
 	src/n3rvservice.cpp
-    src/n3rvservicecontroller.cpp
+  src/n3rvservicecontroller.cpp
+  src/n3rvproto.cpp
 )
 
 

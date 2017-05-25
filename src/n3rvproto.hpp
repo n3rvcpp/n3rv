@@ -1,13 +1,15 @@
-#ifndef N3RV_PROTO
-#define N3RV_PROTO
+#ifndef N3RV_PROTO_HPP
+#define N3RV_PROTO_HPP
 
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
+#include <vector>
 
 namespace n3rv {
 
   typedef struct n3rvquery_ {
 
+    std::string sender;
     std::string action;
     std::vector<std::string> args;
     std::string payload;
@@ -21,47 +23,13 @@ namespace n3rv {
   /**
    * Serializes query for later sending over the net.
    */
-  std::string serialize_query(n3rv::n3rvquery& query) {
-    
-    rapidjson::PrettyWriter writer;
-
-    writer.String("action");
-    writer.String(query.action);
-
-    writer.String("payload");
-    writer.String(query.payload);
-
-    return writer.str();
-
-  }
+  std::string serialize_query(n3rv::n3rvquery& query);
 
   /**
    * Parses a raw query comming from a service and 
    * puts it inside a n3rvquery structure.
    */
-  n3rv::n3rvquery parse_query(std::string query) {
-
-    n3rv::n3rvquery query_;
-
-    rapidjson::Document d;
-    d.Parse<0>(query.c_str()); 
-
-    assert(d.IsObject());
-    assert(d["action"].IsString());
-    assert(d["args"].IsArray());
-    assert(d["payload"].IsString());
-
-    query_.action = d["action"].GetString();
-    query_.payload = d["payload"].GetString();
-
-    for (int i=0;i< d["args"].Size();i++) {
-      query_.args.emplace_back( d["args"][i].GetString() );
-    }
-
-    return query_;
-
-  }
-
+  n3rv::n3rvquery parse_query(std::string query);
 }
 
 #endif
