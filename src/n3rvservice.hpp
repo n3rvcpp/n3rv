@@ -20,10 +20,11 @@ namespace n3rv {
             std::string controller_host, 
             int controller_port, 
             int service_port);
-            
+
     ~service();
     int subscribe();
     int unsubscribe();
+    int recv_loop();
 
   protected:
 
@@ -36,6 +37,9 @@ namespace n3rv {
    std::map<std::string, zmq::socket_t*> connections;
 
    zmq::context_t zctx;
+
+   int last_nconn;
+   std::vector<std::string> last_connlist;
 
   };
 

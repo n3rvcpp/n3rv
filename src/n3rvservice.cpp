@@ -39,6 +39,50 @@ namespace n3rv {
 
   }
 
+
+  int service::recv_loop() {
+
+    this->last_nconn = this->connections.size();
+    this->last_connlist.clear();
+
+    //std::vector<zmq::pollitem_t> items;
+    zmq::pollitem_t* items  = (zmq::pollitem_t*) malloc(sizeof(zmq::pollitem_t) * this->last_nconn );
+    zmq::message_t message;
+
+    int i = 0;
+    for(std::map<std::string, zmq::socket_t*>::iterator iter = this->connections.begin(); 
+        iter != this->connections.end(); 
+        ++iter) {
+
+      if (i >= last_nconn - 1 ) break;
+
+      std::string k = iter->first;
+      zmq::socket_t* s = iter->second;
+
+      this->last_connlist.emplace_back(k);
+
+      items[i].socket  = s;
+      items[i].fd = 0;
+      items[i].events = ZMQ_POLLIN;
+      items[i].revents = 0;
+      i++;
+
+    }
+
+    while(1) {
+
+       zmq::poll (&items[0], 2, -1); 
+
+       for (int j=0;j < this->last_nconn; j++) {
+         
+         if (items[j].revents & ZMQ_POLLIN) {
+            this->connections[this->last_connlist[j]]->recv(&message);
+
+         }
+       }       
+    }
+  }
+
   int service::subscribe() {
 
       n3rv::n3rvquery q1;
@@ -56,7 +100,7 @@ namespace n3rv {
       std::string to_send = serialize_query(q1);
 
       //std::cout << "to_send:" << to_send << std::endl;
-      
+
       zmq::message_t req (to_send.size());
       memcpy (req.data(), to_send.data() , to_send.size());
 
