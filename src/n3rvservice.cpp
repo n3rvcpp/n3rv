@@ -35,6 +35,21 @@ namespace n3rv {
 
   }
 
+  int service::connect(std::string name, int bind_type) {
+
+    n3rv::qserv s = this->directory[name];  
+    this->connections[name] = new zmq::socket_t(this->zctx, bind_type );
+    std::stringstream ep;
+    ep << "tcp://" << name << ":" << s.port;
+    this->connections[name]->connect(ep.str().c_str());
+
+  }
+
+  int service::add_bind(std::string bind_name, std::string endpoint, int bind_type ) { 
+    this->connections[bind_name] = new zmq::socket_t(this->zctx, bind_type);
+    this->connections[bind_name]->bind(endpoint.c_str());
+  }
+
   service::~service() {
 
   }
@@ -70,7 +85,7 @@ namespace n3rv {
     }
 
     while(1) {
-
+       
        zmq::poll (&items[0], 2, -1); 
 
        for (int j=0;j < this->last_nconn; j++) {
@@ -78,10 +93,19 @@ namespace n3rv {
          if (items[j].revents & ZMQ_POLLIN) {
             this->connections[this->last_connlist[j]]->recv(&message);
 
+            if ( this->chmap.find(this->last_connlist[j]) != this->chmap.end() ) {
+              (*this->chmap[this->last_connlist[j]])((void*) &message);
+            }
          }
        }       
     }
   }
+
+
+  int service::attach(std::string connection_name, fctptr ptr) {
+    this->chmap[connection_name]  = ptr;
+  }
+
 
   int service::subscribe() {
 

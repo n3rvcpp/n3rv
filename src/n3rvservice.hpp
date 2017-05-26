@@ -26,6 +26,11 @@ namespace n3rv {
     int unsubscribe();
     int recv_loop();
 
+    int connect(std::string name, int bind_type);
+    int add_bind(std::string bind_name, std::string endpoint, int bind_type );
+
+    int attach(std::string connection_name, fctptr ptr);
+
   protected:
 
    std::string service_class;
@@ -37,6 +42,8 @@ namespace n3rv {
    std::map<std::string, zmq::socket_t*> connections;
 
    zmq::context_t zctx;
+
+   std::map<std::string, fctptr> chmap;
 
    int last_nconn;
    std::vector<std::string> last_connlist;

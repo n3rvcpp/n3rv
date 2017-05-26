@@ -13,7 +13,7 @@ namespace n3rv {
         std::string service_class;
         unsigned int port;
     } qserv;
-    
+
     //WE WILL PROBABLY GEt RID OF SERVICE CLASSES AND BIDINGS, BECAUSE TOPOLOGY WILl BE HARD-CODED INTO SERVICES.
 
     /**
@@ -37,6 +37,9 @@ namespace n3rv {
         std::vector<n3rv::binding> binds;
 
     } service_class;
+
+
+    typedef void* (*fctptr)(void*);
 
 }
 
