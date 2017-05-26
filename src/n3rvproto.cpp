@@ -1,6 +1,12 @@
 #include "n3rvproto.hpp"
+#include <iostream>
 
 namespace n3rv {
+
+  /** Fixes a nasty bug with zmq/debian */
+  void t128bug(std::string& q) {
+    if (q.size() % 128 == 0) q += "\n";
+  }
 
   std::string serialize_query(n3rv::n3rvquery& query) {
     
@@ -27,7 +33,10 @@ namespace n3rv {
     writer.String(query.payload.c_str());
     writer.EndObject();
 
-    return sb.GetString();
+    std::string result = sb.GetString();
+
+    t128bug(result);
+    return result;
 
   }
 
@@ -39,10 +48,12 @@ namespace n3rv {
     d.Parse<0>(query.c_str()); 
 
     assert(d.IsObject());
+    assert(d["sender"].IsString());
     assert(d["action"].IsString());
     assert(d["args"].IsArray());
     assert(d["payload"].IsString());
 
+    query_.sender = d["sender"].GetString();
     query_.action = d["action"].GetString();
     query_.payload = d["payload"].GetString();
 
@@ -51,6 +62,37 @@ namespace n3rv {
     }
 
     return query_;
+  }
+  
+  std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory){
+
+    rapidjson::StringBuffer sb; 
+    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+
+    writer.StartArray();
+    
+    for(std::map<std::string, n3rv::qserv>::iterator iter = directory.begin(); 
+        iter != directory.end(); 
+        ++iter) {
+
+       std::string k =  iter->first;
+
+       writer.StartObject();
+
+       writer.String("name");
+       writer.String(k.c_str());
+       writer.String("service_class");
+       writer.String(directory[k].service_class.c_str());
+       writer.String("port");
+       writer.Int(directory[k].port);
+
+       writer.EndObject();
+    }
+
+    writer.EndArray();
+
+    return sb.GetString();
+
   }
 
 }

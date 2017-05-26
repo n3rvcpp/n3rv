@@ -4,6 +4,9 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include <vector>
+#include <map>
+
+#include "n3rvcommon.hpp"
 
 namespace n3rv {
 
@@ -21,15 +24,22 @@ namespace n3rv {
   } n3rvresponse;
 
   /**
-   * Serializes query for later sending over the net.
+   * Serializes query for later sending over the net as a JSON string.
    */
   std::string serialize_query(n3rv::n3rvquery& query);
 
   /**
-   * Parses a raw query comming from a service and 
+   * Parses a JSON query comming from a service and 
    * puts it inside a n3rvquery structure.
    */
   n3rv::n3rvquery parse_query(std::string query);
+
+
+  /**
+   * Performs the JSON-serialization of a services directory. 
+   */
+  std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory);
+
 }
 
 #endif

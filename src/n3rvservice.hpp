@@ -15,7 +15,12 @@ namespace n3rv {
 
    public:
 
-    service(std::string service_class, std::string controller_host, int controller_port, int service_port);
+    service(std::string name, 
+            std::string service_class, 
+            std::string controller_host, 
+            int controller_port, 
+            int service_port);
+            
     ~service();
     int subscribe();
     int unsubscribe();

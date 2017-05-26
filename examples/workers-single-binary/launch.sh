@@ -7,7 +7,7 @@ TERM="xterm"
 $TERM -hold -title "Service Controller" -geometry "80x40+100+100" -e "./workers-single -t ctl -l 10001" &
 
 #launches worker service 1
-$TERM -title "Worker 1" -geometry "80x40+600+100" -e "./workers-single -s worker -c 127.0.0.1 -p 10001 -l 10002" &
+$TERM -hold -title "Worker 1" -geometry "80x40+600+100" -e "./workers-single -n worker1 -s worker -c 127.0.0.1 -p 10001 -l 11001" &
 
 #launches worker service 2
-$TERM -title "Worker 2" -geometry "80x40+1100+100" -e "./workers-single -s worker -c 127.0.0.1 -p 10001 -l 10003" &
+$TERM -hold -title "Worker 2" -geometry "80x40+1100+100" -e "./workers-single -n worker2 -s worker -c 127.0.0.1 -p 10001 -l 11002" &

@@ -10,10 +10,11 @@ namespace n3rv {
      * qserv aims to store each services directory entries.
      */
     typedef struct qserv_ {
-        std::string host;
+        std::string service_class;
         unsigned int port;
     } qserv;
-
+    
+    //WE WILL PROBABLY GEt RID OF SERVICE CLASSES AND BIDINGS, BECAUSE TOPOLOGY WILl BE HARD-CODED INTO SERVICES.
 
     /**
      * binding structure aims to store configuration for a zmq socket.

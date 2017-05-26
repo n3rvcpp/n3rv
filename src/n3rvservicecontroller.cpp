@@ -6,6 +6,7 @@ namespace n3rv {
 
         this->zctx = zmq::context_t(1);
         this->zmsock = new zmq::socket_t(this->zctx, ZMQ_REP);
+        this->zmsock_pub = new zmq::socket_t(this->zctx, ZMQ_PUB);
 
         this->binding_addr = binding_addr;
         this->binding_port = binding_port;
@@ -15,28 +16,52 @@ namespace n3rv {
         std::cout << "Binding service Controller on " << ss.str() << ".." << std::endl;
 
         zmsock->bind(ss.str().c_str());
+        //zmsock->setsockopt(ZMQ_RCVTIMEO,1);
+
+        ss.str(std::string());
+        ss.clear();
+
+        ss << "tcp://" << this->binding_addr << ":" << (this->binding_port + 1);
+        std::cout << "Binding service Controller on " << ss.str() << ".." << std::endl;
+
+        zmsock_pub->bind(ss.str().c_str());
 
       }
+
+
+  void servicecontroller::send_directory_update() {
+
+       
+
+    
+
+  }
 
   void servicecontroller::recv() {
 
         zmq::message_t query;
         while(true) {
+            
+            if (zmsock->recv(&query) != 0 ) {
 
-            zmsock->recv(&query);
-            n3rv::n3rvquery q1 = parse_query((char*) query.data());
+              n3rv::n3rvquery q1 = parse_query((char*) query.data());
 
-            if ( q1.action == "subscribe"  ) {
-              std::cout << "SUBSCRIPTION OK!" << std::endl;
+              if ( q1.action == "subscribe"  ) {
+                std::cout << "SUBSCRIPTION OK!" << std::endl;
               
-              zmq::message_t reply(2);
-              memcpy(reply.data(),"OK",2);
-              zmsock->send(reply);
+                n3rv::qserv nserv;
+                nserv.service_class = q1.args[0];
+                nserv.port = atoi(q1.args[1].c_str());
+                this->directory[q1.sender] = nserv;
 
+                //std::cout << serialize_directory(this->directory) << std::endl;
+
+                zmq::message_t reply(2);
+                memcpy(reply.data(),"OK",2);
+                zmsock->send(reply);
+              }
             }
-
         }
-
-  }
+    }
 
 }

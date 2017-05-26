@@ -14,9 +14,10 @@ namespace n3rv {
   class servicecontroller {
 
     public:
-    
+
       servicecontroller(std::string binding_addr, unsigned int binding_port);
       void recv();
+      void send_directory_update();
 
     protected:
 
@@ -24,8 +25,8 @@ namespace n3rv {
       unsigned int binding_port;
       zmq::context_t zctx;
       zmq::socket_t* zmsock;
-      std::map<std::string, n3rv::qserv> registered_services;
-
+      zmq::socket_t* zmsock_pub;
+      std::map<std::string, n3rv::qserv> directory;
   };
 
 }
