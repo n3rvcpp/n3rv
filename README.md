@@ -1,6 +1,10 @@
 n3rv, C++ Microservices powered by Zeromq
 =========================================
 
+
+![N3RV LOGO](/resources/images/n3rv.png?raw=true "n3rv logo")
+
+
 About
 -----
 
@@ -9,7 +13,8 @@ n3rv is a project that aims to provide an easy-to use microservice infrastructur
 Project Dependancies
 --------------------
 
-* libzmq 4.0+
+* libzmq 3.2+ (zeromq/libzmq)
+* rapidjson (miloyip/rapidjson)
 * cmake 2.6+
 
 Build
