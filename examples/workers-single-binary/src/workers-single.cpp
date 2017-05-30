@@ -7,7 +7,11 @@
 /** We inherit n3rv service class to create our own service ! */
 class worker: public n3rv::service {
   using n3rv::service::service;
-  
+
+};
+
+class vent: public n3rv::service {
+  using n3rv::service::service;
 };
 
 
@@ -25,7 +29,7 @@ int main(int argc, char** argv) {
 
   }
 
-  else {
+  else if (strcmp(argv[4], "worker") == 0) {
 
     std::cout << "Running Worker.." << std::endl;
 
@@ -35,7 +39,15 @@ int main(int argc, char** argv) {
 
   }
 
+  else if (strcmp(argv[4],"vent") == 0) {
 
+    std::cout << "Running Ventiler.." << std::endl;
+
+    vent v1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
+    v1.subscribe();
+    v1.run();
+
+  }
 
 
 }
