@@ -35,10 +35,10 @@ namespace n3rv {
 
   }
 
-  int service::connect(std::string name, int bind_type) {
+  int service::connect(std::string name, int connection_type) {
 
     n3rv::qserv s = this->directory[name];  
-    this->connections[name] = new zmq::socket_t(this->zctx, bind_type );
+    this->connections[name] = new zmq::socket_t(this->zctx, connection_type );
     std::stringstream ep;
     ep << "tcp://" << name << ":" << s.port;
     this->connections[name]->connect(ep.str().c_str());
@@ -46,8 +46,10 @@ namespace n3rv {
   }
 
   int service::add_bind(std::string bind_name, std::string endpoint, int bind_type ) { 
+    std::stringstream ep;
+    ep << "tcp://" << endpoint;
     this->connections[bind_name] = new zmq::socket_t(this->zctx, bind_type);
-    this->connections[bind_name]->bind(endpoint.c_str());
+    this->connections[bind_name]->bind(ep.str().c_str());
   }
 
   service::~service() {
@@ -55,7 +57,10 @@ namespace n3rv {
   }
 
 
-  int service::recv_loop() {
+  int service::run() {
+
+    zmq::context_t ctx2(1);
+    zmq::socket_t foo(ctx2,ZMQ_REQ);
 
     this->last_nconn = this->connections.size();
     this->last_connlist.clear();
@@ -74,9 +79,13 @@ namespace n3rv {
       std::string k = iter->first;
       zmq::socket_t* s = iter->second;
 
+      //s->setsockopt(ZMQ_RCVTIMEO,1);
+
+      std::cout << "Adding " << k << " to poller (" << s << ")" << std::endl;
+
       this->last_connlist.emplace_back(k);
 
-      items[i].socket  = s;
+      items[i].socket  = &foo;
       items[i].fd = 0;
       items[i].events = ZMQ_POLLIN;
       items[i].revents = 0;
@@ -84,9 +93,14 @@ namespace n3rv {
 
     }
 
+    /** Main service loop, listens to open connections and forwards 
+     * the data to the correct handler.
+     */
     while(1) {
        
-       zmq::poll (&items[0], 2, -1); 
+       std::cout << "sock_conn: " << items[0].socket << std::endl;
+
+       zmq::poll (items,this->last_nconn, 500); 
 
        for (int j=0;j < this->last_nconn; j++) {
          
@@ -94,16 +108,22 @@ namespace n3rv {
             this->connections[this->last_connlist[j]]->recv(&message);
 
             if ( this->chmap.find(this->last_connlist[j]) != this->chmap.end() ) {
-              (*this->chmap[this->last_connlist[j]])((void*) &message);
+              (*this->chmap[this->last_connlist[j]])(&message);
             }
          }
-       }       
+       } 
+
+       this->hkloop();      
     }
+
   }
 
+  void service::hkloop() {
 
-  int service::attach(std::string connection_name, fctptr ptr) {
-    this->chmap[connection_name]  = ptr;
+  }
+
+  int service::attach(std::string connection_name, fctptr callback) {
+    this->chmap[connection_name]  = callback;
   }
 
 

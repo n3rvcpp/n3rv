@@ -2,6 +2,7 @@
 #define N3RV_COMMON
 
 #include <vector>
+#include <zmq.hpp>
 
 
 namespace n3rv {
@@ -39,7 +40,7 @@ namespace n3rv {
     } service_class;
 
 
-    typedef void* (*fctptr)(void*);
+    typedef void* (*fctptr)(zmq::message_t*);
 
 }
 

@@ -4,13 +4,11 @@
 #include <iostream>
 
 
-typedef struct opts_ {
-
-  std::string type;
-  std::string ctl_addr;
-  int ctl_port;
-
-} opts;
+/** We inherit n3rv service class to create our own service ! */
+class worker: public n3rv::service {
+  using n3rv::service::service;
+  
+};
 
 
 int main(int argc, char** argv) {
@@ -31,8 +29,9 @@ int main(int argc, char** argv) {
 
     std::cout << "Running Worker.." << std::endl;
 
-    n3rv::service w1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
+    worker w1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
     w1.subscribe();
+    w1.run();
 
   }
 
