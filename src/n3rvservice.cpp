@@ -59,13 +59,9 @@ namespace n3rv {
 
   int service::run() {
 
-    zmq::context_t ctx2(1);
-    zmq::socket_t foo(ctx2,ZMQ_REQ);
-
     this->last_nconn = this->connections.size();
     this->last_connlist.clear();
 
-    //std::vector<zmq::pollitem_t> items;
     zmq::pollitem_t* items  = (zmq::pollitem_t*) malloc(sizeof(zmq::pollitem_t) * this->last_nconn );
     zmq::message_t message;
 
@@ -79,13 +75,10 @@ namespace n3rv {
       std::string k = iter->first;
       zmq::socket_t* s = iter->second;
 
-      //s->setsockopt(ZMQ_RCVTIMEO,1);
-
-      std::cout << "Adding " << k << " to poller (" << s << ")" << std::endl;
-
       this->last_connlist.emplace_back(k);
 
-      items[i].socket  = &foo;
+      //JEEEZZZZZ, that sucks !
+      items[i].socket = static_cast<void*> (*s);
       items[i].fd = 0;
       items[i].events = ZMQ_POLLIN;
       items[i].revents = 0;
@@ -98,8 +91,6 @@ namespace n3rv {
      */
     while(1) {
        
-       std::cout << "sock_conn: " << items[0].socket << std::endl;
-
        zmq::poll (items,this->last_nconn, 500); 
 
        for (int j=0;j < this->last_nconn; j++) {
