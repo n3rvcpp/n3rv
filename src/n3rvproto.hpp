@@ -40,6 +40,12 @@ namespace n3rv {
    */
   std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory);
 
+  /**
+   * Performs parsing of JSON dirstring.
+   */
+  std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr);
+  
+
 }
 
 #endif

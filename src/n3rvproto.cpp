@@ -64,6 +64,33 @@ namespace n3rv {
     return query_;
   }
   
+
+
+  std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr) {
+
+    std::map<std::string, n3rv::qserv> result;
+
+    rapidjson::Document d;
+    d.Parse<0>(dirstr.c_str());
+    assert(d.IsArray());
+
+    for (int i =0; i < d.Size(); i++ ) {
+
+      assert(d[i]["name"].IsString());
+      assert(d[i]["service_class"].IsString());
+      assert(d[i]["port"].IsInt());
+
+      std::string name = d[i]["name"].GetString();
+
+      result[name].service_class = d[i]["service_class"].GetString();
+      result[name].port = d[i]["port"].GetInt();
+
+    }
+
+    return result;
+  }
+
+
   std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory){
 
     rapidjson::StringBuffer sb; 

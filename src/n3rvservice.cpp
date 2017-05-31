@@ -8,7 +8,7 @@ namespace n3rv {
                    int controller_port, 
                    int service_port) {
 
-        this->zctx = zmq::context_t(1);
+        this->zctx = zmq::context_t(2);
 
         this->name = name;
         this->service_class = service_class;
@@ -31,7 +31,12 @@ namespace n3rv {
         ss.clear();
 
         ss << "tcp://" << controller_host << ":" << (controller_port + 1);
+        std::cout << ss.str() << std::endl;
+        this->connections["controller_c2"]->setsockopt(ZMQ_SUBSCRIBE,"");
         this->connections["controller_c2"]->connect(ss.str().c_str());
+      
+        //attaches controller_c2 to 
+        this->attach("controller_c2",this->directory_update);
 
   }
 
@@ -91,11 +96,15 @@ namespace n3rv {
      */
     while(1) {
        
+       std::cout << "MLOOOOP" << std::endl;
        zmq::poll (items,this->last_nconn, 500); 
 
        for (int j=0;j < this->last_nconn; j++) {
          
          if (items[j].revents & ZMQ_POLLIN) {
+
+            std::cout << "RECV_DETECTED ON SOCKET "  << j << std::endl;
+
             this->connections[this->last_connlist[j]]->recv(&message);
 
             if ( this->chmap.find(this->last_connlist[j]) != this->chmap.end() ) {
@@ -141,9 +150,21 @@ namespace n3rv {
 
       this->connections["controller_c1"]->send(req);
 
+      //Waits for response
+      zmq::message_t r1;
+      this->connections["controller_c1"]->recv(&r1);
+      //std::cout << "RESP:" << (char*) r1.data() << std::endl;
+
       return 0;
 
   }
 
+
+  void* service::directory_update(zmq::message_t* dirmsg) {
+
+    std::cout << "Updating Directory" << std::endl;
+    
+    
+  }
 
 }

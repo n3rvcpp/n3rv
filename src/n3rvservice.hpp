@@ -85,7 +85,8 @@ namespace n3rv {
 
   protected:
    
-
+    /** Directory updates message handling callback */
+    static void* directory_update(zmq::message_t* dirmsg);
 
    std::string service_class;
    std::string name;

@@ -13,4 +13,4 @@ $TERM -hold -title "Worker 1" -geometry "80x20+600+100" -e "./workers-single -n 
 $TERM -hold -title "Worker 2" -geometry "80x20+1100+100" -e "./workers-single -n worker2 -s worker -c 127.0.0.1 -p 10001 -l 11002" &
 
 #launches ventiler service 1
-$TERM -hold -title "Ventiler 1" -geometry "80x20+100+400" -e "./workers-single -n ventiler1 -s vent -c 127.0.0.1 -p 10001 -l 11002" &
+$TERM -hold -title "Ventiler 1" -geometry "80x20+100+400" -e "./workers-single -n ventiler1 -s vent -c 127.0.0.1 -p 10001 -l 11003" &
