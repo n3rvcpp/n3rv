@@ -8,7 +8,7 @@ namespace n3rv {
                    int controller_port, 
                    int service_port) {
 
-        this->zctx = zmq::context_t(2);
+        this->zctx = zmq::context_t(1);
 
         this->name = name;
         this->service_class = service_class;
@@ -32,8 +32,9 @@ namespace n3rv {
 
         ss << "tcp://" << controller_host << ":" << (controller_port + 1);
         std::cout << ss.str() << std::endl;
-        this->connections["controller_c2"]->setsockopt(ZMQ_SUBSCRIBE,"");
         this->connections["controller_c2"]->connect(ss.str().c_str());
+        this->connections["controller_c2"]->setsockopt(ZMQ_SUBSCRIBE,"",0);
+
       
         //attaches controller_c2 to 
         this->attach("controller_c2",this->directory_update);
@@ -80,6 +81,8 @@ namespace n3rv {
       std::string k = iter->first;
       zmq::socket_t* s = iter->second;
 
+      if (k == "controller_c1") continue;
+
       this->last_connlist.emplace_back(k);
 
       //JEEEZZZZZ, that sucks !
@@ -96,14 +99,11 @@ namespace n3rv {
      */
     while(1) {
        
-       std::cout << "MLOOOOP" << std::endl;
-       zmq::poll (items,this->last_nconn, 500); 
+       zmq::poll (items,this->last_connlist.size(), 1000);
 
-       for (int j=0;j < this->last_nconn; j++) {
+       for (int j=0;j < this->last_connlist.size(); j++) {
          
          if (items[j].revents & ZMQ_POLLIN) {
-
-            std::cout << "RECV_DETECTED ON SOCKET "  << j << std::endl;
 
             this->connections[this->last_connlist[j]]->recv(&message);
 
@@ -111,7 +111,7 @@ namespace n3rv {
               (*this->chmap[this->last_connlist[j]])(&message);
             }
          }
-       } 
+       }
 
        this->hkloop();      
     }
@@ -162,8 +162,12 @@ namespace n3rv {
 
   void* service::directory_update(zmq::message_t* dirmsg) {
 
-    std::cout << "Updating Directory" << std::endl;
+    std::cout << "Updating Directory.." << std::endl;
+    std::string foo = (char*) dirmsg->data();
+
     
+
+
     
   }
 

@@ -4,6 +4,8 @@
 #include <zmq.hpp>
 #include <sstream>
 #include <iostream>
+#include <unistd.h>
+
 
 #include <map>
 #include "n3rvcommon.hpp"

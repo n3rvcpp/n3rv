@@ -60,11 +60,12 @@ namespace n3rv {
                 memcpy(reply.data(),"OK",2);
                 zmsock->send(reply);
 
-                 std::string newdict =  serialize_directory(this->directory) ;
+                sleep(1);
+                std::string newdict =  serialize_directory(this->directory) ;
 
                  //Sends directory update to whole pool of connected nodes.
-                zmq::message_t to_send(2);
-                memcpy(to_send.data(), "DI",2);
+                zmq::message_t to_send(newdict.size());
+                memcpy(to_send.data(),newdict.data(),newdict.size());
                 std::cout << "Sending directory update..:" << (char*) to_send.data() << std::endl;
                 zmsock_pub->send(to_send);
                 
