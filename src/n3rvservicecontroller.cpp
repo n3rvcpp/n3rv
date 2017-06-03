@@ -29,14 +29,6 @@ namespace n3rv {
       }
 
 
-  void servicecontroller::send_directory_update() {
-
-       
-
-    
-
-  }
-
   void servicecontroller::recv() {
 
         zmq::message_t query;
@@ -63,7 +55,7 @@ namespace n3rv {
                 sleep(1);
                 std::string newdict =  serialize_directory(this->directory) ;
 
-                 //Sends directory update to whole pool of connected nodes.
+                 //Sends new directory to whole pool of connected nodes.
                 zmq::message_t to_send(newdict.size());
                 memcpy(to_send.data(),newdict.data(),newdict.size());
                 std::cout << "Sending directory update..:" << (char*) to_send.data() << std::endl;

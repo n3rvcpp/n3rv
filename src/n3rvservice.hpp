@@ -33,6 +33,12 @@ namespace n3rv {
             int controller_port, 
             int service_port);
     
+    /** Service class initializer. Empty for base service class, but inheriting classes
+     *  can use it to initialize new connections and make attachements.
+     */
+    int initialize();
+
+
     /** service class destructor. */
     ~service();
 
@@ -86,15 +92,15 @@ namespace n3rv {
   protected:
    
     /** Directory updates message handling callback */
-    static void* directory_update(zmq::message_t* dirmsg);
+    static void* directory_update(void* objref, zmq::message_t* dirmsg);
 
    std::string service_class;
    std::string name;
    std::string controller_host;
    int controller_port;
    int service_port;
-   std::map<std::string, qserv> directory;
-   std::map<std::string, zmq::socket_t*> connections;
+   std::map<std::string, n3rv::qserv> directory;
+   std::map<std::string, n3rv::qconn> connections;
 
    zmq::context_t zctx;
 

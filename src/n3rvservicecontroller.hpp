@@ -19,7 +19,6 @@ namespace n3rv {
 
       servicecontroller(std::string binding_addr, unsigned int binding_port);
       void recv();
-      void send_directory_update();
 
     protected:
 

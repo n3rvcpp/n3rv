@@ -45,7 +45,6 @@ namespace n3rv {
    */
   std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr);
   
-
 }
 
 #endif

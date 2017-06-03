@@ -16,8 +16,8 @@ namespace n3rv {
         this->controller_port = controller_port;
         this->service_port= service_port;
 
-        this->connections["controller_c1"] = new zmq::socket_t(this->zctx,ZMQ_REQ);
-        this->connections["controller_c2"] = new zmq::socket_t(this->zctx,ZMQ_SUB);
+        this->connections["controller_c1"].socket = new zmq::socket_t(this->zctx,ZMQ_REQ);
+        this->connections["controller_c2"].socket = new zmq::socket_t(this->zctx,ZMQ_SUB);
 
         //connects to controller.
         std::stringstream ss;
@@ -25,15 +25,15 @@ namespace n3rv {
 
         std::cout << "Connecting to " << controller_host << " controller.." << std::endl;
 
-        this->connections["controller_c1"]->connect(ss.str().c_str());
+        this->connections["controller_c1"].socket->connect(ss.str().c_str());
 
         ss.str(std::string());
         ss.clear();
 
         ss << "tcp://" << controller_host << ":" << (controller_port + 1);
         std::cout << ss.str() << std::endl;
-        this->connections["controller_c2"]->connect(ss.str().c_str());
-        this->connections["controller_c2"]->setsockopt(ZMQ_SUBSCRIBE,"",0);
+        this->connections["controller_c2"].socket->connect(ss.str().c_str());
+        this->connections["controller_c2"].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
 
       
         //attaches controller_c2 to 
@@ -44,21 +44,25 @@ namespace n3rv {
   int service::connect(std::string name, int connection_type) {
 
     n3rv::qserv s = this->directory[name];  
-    this->connections[name] = new zmq::socket_t(this->zctx, connection_type );
+    this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
     std::stringstream ep;
     ep << "tcp://" << name << ":" << s.port;
-    this->connections[name]->connect(ep.str().c_str());
+    this->connections[name].socket->connect(ep.str().c_str());
 
   }
 
   int service::add_bind(std::string bind_name, std::string endpoint, int bind_type ) { 
     std::stringstream ep;
     ep << "tcp://" << endpoint;
-    this->connections[bind_name] = new zmq::socket_t(this->zctx, bind_type);
-    this->connections[bind_name]->bind(ep.str().c_str());
+    this->connections[bind_name].socket = new zmq::socket_t(this->zctx, bind_type);
+    this->connections[bind_name].socket->bind(ep.str().c_str());
   }
 
   service::~service() {
+
+  }
+
+  int service::initialize() {
 
   }
 
@@ -72,14 +76,14 @@ namespace n3rv {
     zmq::message_t message;
 
     int i = 0;
-    for(std::map<std::string, zmq::socket_t*>::iterator iter = this->connections.begin(); 
+    for(std::map<std::string, n3rv::qconn>::iterator iter = this->connections.begin(); 
         iter != this->connections.end(); 
         ++iter) {
 
       if (i >= last_nconn - 1 ) break;
 
       std::string k = iter->first;
-      zmq::socket_t* s = iter->second;
+      zmq::socket_t* s = iter->second.socket;
 
       if (k == "controller_c1") continue;
 
@@ -105,10 +109,10 @@ namespace n3rv {
          
          if (items[j].revents & ZMQ_POLLIN) {
 
-            this->connections[this->last_connlist[j]]->recv(&message);
+            this->connections[this->last_connlist[j]].socket->recv(&message);
 
             if ( this->chmap.find(this->last_connlist[j]) != this->chmap.end() ) {
-              (*this->chmap[this->last_connlist[j]])(&message);
+              (*this->chmap[this->last_connlist[j]])(this, &message);
             }
          }
        }
@@ -143,31 +147,27 @@ namespace n3rv {
 
       std::string to_send = serialize_query(q1);
 
-      //std::cout << "to_send:" << to_send << std::endl;
-
       zmq::message_t req (to_send.size());
       memcpy (req.data(), to_send.data() , to_send.size());
 
-      this->connections["controller_c1"]->send(req);
+      this->connections["controller_c1"].socket->send(req);
 
       //Waits for response
       zmq::message_t r1;
-      this->connections["controller_c1"]->recv(&r1);
-      //std::cout << "RESP:" << (char*) r1.data() << std::endl;
-
+      this->connections["controller_c1"].socket->recv(&r1);
       return 0;
 
   }
 
 
-  void* service::directory_update(zmq::message_t* dirmsg) {
+  void* service::directory_update(void* objref, zmq::message_t* dirmsg) {
+
+    service* self = (service*) objref;
 
     std::cout << "Updating Directory.." << std::endl;
-    std::string foo = (char*) dirmsg->data();
 
-    
-
-
+    std::string dirstring((char*) dirmsg->data(), dirmsg->size());
+    self->directory = parse_directory(dirstring);
     
   }
 

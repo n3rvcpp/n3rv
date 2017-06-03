@@ -7,6 +7,16 @@
 
 namespace n3rv {
 
+    /** qconn aims to store information about 
+     *  connections and manages zmq sockets. */
+     
+    typedef struct qconn_ {
+      int type;
+      zmq::socket_t* socket;
+      int socket_type;
+      std::vector<std::string> peers;
+    } qconn;
+
     /**
      * qserv aims to store each services directory entries.
      */
@@ -14,6 +24,7 @@ namespace n3rv {
         std::string service_class;
         unsigned int port;
     } qserv;
+
 
     //WE WILL PROBABLY GEt RID OF SERVICE CLASSES AND BIDINGS, BECAUSE TOPOLOGY WILl BE HARD-CODED INTO SERVICES.
 
@@ -40,7 +51,7 @@ namespace n3rv {
     } service_class;
 
 
-    typedef void* (*fctptr)(zmq::message_t*);
+    typedef void* (*fctptr)(void*, zmq::message_t*);
 
 }
 

@@ -8,6 +8,11 @@
 class worker: public n3rv::service {
   using n3rv::service::service;
 
+  public:
+    int initialize() {
+      this->connect("ventiler1",ZMQ_REQ);
+    }
+
 };
 
 class vent: public n3rv::service {
@@ -34,7 +39,8 @@ int main(int argc, char** argv) {
     std::cout << "Running Worker.." << std::endl;
 
     worker w1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
-    w1.subscribe();
+    w1.subscribe();    
+    w1.initialize();
     w1.run();
 
   }

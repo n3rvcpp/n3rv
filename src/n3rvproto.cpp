@@ -93,6 +93,7 @@ namespace n3rv {
 
   std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory){
 
+    std::string result;
     rapidjson::StringBuffer sb; 
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
 
@@ -117,9 +118,21 @@ namespace n3rv {
     }
 
     writer.EndArray();
+    result = sb.GetString();
+    t128bug(result);
 
-    return sb.GetString();
+    return result;
 
   }
+
+  std::string build_directory_update(std::string update_operation,n3rv::qserv& nserv) {
+
+  }
+
+  
+
+
+
+
 
 }
