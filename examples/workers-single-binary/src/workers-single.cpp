@@ -39,8 +39,10 @@ int main(int argc, char** argv) {
     std::cout << "Running Worker.." << std::endl;
 
     worker w1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
-    w1.subscribe();    
+
     w1.initialize();
+
+    w1.subscribe();    
     w1.run();
 
   }

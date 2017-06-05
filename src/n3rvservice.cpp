@@ -43,11 +43,26 @@ namespace n3rv {
 
   int service::connect(std::string name, int connection_type) {
 
-    n3rv::qserv s = this->directory[name];  
-    this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
-    std::stringstream ep;
-    ep << "tcp://" << name << ":" << s.port;
-    this->connections[name].socket->connect(ep.str().c_str());
+    std::cout << "connecting to " << name << std::endl;
+
+    if (this->directory.find(name) != this->directory.end()) {
+
+      n3rv::qserv s = this->directory[name];  
+      this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
+      std::stringstream ep;
+      ep << "tcp://" << name << ":" << s.port;
+      this->connections[name].socket->connect(ep.str().c_str());
+    }
+
+    else {
+
+      std::cout << "peer not found in directory, deferring connection.." << std::endl;
+      
+
+
+    }
+
+
 
   }
 
