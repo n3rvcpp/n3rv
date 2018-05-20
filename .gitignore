@@ -1,7 +1,8 @@
+.vscode
 *.o
 *.so
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 Makefile
-
+examples/workers-single-binary/workers-single

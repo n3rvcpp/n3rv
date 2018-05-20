@@ -8,42 +8,45 @@ namespace n3rv {
                    int controller_port, 
                    int service_port) {
 
-        this->zctx = zmq::context_t(1);
 
+        this->ll = new logger(LOGLV_NORM);
+        this->zctx = zmq::context_t(1);
         this->name = name;
         this->service_class = service_class;
         this->controller_host = controller_host;
         this->controller_port = controller_port;
         this->service_port= service_port;
 
-        this->connections["controller_c1"].socket = new zmq::socket_t(this->zctx,ZMQ_REQ);
-        this->connections["controller_c2"].socket = new zmq::socket_t(this->zctx,ZMQ_SUB);
+        // Controller has 2 I/O channels: 1 for req/resp and one for multicast 
+        // (the later mostly for directory updates). Therefore, each service must 
+        // connect to the 2 of them.
+        this->connections[CTLR_CH1].socket = new zmq::socket_t(this->zctx,ZMQ_REQ);
+        this->connections[CTLR_CH2].socket = new zmq::socket_t(this->zctx,ZMQ_SUB);
 
-        //connects to controller.
+        // Connects to controller on both channels.
         std::stringstream ss;
         ss << "tcp://" << controller_host << ":" << controller_port;
 
-        std::cout << "Connecting to " << controller_host << " controller.." << std::endl;
-
-        this->connections["controller_c1"].socket->connect(ss.str().c_str());
+        this->ll->log(LOGLV_NORM, "Connecting to " + controller_host + " controller.." );
+        this->connections[CTLR_CH1].socket->connect(ss.str().c_str());
 
         ss.str(std::string());
         ss.clear();
 
         ss << "tcp://" << controller_host << ":" << (controller_port + 1);
         std::cout << ss.str() << std::endl;
-        this->connections["controller_c2"].socket->connect(ss.str().c_str());
-        this->connections["controller_c2"].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
+        this->connections[CTLR_CH2].socket->connect(ss.str().c_str());
+        this->connections[CTLR_CH2].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
 
       
-        //attaches controller_c2 to 
-        this->attach("controller_c2",this->directory_update);
+        // Attaches controller's channel 2 to directory updater callback. 
+        this->attach(CTLR_CH2,this->directory_update);
 
   }
 
   int service::connect(std::string name, int connection_type) {
 
-    std::cout << "connecting to " << name << std::endl;
+    this->ll->log(LOGLV_NORM,"connecting to " + name);
 
     if (this->directory.find(name) != this->directory.end()) {
 
@@ -56,13 +59,9 @@ namespace n3rv {
 
     else {
 
-      std::cout << "peer not found in directory, deferring connection.." << std::endl;
+      this->ll->log(LOGLV_WARN,"peer not found in directory, deferring connection..");
       
-
-
     }
-
-
 
   }
 
@@ -100,7 +99,7 @@ namespace n3rv {
       std::string k = iter->first;
       zmq::socket_t* s = iter->second.socket;
 
-      if (k == "controller_c1") continue;
+      if (k == CTLR_CH1) continue;
 
       this->last_connlist.emplace_back(k);
 
@@ -165,11 +164,11 @@ namespace n3rv {
       zmq::message_t req (to_send.size());
       memcpy (req.data(), to_send.data() , to_send.size());
 
-      this->connections["controller_c1"].socket->send(req);
+      this->connections[CTLR_CH1].socket->send(req);
 
       //Waits for response
       zmq::message_t r1;
-      this->connections["controller_c1"].socket->recv(&r1);
+      this->connections[CTLR_CH1].socket->recv(&r1);
       return 0;
 
   }
@@ -179,8 +178,7 @@ namespace n3rv {
 
     service* self = (service*) objref;
 
-    std::cout << "Updating Directory.." << std::endl;
-
+    self->ll->log(LOGLV_DEBUG,"Updating Directory..");
     std::string dirstring((char*) dirmsg->data(), dirmsg->size());
     self->directory = parse_directory(dirstring);
     

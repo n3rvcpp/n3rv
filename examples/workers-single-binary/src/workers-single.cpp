@@ -1,6 +1,6 @@
 #include "../../../src/n3rvservicecontroller.hpp"
 #include "../../../src/n3rvservice.hpp"
-
+#include "../../../src/n3rvlogger.hpp"
 #include <iostream>
 
 
@@ -36,12 +36,12 @@ int main(int argc, char** argv) {
 
   else if (strcmp(argv[4], "worker") == 0) {
 
-    std::cout << "Running Worker.." << std::endl;
-
     worker w1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
+    w1.ll->add_dest("stdout");
+    w1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
+    w1.ll->log(n3rv::LOGLV_NORM,"Running Worker..");
 
     w1.initialize();
-
     w1.subscribe();    
     w1.run();
 
@@ -49,9 +49,11 @@ int main(int argc, char** argv) {
 
   else if (strcmp(argv[4],"vent") == 0) {
 
-    std::cout << "Running Ventiler.." << std::endl;
-
     vent v1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
+    v1.ll->add_dest("stdout");
+    v1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
+    v1.ll->log(n3rv::LOGLV_NORM,"Running Ventiler..");
+
     v1.subscribe();
     v1.run();
 

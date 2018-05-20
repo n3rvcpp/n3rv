@@ -8,6 +8,11 @@
 #include <zmq.hpp>
 #include "n3rvcommon.hpp"
 #include "n3rvproto.hpp"
+#include "n3rvlogger.hpp"
+
+
+#define CTLR_CH1 "controller_ch1"
+#define CTLR_CH2 "controller_ch2"
 
 namespace n3rv {
 
@@ -25,14 +30,19 @@ namespace n3rv {
      *  @param name The name of the service, acts as an identifier inside the cluster. 
      *  @param service_class basically describes the type of node for the instanciated service.
      *  @controller_host the ip/hostname of the controller.
-     *  @controller_port the port number on which the controller is listening. 
+     *  @controller_port the port number on which the controller is listening (ch1). 
+     *  @log_level chooses the log level at which to start service.
      */
     service(std::string name, 
             std::string service_class, 
             std::string controller_host, 
             int controller_port, 
-            int service_port);
+            int service_port
+            );
     
+    logger* ll;
+
+
     /** Service class initializer. Empty for base service class, but inheriting classes
      *  can use it to initialize new connections and make attachements.
      */
