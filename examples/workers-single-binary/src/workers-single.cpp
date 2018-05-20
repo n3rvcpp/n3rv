@@ -27,9 +27,11 @@ int main(int argc, char** argv) {
 
   if ( strcmp(argv[2],"ctl") == 0 ) {
 
-    std::cout << "Running Service Controller.." << std::endl;
-
     n3rv::servicecontroller sc("0.0.0.0", atoi(argv[4]));
+
+    sc.ll->add_dest("stdout");
+    sc.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
+    sc.ll->log(n3rv::LOGLV_NORM, "Running Service Controller..");
     sc.recv();
 
   }

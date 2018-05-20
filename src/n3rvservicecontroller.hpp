@@ -10,6 +10,7 @@
 #include <map>
 #include "n3rvcommon.hpp"
 #include "n3rvproto.hpp"
+#include "n3rvlogger.hpp"
 
 namespace n3rv {
 
@@ -19,6 +20,8 @@ namespace n3rv {
 
       servicecontroller(std::string binding_addr, unsigned int binding_port);
       void recv();
+
+      logger* ll;
 
     protected:
 

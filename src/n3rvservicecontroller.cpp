@@ -4,6 +4,8 @@ namespace n3rv {
 
   servicecontroller::servicecontroller(std::string binding_addr, unsigned int binding_port) {
 
+        this->ll = new logger(LOGLV_NORM);
+
         this->zctx = zmq::context_t(2);
         this->zmsock = new zmq::socket_t(this->zctx, ZMQ_REP);
         this->zmsock_pub = new zmq::socket_t(this->zctx, ZMQ_PUB);
@@ -12,8 +14,8 @@ namespace n3rv {
         this->binding_port = binding_port;
 
         std::stringstream ss;
-        ss << "tcp://" << this->binding_addr << ":" << this->binding_port;
-        std::cout << "Binding service Controller on " << ss.str() << ".." << std::endl;
+        ss << "tcp://" << this->binding_addr << ":" << this->binding_port;     
+        this->ll->log(LOGLV_NORM, "binding service Controller on " + ss.str() + "..");
 
         zmsock->bind(ss.str().c_str());
         //zmsock->setsockopt(ZMQ_RCVTIMEO,1);
@@ -22,8 +24,7 @@ namespace n3rv {
         ss.clear();
 
         ss << "tcp://" << this->binding_addr << ":" << (this->binding_port + 1);
-        std::cout << "Binding service Controller on " << ss.str() << ".." << std::endl;
-
+        this->ll->log(LOGLV_NORM, "binding service Controller on " + ss.str() + ".." );
         zmsock_pub->bind(ss.str().c_str());
 
       }
@@ -41,8 +42,8 @@ namespace n3rv {
               n3rv::n3rvquery q1 = parse_query((char*) query.data());
 
               if ( q1.action == "subscribe"  ) {
-                std::cout << "SUBSCRIPTION OK!" << std::endl;
-              
+
+                this->ll->log(LOGLV_DEBUG, "subscription ok");              
                 n3rv::qserv nserv;
                 nserv.service_class = q1.args[0];
                 nserv.port = atoi(q1.args[1].c_str());
@@ -58,7 +59,9 @@ namespace n3rv {
                  //Sends new directory to whole pool of connected nodes.
                 zmq::message_t to_send(newdict.size());
                 memcpy(to_send.data(),newdict.data(),newdict.size());
-                std::cout << "Sending directory update..:" << (char*) to_send.data() << std::endl;
+                std::stringstream ss;
+                ss << (char*) to_send.data();
+                this->ll->log(LOGLV_DEBUG, "sending directory update:" + ss.str());
                 zmsock_pub->send(to_send);
                 
               }
