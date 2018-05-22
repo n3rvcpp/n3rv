@@ -26,6 +26,8 @@ Build
 Once the required dependancies are satisfacted, building n3rv is quite straightforward.
 
 ```Shell
+git clone https://github.com/quotekio/n3rv
+cd n3rv
 cmake .
 make
 make install
@@ -45,7 +47,7 @@ You'll find below a basic example of how to declare a new publishing service wit
 #include <n3rv/n3rvservice.hpp>
 #include <iostream>
 
-class customservice public n3rv::service {
+class customservice: public n3rv::service {
   using n3rv::service::service;
 
     //here you can declare connections to other services 
@@ -53,7 +55,7 @@ class customservice public n3rv::service {
     int initialize() {
 
         std::stringstream ss;
-        ss << "tcp://0.0.0.0" << this->service_port;
+        ss << "tcp://0.0.0.0:" << this->service_port;
         //creates a new ZMQ socket binding of type PUBLISH
         this->add_bind("pub0",ss.str(), ZMQ_PUB);
 
