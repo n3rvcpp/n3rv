@@ -19,8 +19,8 @@ add_library(
 
 
 add_executable(
-	examples/workers-single-binary/workers-single
-	examples/workers-single-binary/src/workers-single.cpp
+	examples/workers-single-factorial/workers-single-factorial
+	examples/workers-single-factorial/src/workers-single-factorial.cpp
 )
 
 
@@ -30,7 +30,7 @@ target_link_libraries(
 )
 
 target_link_libraries(
-  examples/workers-single-binary/workers-single
+  examples/workers-single-factorial/workers-single-factorial
   n3rv
 )
 

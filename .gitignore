@@ -5,4 +5,4 @@ CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 Makefile
-examples/workers-single-binary/workers-single
+examples/workers-single-factorial/workers-single-factorial

@@ -7,6 +7,15 @@
 
 namespace n3rv {
 
+    /** stores deffered connections for later use, when service becomes available in directory.
+     */
+    typedef struct qdef_ {
+        std::string name;
+        int socket_type;
+    } qdef;
+
+
+
     /** qconn aims to store information about 
      *  connections and manages zmq sockets. */
      

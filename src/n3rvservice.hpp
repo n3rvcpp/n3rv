@@ -46,7 +46,7 @@ namespace n3rv {
     /** Service class initializer. Empty for base service class, but inheriting classes
      *  can use it to initialize new connections and make attachements.
      */
-    int initialize();
+    virtual int initialize();
 
 
     /** service class destructor. */
@@ -76,7 +76,7 @@ namespace n3rv {
      * since it will affect the rest of the service's execution. If you really need to
      * perform blocking, synchronous operations, please do them in a separate thread/process.
      */
-     void hkloop();
+     virtual void hkloop();
     
     /**
      * starts a new connection (zmq_socket) to a remote service available inside the directory.
@@ -89,6 +89,7 @@ namespace n3rv {
      * binds a new ZMQ socket if the service needs a listening socket (ZMQ_REP, ZMQ_PUB, etc..)
      * @param bind_name name of the bound connection, to identify it.
      * @param endpoint string with form "ip:port", to tell on what parameters to bind the socket.
+     * @param type kind of ZMQ socket to bind: ZMQ_REP, ZMQ_PUB, etc..
      */
     int add_bind(std::string bind_name, std::string endpoint, int bind_type );
 
@@ -99,8 +100,34 @@ namespace n3rv {
     int attach(std::string connection_name, fctptr callback);
 
 
+    /** Retrieves a service connection from the internal connections list.
+     *  @param connection_name name of the connection to retrieve.
+     *  @return the related connection object. */
+    n3rv::qconn& get_connection(std::string connection_name);
+
+    /** Conveniency function to send string data on a specified connection. 
+     *  @param connection_name name of the connection to send data to.
+     *  @param data string to send.
+     *  @param flags ZMQ send flags.
+     */
+    int send(std::string connection_name, std::string& data, int flags);
+
+    /** Conveniency function to send raw data on a specified connection. 
+     *  @param connection_name name of the connection to send data to.
+     *  @param data memory pointer of data to send.
+     *  @param size size of the memory data block.
+     *  @param flags ZMQ send flags.
+     */
+    int send(std::string connection_name, void* data, size_t size, int flags);
+
+    /** Checks for deferred connections whose endpoint 
+     * was not yet in directory, and tries to establish connection. */
+    int check_deferred();
+
   protected:
    
+    zmq::pollitem_t* refresh_pollitems();
+    
     /** Directory updates message handling callback */
     static void* directory_update(void* objref, zmq::message_t* dirmsg);
 
@@ -118,6 +145,7 @@ namespace n3rv {
 
    int last_nconn;
    std::vector<std::string> last_connlist;
+   std::vector<n3rv::qdef> deferred;
 
   };
 

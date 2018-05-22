@@ -21,7 +21,7 @@ namespace n3rv {
       servicecontroller(std::string binding_addr, unsigned int binding_port);
       void recv();
 
-      logger* ll;
+      n3rv::logger* ll;
 
     protected:
 

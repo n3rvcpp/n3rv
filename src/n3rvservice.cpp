@@ -58,9 +58,11 @@ namespace n3rv {
     }
 
     else {
-
       this->ll->log(LOGLV_WARN,"peer not found in directory, deferring connection..");
-      
+      n3rv::qdef cqd;
+      cqd.name = name;
+      cqd.socket_type = connection_type;
+      this->deferred.emplace_back(cqd);
     }
 
   }
@@ -81,13 +83,12 @@ namespace n3rv {
   }
 
 
-  int service::run() {
+  zmq::pollitem_t* service::refresh_pollitems() {
 
     this->last_nconn = this->connections.size();
-    this->last_connlist.clear();
+    this->last_connlist.clear();    
 
     zmq::pollitem_t* items  = (zmq::pollitem_t*) malloc(sizeof(zmq::pollitem_t) * this->last_nconn );
-    zmq::message_t message;
 
     int i = 0;
     for(std::map<std::string, n3rv::qconn>::iterator iter = this->connections.begin(); 
@@ -102,7 +103,7 @@ namespace n3rv {
       if (k == CTLR_CH1) continue;
 
       this->last_connlist.emplace_back(k);
-
+      
       //JEEEZZZZZ, that sucks !
       items[i].socket = static_cast<void*> (*s);
       items[i].fd = 0;
@@ -112,12 +113,22 @@ namespace n3rv {
 
     }
 
+    return items;
+
+  }
+
+
+  int service::run() {
+
+    zmq::message_t message;
+
     /** Main service loop, listens to open connections and forwards 
      * the data to the correct handler.
      */
     while(1) {
-       
-       zmq::poll (items,this->last_connlist.size(), 1000);
+
+      zmq::pollitem_t* items = this->refresh_pollitems(); 
+      zmq::poll (items,this->last_connlist.size(), 1000);
 
        for (int j=0;j < this->last_connlist.size(); j++) {
          
@@ -173,15 +184,61 @@ namespace n3rv {
 
   }
 
+  n3rv::qconn& service::get_connection(std::string connection_name) {
+     return this->connections[connection_name];
+  }
+
+
+  int service::send(std::string connection_name, std::string& data, int flags = 0) {
+    
+    zmq::message_t msg(data.size());
+    memcpy(msg.data(), data.data(), data.size());
+    this->connections[connection_name].socket->send(msg);
+
+    return 0;
+
+  }
+
+  int service::send(std::string connection_name, void* data, size_t size, int flags = 0) {
+
+    zmq::message_t msg(size);
+    memcpy(msg.data(), data, size);
+    this->connections[connection_name].socket->send(msg);
+
+    return 0;
+
+  }
+
+  int service::check_deferred() {
+
+    this->ll->log(n3rv::LOGLV_XDEBUG,"checking deferred list..");
+    std::vector<n3rv::qdef> deferred_iter(this->deferred);
+
+    int res = 0;
+    for (auto def: deferred_iter) {
+      if (this->directory.find(def.name) != this->directory.end()) {
+
+        this->ll->log(n3rv::LOGLV_NORM,"reconnecting to " + def.name);
+        this->connect(def.name, def.socket_type);
+        this->deferred.erase(this->deferred.begin() + res);
+
+        res++;
+      }
+    }
+    return res;
+  }
+
 
   void* service::directory_update(void* objref, zmq::message_t* dirmsg) {
 
     service* self = (service*) objref;
 
-    self->ll->log(LOGLV_DEBUG,"Updating Directory..");
+    self->ll->log(LOGLV_DEBUG,"updating Directory..");
     std::string dirstring((char*) dirmsg->data(), dirmsg->size());
-    self->directory = parse_directory(dirstring);
-    
+    self->directory = parse_directory(dirstring);    
+    self->check_deferred();
+
+
   }
 
 }
