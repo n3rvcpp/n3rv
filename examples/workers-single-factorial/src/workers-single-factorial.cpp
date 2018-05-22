@@ -51,11 +51,12 @@ class worker: public n3rv::service {
         for (int i=1;i<facto_pl;i++) {
           res = res * i;
         }
-        
+
         std::stringstream ss;
         ss << res;
         self->ll->log(n3rv::LOGLV_NORM, "work result: " +  ss.str());
-        self->working = false;
+
+        //self->working = false;
 
     }
 
@@ -79,8 +80,8 @@ class vent: public n3rv::service {
     static void* wl_dist(void* objref, zmq::message_t* dirmsg) {
 
       vent* self = (vent*) objref;
-      self->ll->log(n3rv::LOGLV_DEBUG, "WLDIST!");
 
+      self->ll->log(n3rv::LOGLV_NORM,"distributing new workload..");
 
       srand(time(0));
       int factor_val = rand() % 30 + 2;
