@@ -25,7 +25,7 @@ Build
 
 Once the required dependancies are satisfacted, building n3rv is quite straightforward.
 
-```
+```Shell
 cmake .
 make
 make install
@@ -41,7 +41,7 @@ Basically all he/she has to do is to inherit the n3rv::service class and define 
 
 You'll find below a basic example of how to declare a new publishing service with n3rv.
 
-```
+```C++
 #include <n3rv/n3rvservice.hpp>
 #include <iostream>
 
