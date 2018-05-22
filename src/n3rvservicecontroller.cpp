@@ -37,8 +37,6 @@ namespace n3rv {
             
             if (zmsock->recv(&query) != 0 ) {
 
-              std::cout << query.data() << std::endl;
-
               n3rv::n3rvquery q1 = parse_query((char*) query.data());
 
               if ( q1.action == "subscribe"  ) {

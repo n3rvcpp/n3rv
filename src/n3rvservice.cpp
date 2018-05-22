@@ -32,9 +32,8 @@ namespace n3rv {
 
         ss.str(std::string());
         ss.clear();
-
+        
         ss << "tcp://" << controller_host << ":" << (controller_port + 1);
-        std::cout << ss.str() << std::endl;
         this->connections[CTLR_CH2].socket->connect(ss.str().c_str());
         this->connections[CTLR_CH2].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
 
