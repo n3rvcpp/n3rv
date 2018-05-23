@@ -20,7 +20,7 @@ In order to achieve this goal, i needed a very robust and performant communicati
 
 ![arch example](/resources/images/n3rv_arch_example.png?raw=true "arch example")
 
-+++ In General
+### In General
 
 Each service developped with n3rv must first and foremost register/subscribe to a directory service, which i call "service controller". 
 Each new register or update of the directory will trigger an update of the directories in each node (service) alive, via a ZMQ publish socket.
@@ -28,7 +28,7 @@ At this point every service has the list of its own peers, therefore it can conn
 
 Note: At this point you might ask yourself "What's the point of using ZMQ if it's for adding a big SPOF to my architecture", right ? Well, that's not entirely true..What would happen if the service controller goes down ? Not much actually..all the services keep working as usual, the only setback is that you can't add new nodes to your platform until the controller becomes back up.
 
-+++ For the Devs
+### For the Devs
 
 n3rv lets you define custom service classes, all inheriting from the service 'superclass'. In these newly defined classes, you can fully describe the behaviour of your service: which connections it must bind, which are the other services it must connect to, what it should answer in such and such situations, etc..
 The framework also comes with a built-in, JSON-based messages formatting and transport mechanism, which means you don't have to care about that either. ( yet you can still send/receive raw binary data between your services if you want to ==> I also plan to add protobuf messages transport in the near futur. )
