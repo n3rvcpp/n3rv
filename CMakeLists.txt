@@ -24,15 +24,30 @@ add_executable(
 )
 
 
+add_executable(
+	examples/workers-single-factorial-hctl/workers-single-factorial-hctl
+	examples/workers-single-factorial-hctl/src/workers-single-factorial-hctl.cpp
+)
+
+
+
 target_link_libraries(
    n3rv
    zmq
+   pthread
 )
 
 target_link_libraries(
   examples/workers-single-factorial/workers-single-factorial
   n3rv
 )
+
+
+target_link_libraries(
+  examples/workers-single-factorial-hctl/workers-single-factorial-hctl
+  n3rv
+)
+
 
 
 

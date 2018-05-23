@@ -1,8 +1,6 @@
 /**
- * This example shows a basic service architecture. 1 ventiler communicating with 2 workers.
- * workers ask for jobs to the ventiler, which give them.
- * workers perform the asked computation (factorial), then display the result on their stdout.
- * Note: for continuous work delivery, just uncomment the line "self->working = false;" in runwork() function."
+ * This example shows how to hide the controller inside 
+ * another service process with the use of the start_controller() function.
  */
 
 #include "../../../src/n3rvservicecontroller.hpp"
@@ -120,18 +118,8 @@ int main(int argc, char** argv) {
   std::cout << "N3rv Workers Example -- Copyright 2018 Quotek" << std::endl;
   std::cout << "=============================================" << std::endl;
 
-  if ( strcmp(argv[2],"ctl") == 0 ) {
 
-    n3rv::servicecontroller sc("0.0.0.0", atoi(argv[4]));
-
-    sc.ll->add_dest("stdout");
-    sc.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
-    sc.ll->log(n3rv::LOGLV_NORM, "Running Service Controller..");
-    sc.recv();
-
-  }
-
-  else if (strcmp(argv[4], "worker") == 0) {
+  if (strcmp(argv[4], "worker") == 0) {
 
     worker w1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
     w1.ll->add_dest("stdout");
@@ -145,6 +133,9 @@ int main(int argc, char** argv) {
   }
 
   else if (strcmp(argv[4],"vent") == 0) {
+
+    //We start a hidden session of the controller along with the ventiler.
+    n3rv::start_controller("0.0.0.0",10001,false,4);
 
     vent v1(argv[2],argv[4], argv[6], atoi(argv[8]), atoi(argv[10]) );
     v1.ll->add_dest("stdout");
