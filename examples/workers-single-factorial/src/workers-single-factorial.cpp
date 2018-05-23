@@ -24,28 +24,25 @@ class worker: public n3rv::service {
 
       if (! this->working && this->directory.find("ventiler1") != this->directory.end() ) {
         this->ll->log(n3rv::LOGLV_DEBUG,"asking for workload..");
-        std::string wl_req_str = "WL_REQ";
-        zmq::message_t wl_req(wl_req_str.size());
-        memcpy(wl_req.data(),wl_req_str.data(),wl_req_str.size());
-        this->get_connection("ventiler1").socket->send(wl_req);
+
+        n3rv::message m;
+        m.action = "WL_REQ";
+        this->send("ventiler1", m,0);        
         working = true;
       }
       
     }
 
-    static void* runwork(void* objref, zmq::message_t* msg) {
+    static void* runwork(void* objref, zmq::message_t* zmsg) {
         
-    
+
+        n3rv::message msg = n3rv::parse_msg(zmsg);
+
         worker* self = (worker*) objref;
         self->ll->log(n3rv::LOGLV_XDEBUG,"starting work..");
         self->working = true;
-
-        char * data_ = (char*) calloc(msg->size(), sizeof(char) );
-        memcpy(data_, msg->data(), msg->size());
-        
-        std::string data = data_;
-        data = std::regex_replace(data,std::regex("WL_RESP:"),"");
-        int facto_pl = atoi(data.c_str());
+  
+        int facto_pl = atoi(msg.args[0].c_str());
 
         long long res = 1;
         for (int i=1;i<facto_pl;i++) {
@@ -77,18 +74,27 @@ class vent: public n3rv::service {
       this->attach("workers_ch", wl_dist);
     } 
 
-    static void* wl_dist(void* objref, zmq::message_t* dirmsg) {
+    static void* wl_dist(void* objref, zmq::message_t* zmsg) {
 
-      vent* self = (vent*) objref;
+      n3rv::message m_ = n3rv::parse_msg(zmsg);
 
+      if (m_.action == "WL_REQ") {
+
+        vent* self = (vent*) objref;
       self->ll->log(n3rv::LOGLV_NORM,"distributing new workload..");
 
       srand(time(0));
       int factor_val = rand() % 30 + 2;
       std::stringstream ss;
       ss << factor_val;
-      std::string foo = "WL_RESP:" + ss.str();
-      self->send("workers_ch", foo,0);
+
+      n3rv::message msg;
+      msg.action = "WL_DIST";
+      msg.args.emplace_back(ss.str());
+
+      self->send("workers_ch",msg,0);
+
+      }
 
     }
 

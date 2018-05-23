@@ -120,6 +120,12 @@ namespace n3rv {
      */
     int send(std::string connection_name, void* data, size_t size, int flags);
 
+    /** Conveniency function to send n3rv::mesage data on a specified connection. 
+     * 
+    */
+    int send(std::string connection_name, message& msg, int flags);
+
+
     /** Checks for deferred connections whose endpoint 
      * was not yet in directory, and tries to establish connection. */
     int check_deferred();

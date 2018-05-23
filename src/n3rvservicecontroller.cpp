@@ -37,15 +37,15 @@ namespace n3rv {
             
             if (zmsock->recv(&query) != 0 ) {
 
-              n3rv::n3rvquery q1 = parse_query((char*) query.data());
+              n3rv::message m = parse_msg(&query);
 
-              if ( q1.action == "subscribe"  ) {
+              if ( m.action == "subscribe"  ) {
 
                 this->ll->log(LOGLV_DEBUG, "subscription ok");              
                 n3rv::qserv nserv;
-                nserv.service_class = q1.args[0];
-                nserv.port = atoi(q1.args[1].c_str());
-                this->directory[q1.sender] = nserv;
+                nserv.service_class = m.args[0];
+                nserv.port = atoi(m.args[1].c_str());
+                this->directory[m.sender] = nserv;
 
                 zmq::message_t reply(2);
                 memcpy(reply.data(),"OK",2);

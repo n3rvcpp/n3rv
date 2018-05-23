@@ -10,29 +10,31 @@
 
 namespace n3rv {
 
-  typedef struct n3rvquery_ {
+  typedef struct message_ {
 
     std::string sender;
     std::string action;
     std::vector<std::string> args;
     std::string payload;
 
-  } n3rvquery;
+  } message;
 
-  typedef struct n3rvresponse_ {
-
-  } n3rvresponse;
-
+  
   /**
-   * Serializes query for later sending over the net as a JSON string.
+   * Serializes message for later sending over the net as a JSON string.
    */
-  std::string serialize_query(n3rv::n3rvquery& query);
+  std::string serialize_msg(n3rv::message& msg);
 
   /**
-   * Parses a JSON query comming from a service and 
+   * Parses a JSON message comming from a service and 
    * puts it inside a n3rvquery structure.
    */
-  n3rv::n3rvquery parse_query(std::string query);
+  n3rv::message parse_msg(std::string query);
+
+  /**
+   * Parses a JSON query directly from zmq message container.
+   */ 
+  n3rv::message parse_msg(zmq::message_t* msg);
 
 
   /**

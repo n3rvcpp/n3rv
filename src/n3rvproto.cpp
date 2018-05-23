@@ -8,7 +8,7 @@ namespace n3rv {
     if (q.size() % 128 == 0) q += "\n";
   }
 
-  std::string serialize_query(n3rv::n3rvquery& query) {
+  std::string serialize_msg(n3rv::message& msg) {
     
     rapidjson::StringBuffer sb; 
     rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
@@ -16,21 +16,21 @@ namespace n3rv {
     writer.StartObject();
 
     writer.String("sender");
-    writer.String(query.sender.c_str());
+    writer.String(msg.sender.c_str());
 
     writer.String("action");
-    writer.String(query.action.c_str());
+    writer.String(msg.action.c_str());
 
     writer.String("args");
-    writer.StartArray();
+    writer.StartArray();;
  
-    for (std::string arg: query.args ) {
+    for (std::string arg: msg.args ) {
       writer.String(arg.c_str());
     }
     writer.EndArray();
 
     writer.String("payload");
-    writer.String(query.payload.c_str());
+    writer.String(msg.payload.c_str());
     writer.EndObject();
 
     std::string result = sb.GetString();
@@ -40,12 +40,25 @@ namespace n3rv {
 
   }
 
-  n3rv::n3rvquery parse_query(std::string query) {
 
-    n3rv::n3rvquery query_;
+   n3rv::message parse_msg(zmq::message_t* msg) {
+    char * data_ = (char*) calloc(  msg->size() + 1 , sizeof(char) );
+    memcpy(data_, msg->data(), msg->size());
+    std::string data_s = data_;
+
+    n3rv::message q = parse_msg(data_s);
+    free(data_);
+    return q;
+    
+  }
+
+
+   n3rv::message parse_msg(std::string msg) {
+
+    n3rv::message msg_;
 
     rapidjson::Document d;
-    d.Parse<0>(query.c_str()); 
+    d.Parse<0>(msg.c_str()); 
 
     assert(d.IsObject());
     assert(d["sender"].IsString());
@@ -53,15 +66,15 @@ namespace n3rv {
     assert(d["args"].IsArray());
     assert(d["payload"].IsString());
 
-    query_.sender = d["sender"].GetString();
-    query_.action = d["action"].GetString();
-    query_.payload = d["payload"].GetString();
+    msg_.sender = d["sender"].GetString();
+    msg_.action = d["action"].GetString();
+    msg_.payload = d["payload"].GetString();
 
     for (int i=0;i< d["args"].Size();i++) {
-      query_.args.emplace_back( d["args"][i].GetString() );
+      msg_.args.emplace_back( d["args"][i].GetString() );
     }
 
-    return query_;
+    return msg_;
   }
   
 

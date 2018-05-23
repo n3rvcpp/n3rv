@@ -157,19 +157,19 @@ namespace n3rv {
 
   int service::subscribe() {
 
-      n3rv::n3rvquery q1;
-
-      q1.sender = this->name;
-      q1.action = "subscribe";
-      q1.args.emplace_back(this->service_class);
+      n3rv::message m;
+      
+      m.sender = this->name;
+      m.action = "subscribe";
+      m.args.emplace_back(this->service_class);
 
       std::stringstream ss;
       ss << this->service_port;
 
-      q1.args.emplace_back(ss.str());
-      q1.payload = "";
+      m.args.emplace_back(ss.str());
+      m.payload = "";
 
-      std::string to_send = serialize_query(q1);
+      std::string to_send = serialize_msg(m);
 
       zmq::message_t req (to_send.size());
       memcpy (req.data(), to_send.data() , to_send.size());
@@ -207,6 +207,13 @@ namespace n3rv {
     return 0;
 
   }
+
+  int service::send(std::string connection_name, message& msg, int flags=0) {
+    std::string msg_ser = serialize_msg(msg);
+    return this->send(connection_name,msg_ser, flags);
+  }
+
+
 
   int service::check_deferred() {
 
