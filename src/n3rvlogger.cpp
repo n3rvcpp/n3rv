@@ -26,8 +26,9 @@ namespace n3rv {
 
         if (dst.substr(0,7) == "file://") {
             std::string dpath = std::regex_replace(dst, std::regex("file:\\/\\/"), "");        
-            std::ofstream out(dpath);
-            this->dest_buffers.emplace_back(out.rdbuf());
+            std::ofstream* out = new std::ofstream();
+            out->open(dpath);
+            this->dest_buffers.emplace_back(out->rdbuf());
         }
 
         else if ( dst == "stdout") {
