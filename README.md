@@ -26,7 +26,7 @@ Each service developped with n3rv must first and foremost register/subscribe to 
 Each new register or update of the directory will trigger an update of the directories in each node (service) alive, via a ZMQ publish socket.
 At this point every service has the list of its own peers, therefore it can connect to them..and the magic begins !
 
-Note: At this point you might ask yourself "What's the point of using ZMQ if it's for adding a big SPOF to my architecture", right ? Well, that's not entirely true..What would happen if the service controller goes down ? Not much actually..all the services keep working as usual, the only setback is that you can't add new nodes to your platform until the controller becomes back up.
+Note: Now you might ask yourself "What's the point of using ZMQ if it's for adding a big SPOF to my architecture", right ? Well, that's not entirely true..What would happen if the service controller goes down ? Not much actually..all the services keep working as usual, the only setback is that you can't add new nodes to your platform until the controller becomes back up.
 
 ### For the Devs
 
