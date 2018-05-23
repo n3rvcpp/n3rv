@@ -2,12 +2,11 @@
 #include <n3rv/n3rvlogger.hpp>
 #include <n3rv/n3rvservicecontroller.hpp>
 
-class eval: public n3rv::service {
+class exec: public n3rv::service {
     using n3rv::service::service;
 
     public:
 
-    float dow_price = 0;
     int initialize() { 
 
         this->connect("broker1",ZMQ_SUB);

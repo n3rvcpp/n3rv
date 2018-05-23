@@ -54,6 +54,12 @@ namespace n3rv {
       std::stringstream ep;
       ep << "tcp://" << name << ":" << s.port;
       this->connections[name].socket->connect(ep.str().c_str());
+
+      //Adds sockopt if zmq socket type is ZMQ_SUB
+      if (connection_type == ZMQ_SUB) {
+        this->connections[name].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
+      }
+
     }
 
     else {
