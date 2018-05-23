@@ -5,9 +5,9 @@
  * Note: for continuous work delivery, just uncomment the line "self->working = false;" in runwork() function."
  */
 
-#include "../../../src/n3rvservicecontroller.hpp"
-#include "../../../src/n3rvservice.hpp"
-#include "../../../src/n3rvlogger.hpp"
+#include <n3rv/n3rvservicecontroller.hpp>
+#include <n3rv/n3rvservice.hpp>
+#include <n3rv/n3rvlogger.hpp>
 #include <iostream>
 
 

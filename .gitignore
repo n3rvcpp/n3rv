@@ -7,3 +7,5 @@ cmake_install.cmake
 Makefile
 examples/workers-single-factorial/workers-single-factorial
 examples/workers-single-factorial-hctl/workers-single-factorial-hctl
+examples/algotrading/broker
+examples/algotrading/eval

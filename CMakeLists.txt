@@ -7,8 +7,6 @@ SET (CMAKE_C_COMPILER       "/usr/bib/gcc")
 SET (CMAKE_CXX_FLAGS        "-g -std=c++1y -fPIC")
 SET (CMAKE_LINKER_FLAGS    "-rdynamic")
 
-add_definitions(-DQATE_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
-
 add_library(
 	n3rv SHARED
 	src/n3rvservice.cpp
@@ -17,39 +15,19 @@ add_library(
   src/n3rvproto.cpp
 )
 
-
-add_executable(
-	examples/workers-single-factorial/workers-single-factorial
-	examples/workers-single-factorial/src/workers-single-factorial.cpp
-)
-
-
-add_executable(
-	examples/workers-single-factorial-hctl/workers-single-factorial-hctl
-	examples/workers-single-factorial-hctl/src/workers-single-factorial-hctl.cpp
-)
-
-
-
 target_link_libraries(
    n3rv
    zmq
    pthread
 )
 
-target_link_libraries(
-  examples/workers-single-factorial/workers-single-factorial
-  n3rv
-)
-
-
-target_link_libraries(
-  examples/workers-single-factorial-hctl/workers-single-factorial-hctl
-  n3rv
-)
-
-
-
-
 find_library (PTHREAD pthread)
 find_library (ZMQ zmq)
+
+
+install (TARGETS n3rv DESTINATION /usr/local/lib)
+install (FILES src/n3rvcommon.hpp DESTINATION /usr/local/include/n3rv)
+install (FILES src/n3rvservice.hpp DESTINATION /usr/local/include/n3rv)
+install (FILES src/n3rvlogger.hpp DESTINATION /usr/local/include/n3rv)
+install (FILES src/n3rvproto.hpp DESTINATION /usr/local/include/n3rv)
+install (FILES src/n3rvservicecontroller.hpp DESTINATION /usr/local/include/n3rv)
