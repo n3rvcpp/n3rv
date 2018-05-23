@@ -57,9 +57,16 @@ namespace n3rv {
      */
     int subscribe();
 
+
+    /** If you need to advertize extra channels for a given service. (quite common).
+     *  Note: this is a temporary function , time to find a more convient way */
+    int subscribe_ex(std::string name, std::string sclass, int port);
+
+
     /** Gracefuly Unregisters the service from the controller,
      *  in case the service must go down. Not very useful, because the ZMQ stack takes care of this.
      */
+
     int unsubscribe();
 
     /** Main service's loop. basically manages all the established connections, 

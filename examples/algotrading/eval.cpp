@@ -19,7 +19,7 @@ class eval: public n3rv::service {
     int send_order(std::string asset, int size, float stop, float limit) {
         
         n3rv::message msg;
-        msg.action = "MARKET_ORDER";
+        msg.action = "market_order";
         msg.args.emplace_back(asset);
         std::stringstream ss;
         ss << size;
@@ -79,7 +79,7 @@ class eval: public n3rv::service {
 int main() {
 
 
-    eval e0("eval1", "evaluator", "127.0.0.1", 10001, 11002);
+    eval e0("eval1", "evaluator", "127.0.0.1", 10001, 11003);
 
     e0.ll->set_loglevel(4);
     e0.ll->add_dest("stdout");

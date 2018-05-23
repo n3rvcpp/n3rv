@@ -189,6 +189,35 @@ namespace n3rv {
 
   }
 
+  int service::subscribe_ex(std::string name, std::string sclass, int port) {
+
+      n3rv::message m;
+      
+      m.sender = name;
+      m.action = "subscribe";
+      m.args.emplace_back(sclass);
+
+      std::stringstream ss;
+      ss << port;
+
+      m.args.emplace_back(ss.str());
+      m.payload = "";
+
+      std::string to_send = serialize_msg(m);
+
+      zmq::message_t req (to_send.size());
+      memcpy (req.data(), to_send.data() , to_send.size());
+
+      this->connections[CTLR_CH1].socket->send(req);
+
+      //Waits for response
+      zmq::message_t r1;
+      this->connections[CTLR_CH1].socket->recv(&r1);
+      return 0;
+
+  }
+
+
   n3rv::qconn& service::get_connection(std::string connection_name) {
      return this->connections[connection_name];
   }

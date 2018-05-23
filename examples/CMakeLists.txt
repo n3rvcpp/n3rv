@@ -30,6 +30,12 @@ add_executable(
 	algotrading/eval.cpp
 )
 
+add_executable(
+	algotrading/exec
+	algotrading/exec.cpp
+)
+
+
 target_link_libraries(
   algotrading/broker
   n3rv
@@ -39,6 +45,14 @@ target_link_libraries(
 
 target_link_libraries(
   algotrading/eval
+  n3rv
+  zmq
+  pthread
+)
+
+
+target_link_libraries(
+  algotrading/exec
   n3rv
   zmq
   pthread

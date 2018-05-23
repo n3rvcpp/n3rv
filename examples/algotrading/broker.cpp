@@ -44,10 +44,6 @@ class broker: public n3rv::service {
 
 };
 
-
-
-
-
 int main() {
 
     //we start an hidden svc controller with broker.
@@ -58,7 +54,8 @@ int main() {
     b0.ll->add_dest("stdout");
 
     b0.initialize();
-    b0.subscribe();    
+    b0.subscribe();   
+    b0.subscribe_ex("broker1.orders","broker-orders", 11002);
     b0.run();
 
 
