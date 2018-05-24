@@ -1,6 +1,0 @@
-/usr/local/lib/libn3rv.so
-/usr/local/include/n3rv/n3rvcommon.hpp
-/usr/local/include/n3rv/n3rvservice.hpp
-/usr/local/include/n3rv/n3rvlogger.hpp
-/usr/local/include/n3rv/n3rvproto.hpp
-/usr/local/include/n3rv/n3rvservicecontroller.hpp

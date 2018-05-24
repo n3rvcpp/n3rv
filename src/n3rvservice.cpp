@@ -52,7 +52,7 @@ namespace n3rv {
       n3rv::qserv s = this->directory[name];  
       this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
       std::stringstream ep;
-      ep << "tcp://" << name << ":" << s.port;
+      ep << "tcp://" << s.ip << ":" << s.port;
       this->connections[name].socket->connect(ep.str().c_str());
 
       //Adds sockopt if zmq socket type is ZMQ_SUB

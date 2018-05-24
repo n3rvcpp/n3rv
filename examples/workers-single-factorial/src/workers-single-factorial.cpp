@@ -77,6 +77,8 @@ class vent: public n3rv::service {
 
     int initialize() {
 
+      srand(time(NULL));
+
       std::stringstream ss;
       ss << "127.0.0.1:" << this->service_port;
 
@@ -97,7 +99,6 @@ class vent: public n3rv::service {
         vent* self = (vent*) objref;
       self->ll->log(n3rv::LOGLV_NORM,"distributing new workload..");
 
-      srand(time(0));
       int factor_val = rand() % 30 + 2;
       std::stringstream ss;
       ss << factor_val;

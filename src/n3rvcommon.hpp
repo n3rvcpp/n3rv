@@ -31,6 +31,7 @@ namespace n3rv {
      */
     typedef struct qserv_ {
         std::string service_class;
+        std::string ip;
         unsigned int port;
     } qserv;
 

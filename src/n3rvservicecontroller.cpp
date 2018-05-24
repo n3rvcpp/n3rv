@@ -30,6 +30,16 @@ namespace n3rv {
       }
 
 
+  std::string servicecontroller::peer_ip(zmq::message_t* zmsg) {
+
+      std::string ip;
+      int fd = zmq_msg_get((zmq_msg_t*) zmsg, ZMQ_SRCFD);
+      zmq::get_peer_ip_address(fd, ip);
+      return ip;
+
+  }
+
+
   void servicecontroller::recv() {
 
         zmq::message_t query;
@@ -41,9 +51,11 @@ namespace n3rv {
 
               if ( m.action == "subscribe"  ) {
 
-                this->ll->log(LOGLV_DEBUG, "subscription ok");              
+                this->ll->log(LOGLV_DEBUG, "subscription ok");
+                              
                 n3rv::qserv nserv;
                 nserv.service_class = m.args[0];
+                nserv.ip = this->peer_ip(&query);
                 nserv.port = atoi(m.args[1].c_str());
                 this->directory[m.sender] = nserv;
 

@@ -91,11 +91,12 @@ namespace n3rv {
 
       assert(d[i]["name"].IsString());
       assert(d[i]["service_class"].IsString());
+      assert(d[i]["ip"].IsString());
       assert(d[i]["port"].IsInt());
 
       std::string name = d[i]["name"].GetString();
-
       result[name].service_class = d[i]["service_class"].GetString();
+      result[name].ip = d[i]["ip"].GetString();
       result[name].port = d[i]["port"].GetInt();
 
     }
@@ -124,6 +125,8 @@ namespace n3rv {
        writer.String(k.c_str());
        writer.String("service_class");
        writer.String(directory[k].service_class.c_str());
+       writer.String("ip");
+       writer.String(directory[k].ip.c_str());
        writer.String("port");
        writer.Int(directory[k].port);
 

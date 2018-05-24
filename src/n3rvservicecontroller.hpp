@@ -2,6 +2,7 @@
 #define N3RV_SERVICE_CTRL_HPP
 
 #include <zmq.hpp>
+
 #include <sstream>
 #include <iostream>
 #include <unistd.h>
@@ -11,6 +12,7 @@
 #include "n3rvcommon.hpp"
 #include "n3rvproto.hpp"
 #include "n3rvlogger.hpp"
+#include "n3rvzmq.hpp"
 
 namespace n3rv {
 
@@ -20,11 +22,11 @@ namespace n3rv {
 
       servicecontroller(std::string binding_addr, unsigned int binding_port);
       void recv();
-
       n3rv::logger* ll;
 
     protected:
 
+      std::string peer_ip(zmq::message_t* zmsg);
       std::string binding_addr;
       unsigned int binding_port;
       zmq::context_t zctx;
