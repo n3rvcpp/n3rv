@@ -13,4 +13,4 @@ $TERM -hold -title "Eval" -geometry "80x20+600+100" -e "./eval" &
 $TERM -hold -title "Exec" -geometry "80x20+1100+100" -e "./exec" &
 
 #launches ventiler service 1
-#$TERM -hold -title "Ventiler 1" -geometry "80x20+100+400" -e "./workers-single-factorial -n ventiler1 -s vent -c 127.0.0.1 -p 10001 -l 11003" &
+$TERM -hold -title "Money Manager" -geometry "80x20+100+400" -e "./moneyman" &

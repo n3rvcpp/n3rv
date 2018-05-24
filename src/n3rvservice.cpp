@@ -248,7 +248,9 @@ namespace n3rv {
     return this->send(connection_name,msg_ser, flags);
   }
 
-
+  int service::send(std::string connection_name, zmq::message_t* zmsg, int flags =0) {
+    this->connections[connection_name].socket->send(*zmsg);
+  }
 
   int service::check_deferred() {
 

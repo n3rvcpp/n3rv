@@ -35,6 +35,11 @@ add_executable(
 	algotrading/exec.cpp
 )
 
+add_executable(
+	algotrading/moneyman
+	algotrading/moneyman.cpp
+)
+
 
 target_link_libraries(
   algotrading/broker
@@ -53,6 +58,13 @@ target_link_libraries(
 
 target_link_libraries(
   algotrading/exec
+  n3rv
+  zmq
+  pthread
+)
+
+target_link_libraries(
+  algotrading/moneyman
   n3rv
   zmq
   pthread

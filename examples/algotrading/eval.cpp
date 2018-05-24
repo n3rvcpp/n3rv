@@ -12,7 +12,7 @@ class eval: public n3rv::service {
 
         this->connect("broker1",ZMQ_SUB);
         this->attach("broker1",process_data);
-        this->connect("exec1",ZMQ_REQ);
+        this->connect("exec1",ZMQ_PUSH);
 
     }
 
@@ -54,12 +54,12 @@ class eval: public n3rv::service {
 
             if (self->dow_price != 0 && self->dow_price <= 20900 ) {
                 self->ll->log(n3rv::LOGLV_NORM,"SELL SIGNAL!");
-                self->send_order("DOW",-1, 21000, 20500);
+                self->send_order("DOW_IA",-1, -5000, 2000);
             }
 
             else if (self->dow_price >= 21200) {
                 self->ll->log(n3rv::LOGLV_NORM,"BUY SIGNAL!");
-                self->send_order("DOW",1, 21000, 21500);
+                self->send_order("DOW_IA",1, -5000, 2000);
             }
         
             else if (self->dow_price != 0) {

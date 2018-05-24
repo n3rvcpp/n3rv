@@ -132,6 +132,9 @@ namespace n3rv {
     */
     int send(std::string connection_name, message& msg, int flags);
 
+    /** Conveniency function to send direct zmq::message_t data on a specified connection. */
+    int send(std::string connection_name, zmq::message_t* zmsg, int flags);
+
 
     /** Checks for deferred connections whose endpoint 
      * was not yet in directory, and tries to establish connection. */
