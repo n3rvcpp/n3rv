@@ -13,6 +13,7 @@ add_library(
   src/n3rvservicecontroller.cpp
   src/n3rvlogger.cpp
   src/n3rvproto.cpp
+  src/n3rvtopology.cpp
 )
 
 target_link_libraries(
@@ -32,3 +33,4 @@ install (FILES src/n3rvlogger.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvproto.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvzmq.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvservicecontroller.hpp DESTINATION /usr/local/include/n3rv)
+install (FILES src/n3rvtopology.hpp DESTINATION /usr/local/include/n3rv)
