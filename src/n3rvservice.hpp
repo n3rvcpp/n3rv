@@ -81,6 +81,11 @@ namespace n3rv {
      */
      virtual void hkloop();
     
+    /** This method is used essentially to map callback function pointers to an identifier string.
+     *  Can be very useful for text-defined topologies.
+     */     
+    virtual void map_callbacks();
+
     /**
      * starts a new connection (zmq_socket) to a remote service available inside the directory.
      * @param name identifier of the remote service inside the directory.
@@ -108,6 +113,9 @@ namespace n3rv {
      */
     int attach(std::string connection_name, fctptr callback);
 
+    /** Attaches a service connection to its message handler callback !
+     *  Warning: this method only works if service::cbmap was filled at map_callbacks() time. */
+    int attach(std::string connection_name, std::string callback_name);
 
     /** Retrieves a service connection from the internal connections list.
      *  @param connection_name name of the connection to retrieve.
@@ -155,9 +163,10 @@ namespace n3rv {
    int controller_port;
    std::map<std::string, n3rv::qserv> directory;
    std::map<std::string, n3rv::qconn> connections;
-
    zmq::context_t zctx;
 
+
+   std::map<std::string, fctptr> cbmap;
    std::map<std::string, fctptr> chmap;
 
    int last_nconn;

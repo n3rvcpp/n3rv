@@ -94,6 +94,10 @@ namespace n3rv {
 
   }
 
+  void service::map_callbacks() {
+
+  }
+
 
   zmq::pollitem_t* service::refresh_pollitems() {
 
@@ -166,6 +170,12 @@ namespace n3rv {
   int service::attach(std::string connection_name, fctptr callback) {
     this->chmap[connection_name]  = callback;
   }
+
+  int service::attach(std::string connection_name, std::string callback_name) {
+    this->chmap[connection_name] = this->cbmap[callback_name];
+  }
+
+
 
   int service::subscribe(std::string name, std::string sclass, int port) {
 

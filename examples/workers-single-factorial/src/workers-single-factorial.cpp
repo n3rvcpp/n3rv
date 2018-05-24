@@ -77,12 +77,18 @@ class vent: public n3rv::service {
 
     int initialize() {
 
+      this->map_callbacks();
+
       srand(time(NULL));
 
       this->ll->log(n3rv::LOGLV_NORM, "binding service..");
       this->bind("ventiler1","127.0.0.1",11003,ZMQ_REP);
-      this->attach("ventiler1", wl_dist);
+      this->attach("ventiler1", "wl_dist");
     } 
+
+    void map_callbacks() {
+      this->cbmap["wl_dist"] = wl_dist;
+    }
 
 
     /** Once a workload query has been sent, this callback generates 
