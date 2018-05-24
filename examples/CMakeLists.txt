@@ -40,6 +40,12 @@ add_executable(
 	algotrading/moneyman.cpp
 )
 
+add_executable(
+	topology-load/topology-load
+	topology-load/topology-load
+)
+
+
 
 target_link_libraries(
   algotrading/broker
@@ -84,6 +90,17 @@ target_link_libraries(
   zmq
   pthread
 )
+
+
+target_link_libraries(
+  topology-load/topology-load
+  n3rv
+  zmq
+  pthread
+)
+
+
+
 
 find_library (N3RV n3rv)
 find_library (ZMQ zmq)

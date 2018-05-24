@@ -1,20 +1,19 @@
 #ifndef __N3RV_TOPOLOGY__
 #define __N3RV_TOPOLOGY__
 
-#include "rapidjson/document.h"
 #include <map>
 #include <vector>
 
 namespace n3rv {
 
-    typedef struct binding_ {
+    typedef struct tbinding_ {
 
         public:
             std::string name;
             int port;
             std::string type;
 
-    } binding;
+    } tbinding;
 
 
     typedef struct connection_ {
@@ -34,7 +33,7 @@ namespace n3rv {
     typedef struct node_ {
 
         public:
-            std::vector<binding> bindings;
+            std::vector<tbinding> bindings;
             std::vector<connection> connections;
             std::vector<callback> callbacks;
     } node;
@@ -48,7 +47,7 @@ namespace n3rv {
         std::map<std::string, node> nodes;
 
         static topology* load(std::string topology_file);
-        static topology* parse(std::string topology_def);
+        static topology* parse(std::string& topology_def);
 
         topology() {}
 

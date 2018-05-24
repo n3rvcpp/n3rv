@@ -1,6 +1,8 @@
 #include "n3rvtopology.hpp"
 #include <iostream>
 #include <fstream>
+#include "rapidjson/document.h"
+
 
 #define topo_ "topology"
 #define binds_ "binds" 
@@ -17,7 +19,7 @@ namespace n3rv {
          std::string line;
          while(f1.good()){
             getline(f1,line);
-            topo_ct += line;
+            topo_ct += line + "\n";
          }
          f1.close();
 
@@ -26,7 +28,7 @@ namespace n3rv {
     }
 
 
-    topology* topology::parse(std::string topology_def) {
+    topology* topology::parse(std::string& topology_def) {
 
         topology* t1  = new topology();
 
@@ -45,7 +47,7 @@ namespace n3rv {
 
             for (int j=0;j< d[topo_][i][binds_].Size();j++ ) {
 
-                binding b;
+                tbinding b;
 
                 b.name = d[topo_][i][binds_][j]["name"].GetString();
                 b.port = d[topo_][i][binds_][j]["port"].GetInt();

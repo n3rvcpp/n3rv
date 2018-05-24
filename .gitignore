@@ -11,4 +11,5 @@ examples/algotrading/broker
 examples/algotrading/eval
 examples/algotrading/exec
 examples/algotrading/moneyman
+examples/topology-load/topology-load
 install_manifest.txt

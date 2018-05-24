@@ -1,0 +1,42 @@
+{
+	"topology": [
+
+		{
+			"service_class": "broker",
+			"binds": [{
+
+					"name": "stream",
+					"port": 11001,
+					"type": "ZMQ_PUB"
+
+				},
+				{
+					"name": "order",
+					"port": 11002,
+					"type": "ZMQ_REP"
+				}
+
+			],
+
+			"connects": [],
+			"callbacks": [
+				["order", "order_proc"]
+			]
+
+		},
+
+		{
+			"service_class": "moneyman",
+			"binds": [],
+			"connects": [{
+				"name": "broker.stream",
+				"type": "ZMQ_SUB"
+			}],
+			"callbacks": [
+				["broker.stream", "pnl"]
+			]
+		}
+
+	]
+}
+
