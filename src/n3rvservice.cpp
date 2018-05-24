@@ -5,8 +5,7 @@ namespace n3rv {
   service::service(std::string name, 
                    std::string service_class, 
                    std::string controller_host, 
-                   int controller_port, 
-                   int service_port) {
+                   int controller_port) {
 
 
         this->ll = new logger(LOGLV_NORM);
@@ -15,7 +14,6 @@ namespace n3rv {
         this->service_class = service_class;
         this->controller_host = controller_host;
         this->controller_port = controller_port;
-        this->service_port= service_port;
 
         // Controller has 2 I/O channels: 1 for req/resp and one for multicast 
         // (the later mostly for directory updates). Therefore, each service must 
@@ -72,12 +70,21 @@ namespace n3rv {
 
   }
 
-  int service::add_bind(std::string bind_name, std::string endpoint, int bind_type ) { 
+  int service::bind(std::string bind_name, std::string endpoint, int bind_type ) { 
+    this->connections[bind_name].socket = new zmq::socket_t(this->zctx, bind_type);
+    this->connections[bind_name].socket->bind(endpoint.c_str());
+  }
+
+  int service::bind(std::string bind_name, std::string ip, int port , int bind_type ) {
+
     std::stringstream ep;
-    ep << "tcp://" << endpoint;
+    ep << "tcp://" << ip << ":" << port;
     this->connections[bind_name].socket = new zmq::socket_t(this->zctx, bind_type);
     this->connections[bind_name].socket->bind(ep.str().c_str());
+    this->subscribe(bind_name, this->service_class, port);
+
   }
+
 
   service::~service() {
 
@@ -160,36 +167,7 @@ namespace n3rv {
     this->chmap[connection_name]  = callback;
   }
 
-
-  int service::subscribe() {
-
-      n3rv::message m;
-      
-      m.sender = this->name;
-      m.action = "subscribe";
-      m.args.emplace_back(this->service_class);
-
-      std::stringstream ss;
-      ss << this->service_port;
-
-      m.args.emplace_back(ss.str());
-      m.payload = "";
-
-      std::string to_send = serialize_msg(m);
-
-      zmq::message_t req (to_send.size());
-      memcpy (req.data(), to_send.data() , to_send.size());
-
-      this->connections[CTLR_CH1].socket->send(req);
-
-      //Waits for response
-      zmq::message_t r1;
-      this->connections[CTLR_CH1].socket->recv(&r1);
-      return 0;
-
-  }
-
-  int service::subscribe_ex(std::string name, std::string sclass, int port) {
+  int service::subscribe(std::string name, std::string sclass, int port) {
 
       n3rv::message m;
       

@@ -10,8 +10,8 @@ class eval: public n3rv::service {
     float dow_price = 0;
     int initialize() { 
 
-        this->connect("broker1",ZMQ_SUB);
-        this->attach("broker1",process_data);
+        this->connect("broker1.stream", ZMQ_SUB);
+        this->attach("broker1.stream",process_data);
         this->connect("exec1",ZMQ_PUSH);
 
     }
@@ -79,13 +79,12 @@ class eval: public n3rv::service {
 int main() {
 
 
-    eval e0("eval1", "evaluator", "127.0.0.1", 10001, 11003);
+    eval e0("eval1", "evaluator", "127.0.0.1", 10001);
 
     e0.ll->set_loglevel(4);
     e0.ll->add_dest("stdout");
 
     e0.initialize();
-    e0.subscribe();    
     e0.run();
 
 

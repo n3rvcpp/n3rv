@@ -9,7 +9,7 @@ class exec: public n3rv::service {
 
     int initialize() { 
 
-        this->add_bind("exec1","0.0.0.0:11004", ZMQ_PULL);
+        this->bind("exec1","0.0.0.0",11004, ZMQ_PULL);
         this->connect("moneyman1", ZMQ_REQ);
         //this->attach("broker1.orders",broker_resp_process);
         this->attach("exec1", process_orders);
@@ -61,14 +61,10 @@ class exec: public n3rv::service {
 
 int main() {
 
-
-    exec e0("exec1", "executor", "127.0.0.1", 10001, 11004);
-
+    exec e0("exec1", "executor", "127.0.0.1", 10001);
     e0.ll->set_loglevel(4);
     e0.ll->add_dest("stdout");
-
     e0.initialize();
-    e0.subscribe();    
     e0.run();
 
 

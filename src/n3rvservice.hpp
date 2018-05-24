@@ -36,9 +36,7 @@ namespace n3rv {
     service(std::string name, 
             std::string service_class, 
             std::string controller_host, 
-            int controller_port, 
-            int service_port
-            );
+            int controller_port);
     
     logger* ll;
 
@@ -55,12 +53,10 @@ namespace n3rv {
     /** Registers the service on the controller, 
      *  for it to update its directory and advise others a new node is available.
      */
-    int subscribe();
-
 
     /** If you need to advertize extra channels for a given service. (quite common).
      *  Note: this is a temporary function , time to find a more convient way */
-    int subscribe_ex(std::string name, std::string sclass, int port);
+    int subscribe(std::string name, std::string sclass, int port);
 
 
     /** Gracefuly Unregisters the service from the controller,
@@ -93,12 +89,18 @@ namespace n3rv {
     int connect(std::string name, int connection_type);
 
     /**
-     * binds a new ZMQ socket if the service needs a listening socket (ZMQ_REP, ZMQ_PUB, etc..)
+     * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)
+     */
+    int bind(std::string bind_name, std::string ip, int port , int bind_type );
+
+    /**
+     * binds a new RAW ZMQ socket if the service needs a listening socket (ZMQ_REP, ZMQ_PUB, etc..)
      * @param bind_name name of the bound connection, to identify it.
-     * @param endpoint string with form "ip:port", to tell on what parameters to bind the socket.
+     * @param endpoint string, to tell on what parameters to bind the socket.
      * @param type kind of ZMQ socket to bind: ZMQ_REP, ZMQ_PUB, etc..
      */
-    int add_bind(std::string bind_name, std::string endpoint, int bind_type );
+    int bind(std::string bind_name, std::string endpoint, int bind_type );
+
 
     /** Attaches a service connection to its message handler callback !
      *  @param connection_name Name of the connection to attach callback to.
@@ -151,7 +153,6 @@ namespace n3rv {
    std::string name;
    std::string controller_host;
    int controller_port;
-   int service_port;
    std::map<std::string, n3rv::qserv> directory;
    std::map<std::string, n3rv::qconn> connections;
 

@@ -27,12 +27,12 @@ class moneyman: public n3rv::service {
 
         this->GLOB_PNL = 0;
 
-        this->connect("broker1", ZMQ_SUB);
-        this->add_bind("moneyman1","0.0.0.0:11005", ZMQ_REP);
+        this->connect("broker1.stream", ZMQ_SUB);
+        this->bind("moneyman1","0.0.0.0",11005, ZMQ_REP);
         //this->connect("broker1.orders", ZMQ_REQ);
         //this->attach("broker1.orders",broker_resp_process);
         this->attach("moneyman1", process_mmqueries);
-        this->attach("broker1", update_portfolio);
+        this->attach("broker1.stream", update_portfolio);
     }
 
 
@@ -145,13 +145,11 @@ class moneyman: public n3rv::service {
 int main() {
 
 
-    moneyman mm0("moneyman1", "money_manager", "127.0.0.1", 10001, 11005);
+    moneyman mm0("moneyman1", "money_manager", "127.0.0.1", 10001);
 
     mm0.ll->set_loglevel(4);
     mm0.ll->add_dest("stdout");
-
     mm0.initialize();
-    mm0.subscribe();    
     mm0.run();
 
 
