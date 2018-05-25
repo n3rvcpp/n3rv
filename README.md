@@ -74,7 +74,7 @@ class customservice: public n3rv::service {
     // to bind and/or establish, and other service initialization directices.
     int initialize() {
         //creates a new ZMQ socket binding of type PUBLISH
-        this->bind("publisher1.pub0","0.0.0.0", 11001, ZMQ_PUB);
+        this->bind("pub0","0.0.0.0", 11001, ZMQ_PUB);
     }
 
     //Allows to pass instructions inside the main service's loop, can be left empty.
