@@ -22,8 +22,7 @@ In order to achieve this goal, i needed a very robust and performant communicati
 
 ### In General
 
-Each service developped with n3rv must first and foremost register/subscribe to a directory service, which i call "service controller". 
-Each new register or update of the directory will trigger an update of the directories in each node (service) alive, via a ZMQ publish socket.
+Each service developped with n3rv must first and foremost register/subscribe to a directory service, which i call "service controller". Each or update of the directory will trigger an update of the directories in each node (service) alive, via a ZMQ publish socket.
 At this point every service has the list of its own peers, therefore it can connect to them..and the magic begins !
 
 Note: Now you might ask yourself "What's the point of using ZMQ if it's for adding a big SPOF to my architecture", right ? Well, that's not entirely true..What would happen if the service controller goes down ? Not much actually..all the services keep working as usual, the only setback is that you can't add new nodes to your platform until the controller becomes back up.
@@ -55,6 +54,7 @@ make install
 
 That's all, you are now ready to build your first µservice architecture with n3rv !
 
+
 Use
 ---
 
@@ -73,12 +73,8 @@ class customservice: public n3rv::service {
     //here you can declare connections to other services 
     // to bind and/or establish, and other service initialization directices.
     int initialize() {
-
-        std::stringstream ss;
-        ss << "tcp://0.0.0.0:" << this->service_port;
         //creates a new ZMQ socket binding of type PUBLISH
-        this->add_bind("pub0",ss.str(), ZMQ_PUB);
-
+        this->bind("publisher1.pub0","0.0.0.0", 11001, ZMQ_PUB);
     }
 
     //Allows to pass instructions inside the main service's loop, can be left empty.
@@ -93,9 +89,9 @@ int main() {
 
    
     //creates new instance of customservice class. 
-    // this node will be identidied as "pub0", it will try to connect
+    // this node will be identidied as "publisher1", it will try to connect
     // to its service controller at address 127.0.0.1:10001.
-    customservice c1("pub0","publisher","127.0.0.1",10001,11001);
+    customservice c1("publisher1","publisher","127.0.0.1",10001);
 
     c1.initialize();
 
@@ -106,3 +102,14 @@ int main() {
 ```
 
 If you want to dive further inside the inner workings of n3rv, i invite you to check the "examples" section of this repository.
+
+Building Examples
+-----------------
+
+One the main library is correctly compiled and installed, you can build all the examples
+
+```Shell
+cd examples
+cmake .
+make
+```
