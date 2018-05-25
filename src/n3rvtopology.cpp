@@ -60,8 +60,8 @@ namespace n3rv {
             for (int j=0;j< d[topo_][i][conn_].Size();j++ ) {
 
                 connection cx;
-                cx.name = d[topo_][i][binds_][j]["name"].GetString();
-                cx.type = d[topo_][i][binds_][j]["type"].GetString();
+                cx.name = d[topo_][i][conn_][j]["name"].GetString();
+                cx.type = d[topo_][i][conn_][j]["type"].GetString();
                 n.connections.emplace_back(cx);
 
             }

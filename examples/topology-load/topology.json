@@ -26,7 +26,7 @@
 		},
 
 		{
-			"service_class": "moneyman",
+			"service_class": "moneym",
 			"binds": [],
 			"connects": [{
 				"name": "broker.stream",
