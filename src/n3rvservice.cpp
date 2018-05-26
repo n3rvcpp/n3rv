@@ -184,6 +184,54 @@ namespace n3rv {
   }
 
 
+  int service:: load_topology(std::string path) {
+    topology* t = topology::load(path);
+    this->load_topology(t);
+  }
+
+
+  int service::load_topology(topology* t) {
+
+    std::map<std::string, int> zmq_sockmap;
+
+    zmq_sockmap["ZMQ_PUB"] = ZMQ_PUB;
+    zmq_sockmap["ZMQ_SUB"] = ZMQ_SUB;
+    zmq_sockmap["ZMQ_REQ"] = ZMQ_REQ;
+    zmq_sockmap["ZMQ_REP"] = ZMQ_REP;
+    zmq_sockmap["ZMQ_XPUB"] = ZMQ_XPUB;
+    zmq_sockmap["ZMQ_XSUB"] = ZMQ_XSUB;
+    zmq_sockmap["ZMQ_XREQ"] = ZMQ_XREQ;
+    zmq_sockmap["ZMQ_XREP"] = ZMQ_XREP;
+    zmq_sockmap["ZMQ_PULL"] = ZMQ_PULL;
+    zmq_sockmap["ZMQ_PUSH"] = ZMQ_PUSH;
+    zmq_sockmap["ZMQ_DEALER"] = ZMQ_DEALER;
+    zmq_sockmap["ZMQ_ROUTER"] = ZMQ_ROUTER;
+    zmq_sockmap["ZMQ_PAIR"] = ZMQ_PAIR;
+
+    for (auto& nmap : t->nodes) {
+
+      auto& key = nmap.first;
+      auto& n = nmap.second;
+
+      if ( key == this->service_class  ) {
+
+        for (auto& b: n.bindings) {
+          this->bind(this->name + "." +b.name, "0.0.0.0", zmq_sockmap[b.type] );
+        }
+
+        for (auto& c: n.connections) {
+          this->connect(c.name, zmq_sockmap[c.type]);
+        }
+
+        for (auto& cb: n.callbacks) {
+          this->attach(cb.connection_name, cb.callback_name);
+        }
+      }
+      break;
+    }
+  }
+
+
 
   int service::subscribe(std::string name, std::string sclass, int port) {
 

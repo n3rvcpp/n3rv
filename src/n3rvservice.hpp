@@ -9,6 +9,7 @@
 #include "n3rvcommon.hpp"
 #include "n3rvproto.hpp"
 #include "n3rvlogger.hpp"
+#include "n3rvtopology.hpp"
 
 
 #define CTLR_CH1 "controller_ch1"
@@ -126,6 +127,14 @@ namespace n3rv {
      *  @param callback_name string name of the callback to atach to connection.
      */ 
     int attach(std::string connection_name, std::string callback_name);
+
+    /** Loads a topology file and automatically bind ports, 
+     * connects to remote endpoints and attach callbacks */
+    int load_topology(std::string topology_file);
+
+    /** Uses a previously define topology object to automatically bind ports, 
+     * connects to remote endpoints and attach callbacks */
+    int load_topology(topology* topo);
 
     /** Retrieves a service connection from the internal connections list.
      *  @param connection_name name of the connection to retrieve.
