@@ -40,7 +40,7 @@ namespace n3rv {
   }
 
 
-  void servicecontroller::recv() {
+  void servicecontroller::run() {
 
         zmq::message_t query;
         while(true) {

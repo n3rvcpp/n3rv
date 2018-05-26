@@ -131,7 +131,7 @@ int main(int argc, char** argv) {
     sc.ll->add_dest("stdout");
     sc.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     sc.ll->log(n3rv::LOGLV_NORM, "Running Service Controller..");
-    sc.recv();
+    sc.run();
 
   }
 

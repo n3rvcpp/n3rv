@@ -16,16 +16,28 @@
 
 namespace n3rv {
 
+  /**
+   * servicecontroller is the directory service that:
+   * - Maintains the full list of available endpoints.
+   * - Propagates the available endpoints to every online nodes.*/
   class servicecontroller {
 
     public:
-
+      /** service controller class constructor. 
+       *  @param binding_addr Ip address the controller must listen to (0.0.0.0 for listen all)
+       *  @param binding_port TCP port to bind controller on.
+      */    
       servicecontroller(std::string binding_addr, unsigned int binding_port);
-      void recv();
+
+      /** Runs the service controller once instanciated. */
+      void run();
       n3rv::logger* ll;
 
     protected:
 
+      /** Retrieves the sender's ip in order to advertise endpoint 
+       *  @param zmsg originating ZMQ message.
+       *  @return send's ip string. */
       std::string peer_ip(zmq::message_t* zmsg);
       std::string binding_addr;
       unsigned int binding_port;
@@ -36,6 +48,13 @@ namespace n3rv {
   };
 
 
+  /** Conveniency function that runs a service controller instance inside its own thread,
+   *  so you can embed a service controller along with another service easilly. 
+   *  @param binding_addr Ip address the controller must listen to (0.0.0.0 for listen all)
+   *  @param binding_port TCP port to bind controller on.
+   *  @param display_out tells if service controller must display logs on stdout or not.
+   *  @param log_level Tells the log level of the service controller.
+   */ 
   int start_controller(std::string binding_addr, unsigned int binding_port, bool display_out, int log_level) {
 
       
@@ -46,7 +65,7 @@ namespace n3rv {
           sc1.ll->add_dest("stdout");
           sc1.ll->set_loglevel(log_level);
         }
-        sc1.recv();
+        sc1.run();
 
       } );
 

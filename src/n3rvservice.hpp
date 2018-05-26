@@ -31,7 +31,6 @@ namespace n3rv {
      *  @param service_class basically describes the type of node for the instanciated service.
      *  @controller_host the ip/hostname of the controller.
      *  @controller_port the port number on which the controller is listening (ch1). 
-     *  @log_level chooses the log level at which to start service.
      */
     service(std::string name, 
             std::string service_class, 
@@ -52,17 +51,18 @@ namespace n3rv {
 
     /** Registers the service on the controller, 
      *  for it to update its directory and advise others a new node is available.
+     *  This method is called automatically by bind() on TCP sockets, except specific cases
+     *  you don't need to call it yourself.
+     *  @param name Name of the binding to register.
+     *  @param sclass service class of the binding to register.
+     *  @param port port of the binding to register.
      */
-
-    /** If you need to advertize extra channels for a given service. (quite common).
-     *  Note: this is a temporary function , time to find a more convient way */
     int subscribe(std::string name, std::string sclass, int port);
 
 
     /** Gracefuly Unregisters the service from the controller,
      *  in case the service must go down. Not very useful, because the ZMQ stack takes care of this.
      */
-
     int unsubscribe();
 
     /** Main service's loop. basically manages all the established connections, 
@@ -95,6 +95,10 @@ namespace n3rv {
 
     /**
      * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)
+     * @param bind_name Name of the binding.
+     * @param ip ip to listen on (0.0.0.0 to listen on all addr).
+     * @param port TCP port to listen on.
+     * @param bind_type ZMQ socket type to create (ZMQ_REP, ZMQ_PUB,..)
      */
     int bind(std::string bind_name, std::string ip, int port , int bind_type );
 
@@ -114,7 +118,10 @@ namespace n3rv {
     int attach(std::string connection_name, fctptr callback);
 
     /** Attaches a service connection to its message handler callback !
-     *  Warning: this method only works if service::cbmap was filled at map_callbacks() time. */
+     *  Warning: this method only works if service::cbmap was filled at map_callbacks() time.
+     *  @param connection_name Name of the connection to attach callback to.
+     *  @param callback_name string name of the callback to atach to connection.
+     */ 
     int attach(std::string connection_name, std::string callback_name);
 
     /** Retrieves a service connection from the internal connections list.
@@ -138,11 +145,17 @@ namespace n3rv {
     int send(std::string connection_name, void* data, size_t size, int flags);
 
     /** Conveniency function to send n3rv::mesage data on a specified connection. 
-     * 
+     *  @param connection_name name of the connection to send data to.
+     *  @param msg n3rv::message to send.
+     *  @param flags ZMQ send flags.
     */
     int send(std::string connection_name, message& msg, int flags);
 
-    /** Conveniency function to send direct zmq::message_t data on a specified connection. */
+    /** Conveniency function to send direct zmq::message_t data on a specified connection. 
+     *  @param connection_name name of the connection to send data to.
+     *  @param msg ZMQ message_t to send.
+     *  @param flags ZMQ send flags. 
+     */
     int send(std::string connection_name, zmq::message_t* zmsg, int flags);
 
 

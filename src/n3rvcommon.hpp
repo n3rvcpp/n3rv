@@ -7,7 +7,8 @@
 
 namespace n3rv {
 
-    /** stores deffered connections for later use, when service becomes available in directory.
+    /** stores deffered connections for later use, 
+     *  when service becomes available in directory.
      */
     typedef struct qdef_ {
         std::string name;
@@ -36,8 +37,6 @@ namespace n3rv {
     } qserv;
 
 
-    //WE WILL PROBABLY GEt RID OF SERVICE CLASSES AND BIDINGS, BECAUSE TOPOLOGY WILl BE HARD-CODED INTO SERVICES.
-
     /**
      * binding structure aims to store configuration for a zmq socket.
      * (socket_type is a direct allusion to zmq socket types.)
@@ -48,19 +47,7 @@ namespace n3rv {
     } binding;
 
 
-    /**
-     * service_class structure aims to declare 
-     * a new service class inside a topology.
-     */
-    typedef struct service_class_ {
-
-        std::string name;
-        std::string connects_to;
-        std::vector<n3rv::binding> binds;
-
-    } service_class;
-
-
+    // Main n3rv callbacks signature.
     typedef void* (*fctptr)(void*, zmq::message_t*);
 
 }

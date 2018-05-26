@@ -33,10 +33,15 @@ namespace n3rv {
              *  Note: If buffer encounters std::endl then if is flushed to destinations. */ 
             std::istream& operator>>(std::istream& is) ;
 
-            /** Adds str to log buffer and flushes it. */
+            /** Adds str to log buffer and flushes it. 
+             *  @param log_level log level of the string to log.
+             *  @param str string to log.
+            */
             void log(int log_level, std::string str);
 
-            /** Changes current logger's log level. */
+            /** Changes current logger's log level. 
+             *  @param lvl log level to set, from 0 to 4.
+            */
             void set_loglevel(int lvl);
 
             /** class constructor */
