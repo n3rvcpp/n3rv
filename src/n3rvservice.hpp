@@ -65,10 +65,13 @@ namespace n3rv {
      */
     int unsubscribe();
 
-    /** Main service's loop. basically manages all the established connections, 
+    /** Starts the service. run() Basically manages all the established connections, 
      * plus eventual extra behaviour coded inside hkloop(). 
      */
     int run();
+
+    /** Start the service asynchronously, by running it in its own dedicated thread. */
+    int run_async();
 
     /**
      * hkloop is a "hook" function allowing to place some code inside a service's main loop.

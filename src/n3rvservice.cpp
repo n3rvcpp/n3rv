@@ -1,4 +1,5 @@
 #include "n3rvservice.hpp"
+#include <thread>
 
 namespace n3rv {
 
@@ -160,6 +161,13 @@ namespace n3rv {
 
        this->hkloop();      
     }
+
+  }
+
+  int service::run_async() {
+
+    std::thread t([this]() {  this->run(); });
+    t.detach();
 
   }
 
