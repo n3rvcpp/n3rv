@@ -216,7 +216,7 @@ namespace n3rv {
       if ( key == this->service_class  ) {
 
         for (auto& b: n.bindings) {
-          this->bind(this->name + "." +b.name, "0.0.0.0", zmq_sockmap[b.type] );
+          this->bind(this->name + "." + b.name, "0.0.0.0", b.port, zmq_sockmap[b.type] );
         }
 
         for (auto& c: n.connections) {
@@ -226,8 +226,8 @@ namespace n3rv {
         for (auto& cb: n.callbacks) {
           this->attach(cb.connection_name, cb.callback_name);
         }
+        break;
       }
-      break;
     }
   }
 
