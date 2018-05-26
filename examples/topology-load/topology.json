@@ -2,40 +2,31 @@
 	"topology": [
 
 		{
-			"service_class": "broker",
+			"service_class": "pong",
 			"binds": [{
 
-					"name": "stream",
+					"name": "pong",
 					"port": 11001,
-					"type": "ZMQ_PUB"
-
-				},
-				{
-					"name": "order",
-					"port": 11002,
 					"type": "ZMQ_REP"
 				}
-
 			],
 
 			"connects": [],
 			"callbacks": [
-				["order", "order_proc"]
+				["pong.pong", "pr"]
 			]
 
 		},
 
 		{
-			"service_class": "moneym",
+			"service_class": "ping",
 			"binds": [],
-			"connects": [{
-				"name": "broker.stream",
-				"type": "ZMQ_SUB"
-			}],
-			"callbacks": [
-				["broker.stream", "pnl"]
-			]
+			"connects": [{ "name": "pong.pong", "type": "ZMQ_REQ"} ],
+			"callbacks": [["pong.pong","por"]]
+
 		}
+
+
 
 	]
 }
