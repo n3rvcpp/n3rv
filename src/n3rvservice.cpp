@@ -288,6 +288,7 @@ namespace n3rv {
   }
 
   int service::send(std::string connection_name, message& msg, int flags=0) {
+    if (msg.sender == "") msg.sender = this->name;
     std::string msg_ser = serialize_msg(msg);
     return this->send(connection_name,msg_ser, flags);
   }
