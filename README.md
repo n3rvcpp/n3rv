@@ -113,3 +113,12 @@ cd examples
 cmake .
 make
 ```
+
+TOTO
+----
+
+- Distribution of topologies through the service-controller.
+- undiscriminated Service Class/name node resoution mechanics (with random node selection mech)?
+- Support for protobuf in addition to JSON for inter-services messages exchange.
+- Implementation of a REST HTTP<=>n3rv cluster gateway (probably in a separate project.)
+- Implementation of a WYSIWYG edtior allowing to generate topologies and produce class templates (separate project).
