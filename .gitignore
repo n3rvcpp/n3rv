@@ -14,3 +14,4 @@ examples/algotrading/moneyman
 examples/topology-load/topology-load
 install_manifest.txt
 doc
+doxygen/breathe/build
