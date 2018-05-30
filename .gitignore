@@ -12,6 +12,7 @@ examples/algotrading/eval
 examples/algotrading/exec
 examples/algotrading/moneyman
 examples/topology-load/topology-load
+examples/hello/hello
 install_manifest.txt
 doc
 doxygen/breathe/build

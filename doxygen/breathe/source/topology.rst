@@ -5,3 +5,6 @@ Topology Class
   :members:
   :protected-members:
   :private-members:
+
+.. doxygenstruct:: n3rv::node_
+  :members:

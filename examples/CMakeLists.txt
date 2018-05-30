@@ -9,6 +9,13 @@ SET (CMAKE_LINKER_FLAGS    "-rdynamic")
 
 add_definitions(-DQATE_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
+
+add_executable(
+	hello/hello
+  hello/hello.cpp
+)
+
+
 add_executable(
 	workers-single-factorial/workers-single-factorial
 	workers-single-factorial/src/workers-single-factorial.cpp
@@ -42,10 +49,16 @@ add_executable(
 
 add_executable(
 	topology-load/topology-load
-	topology-load/topology-load
+	topology-load/topology-load.cpp
 )
 
 
+target_link_libraries(
+  hello/hello
+  n3rv
+  zmq
+  pthread
+)
 
 target_link_libraries(
   algotrading/broker
@@ -98,9 +111,6 @@ target_link_libraries(
   zmq
   pthread
 )
-
-
-
 
 find_library (N3RV n3rv)
 find_library (ZMQ zmq)
