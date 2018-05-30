@@ -32,6 +32,12 @@ Note: Now you might ask yourself "What's the point of using ZMQ if it's for addi
 n3rv lets you define custom service classes, all inheriting from the service 'superclass'. In these newly defined classes, you can fully describe the behaviour of your service: which connections it must bind, which are the other services it must connect to, what it should answer in such and such situations, etc..
 The framework also comes with a built-in, JSON-based messages formatting and transport mechanism, which means you don't have to care about that either. ( yet you can still send/receive raw binary data between your services if you want to ==> I also plan to add protobuf messages transport in the near futur. )
 
+API Documentation
+-----------------
+
+You can find the full API doc of the n3rv framework at the following address: https://n3rvcpp.github.io/api
+
+
 Project Dependancies
 --------------------
 
@@ -125,7 +131,7 @@ You'll find below a basic example of how to declare a new publishing service wit
 }
 ```
 
-If you want to dive further inside the inner workings of n3rv, i invite you to check the "examples" section of this repository.
+If you want to dive further inside the inner workings of n3rv, i invite you to check the "examples" section of this repository and also to have a look at the API documentation at https://n3rvcpp.github.io/api .
 
 Building Examples
 -----------------
