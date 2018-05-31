@@ -13,6 +13,7 @@ examples/algotrading/exec
 examples/algotrading/moneyman
 examples/topology-load/topology-load
 examples/hello/hello
+tests/tests
 install_manifest.txt
 doc
 doxygen/breathe/build
