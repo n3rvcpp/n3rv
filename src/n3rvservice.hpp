@@ -128,6 +128,10 @@ namespace n3rv {
      */ 
     int attach(std::string connection_name, std::string callback_name);
 
+    /* Tries to download the topology from the service controller, and if available 
+     * automatically bind ports, connects to remote endpoints and attach callbacks. */
+    int fetch_topology();
+
     /** Loads a topology file and automatically bind ports, 
      * connects to remote endpoints and attach callbacks */
     int load_topology(std::string topology_file);

@@ -184,11 +184,34 @@ namespace n3rv {
   }
 
 
-  int service:: load_topology(std::string path) {
+  int service::fetch_topology() {
+
+      n3rv::message m;  
+      m.action = "topology";
+      m.payload = "";
+      this->send(CTLR_CH1,m,0);
+
+      //fetches response
+      zmq::message_t r1;
+      this->connections[CTLR_CH1].socket->recv(&r1);
+
+      char * rawmsg = (char*) calloc(r1.size() + 1  , sizeof(char)   );
+      memcpy(rawmsg, r1.data(), r1.size() );
+      std::string topo_resp = rawmsg;
+
+      if (topo_resp != "ERR: NO TOPOLOGY") {
+        topology* t = topology::parse(topo_resp);
+        this->load_topology(t);
+      }
+      return 0;
+  }
+
+
+
+  int service::load_topology(std::string path) {
     topology* t = topology::load(path);
     this->load_topology(t);
   }
-
 
   int service::load_topology(topology* t) {
 

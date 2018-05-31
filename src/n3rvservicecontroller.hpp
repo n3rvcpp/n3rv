@@ -33,8 +33,7 @@ namespace n3rv {
       
       /** Loads a topology file for the service controller to distribute */
       int load_topology(std::string path);
-
-
+      
       /** Runs the service controller once instanciated. */
       void run();
       n3rv::logger* ll;

@@ -42,10 +42,7 @@ namespace n3rv {
   }
 
   int servicecontroller::load_topology(std::string path) {
-
-
-
-
+      this->topo_  = topology::load(path);
   }
 
 
@@ -87,20 +84,20 @@ namespace n3rv {
 
               else if ( m.action == "topology" ) {
 
-                 if (this->topo_ != nullptr) {
-                     this->ll->log(LOGLV_DEBUG, "sending topology..");
-                     
-                     message msg;
-                     msg.action = "topology_dist";
-                     //std::string ts = 
-                     //zmsock_pub->send()
-
-
+                 std::string resp = "";
+                 if (this->topo_ != nullptr) {                  
+                      resp = this->topo_->serialize();                    
                  }
-                 
+                 else {
+                     resp = "ERR: NO TOPOLOGY";
+                 }
+
+                 zmq::message_t to_send(resp.size()+1);
+                 memcpy(to_send.data(), resp.data(), resp.size());
+                 this->ll->log(LOGLV_DEBUG, "sending topology..");
+                 zmsock->send(to_send);
+           
               }
-
-
 
             }
         }
