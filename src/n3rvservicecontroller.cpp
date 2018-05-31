@@ -13,6 +13,8 @@ namespace n3rv {
         this->binding_addr = binding_addr; 
         this->binding_port = binding_port;
 
+        this->topo_ = nullptr;
+
         std::stringstream ss;
         ss << "tcp://" << this->binding_addr << ":" << this->binding_port;     
         this->ll->log(LOGLV_NORM, "binding service Controller on " + ss.str() + "..");
@@ -36,6 +38,13 @@ namespace n3rv {
       int fd = zmq_msg_get((zmq_msg_t*) zmsg, ZMQ_SRCFD);
       zmq::get_peer_ip_address(fd, ip);
       return ip;
+
+  }
+
+  int servicecontroller::load_topology(std::string path) {
+
+
+
 
   }
 
@@ -75,6 +84,24 @@ namespace n3rv {
                 zmsock_pub->send(to_send);
                 
               }
+
+              else if ( m.action == "topology" ) {
+
+                 if (this->topo_ != nullptr) {
+                     this->ll->log(LOGLV_DEBUG, "sending topology..");
+                     
+                     message msg;
+                     msg.action = "topology_dist";
+                     //std::string ts = 
+                     //zmsock_pub->send()
+
+
+                 }
+                 
+              }
+
+
+
             }
         }
     }

@@ -12,7 +12,9 @@
 #include "n3rvcommon.hpp"
 #include "n3rvproto.hpp"
 #include "n3rvlogger.hpp"
+#include "n3rvtopology.hpp"
 #include "n3rvzmq.hpp"
+
 
 namespace n3rv {
 
@@ -28,6 +30,10 @@ namespace n3rv {
        *  @param binding_port TCP port to bind controller on.
       */    
       servicecontroller(std::string binding_addr, unsigned int binding_port);
+      
+      /** Loads a topology file for the service controller to distribute */
+      int load_topology(std::string path);
+
 
       /** Runs the service controller once instanciated. */
       void run();
@@ -45,6 +51,7 @@ namespace n3rv {
       zmq::socket_t* zmsock;
       zmq::socket_t* zmsock_pub;
       std::map<std::string, n3rv::qserv> directory;
+      topology* topo_;
   };
 
 

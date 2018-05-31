@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
 
 
 #define topo_ "topology"
@@ -81,5 +82,76 @@ namespace n3rv {
         }
         return t1;
     }
+
+    std::string topology::serialize() {
+
+        rapidjson::StringBuffer sb; 
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+
+        writer.StartObject();
+        writer.String(topo_);
+
+        writer.StartArray();
+
+
+        for (auto node: this->nodes) {
+
+            std::string sname = node.first;
+            auto n = node.second;
+
+            writer.StartObject();
+            writer.String("service_class");
+            writer.String(sname.c_str());
+
+            writer.String(binds_);
+
+            writer.StartArray();
+            for ( auto b_: n.bindings) {
+                writer.StartObject();
+                writer.String("name");
+                writer.String(b_.name.c_str());
+                writer.String("port");
+                writer.Int(b_.port);
+                writer.String("type");
+                writer.String(b_.type.c_str());
+                writer.EndObject();
+            }
+            writer.EndArray();
+
+            writer.String(conn_);
+
+            writer.StartArray();
+            for ( auto c_: n.connections) {
+                writer.StartObject();
+                writer.String("name");
+                writer.String(c_.name.c_str());
+                writer.String("type");
+                writer.String(c_.type.c_str());
+                writer.EndObject();
+            }
+            writer.EndArray();
+
+            writer.String(cb_);
+
+            writer.StartArray();
+            for ( auto call_: n.callbacks) {
+                writer.StartArray();            
+                writer.String(call_.connection_name.c_str());       
+                writer.String(call_.callback_name.c_str());
+                writer.EndArray();
+            }
+            writer.EndArray();
+        
+            writer.EndObject();
+
+        }
+
+        writer.EndArray();    
+        writer.EndObject();
+
+        return sb.GetString();
+        
+    }
+
 }
 

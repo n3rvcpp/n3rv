@@ -68,6 +68,12 @@ namespace n3rv {
          */
         static topology* parse(std::string& topology_def);
 
+        /** Serializes current topology object to a JSON-string 
+         *  @returns JSON-serialized topology object.
+         */
+        std::string serialize();
+
+
         /** class constructor */
         topology() {}
 
