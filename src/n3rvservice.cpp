@@ -195,10 +195,11 @@ namespace n3rv {
       zmq::message_t r1;
       this->connections[CTLR_CH1].socket->recv(&r1);
 
-      char * rawmsg = (char*) calloc(r1.size() + 1  , sizeof(char)   );
+      char * rawmsg = (char*) calloc(r1.size()+1, sizeof(char)   );
       memcpy(rawmsg, r1.data(), r1.size() );
       std::string topo_resp = rawmsg;
-
+      std::cout << topo_resp << std::endl;
+      
       if (topo_resp != "ERR: NO TOPOLOGY") {
         topology* t = topology::parse(topo_resp);
         this->load_topology(t);

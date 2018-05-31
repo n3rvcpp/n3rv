@@ -85,14 +85,14 @@ namespace n3rv {
               else if ( m.action == "topology" ) {
 
                  std::string resp = "";
-                 if (this->topo_ != nullptr) {                  
-                      resp = this->topo_->serialize();                    
+                 if (this->topo_ != nullptr) { 
+                      resp = this->topo_->serialize();               
                  }
                  else {
                      resp = "ERR: NO TOPOLOGY";
                  }
 
-                 zmq::message_t to_send(resp.size()+1);
+                 zmq::message_t to_send(resp.size());
                  memcpy(to_send.data(), resp.data(), resp.size());
                  this->ll->log(LOGLV_DEBUG, "sending topology..");
                  zmsock->send(to_send);

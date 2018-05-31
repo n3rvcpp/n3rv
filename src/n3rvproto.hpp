@@ -25,6 +25,8 @@ namespace n3rv {
   } message;
 
   
+
+
   /**
    * Serializes message for later sending over the net as a JSON string.
    * @param msg message to serialize.
@@ -62,6 +64,8 @@ namespace n3rv {
    */
   std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr);
   
+  void t128bug(std::string& q);
+
 }
 
 #endif

@@ -52,6 +52,11 @@ add_executable(
 	topology-load/topology-load.cpp
 )
 
+add_executable(
+	topology-fetch/topology-fetch
+	topology-fetch/topology-fetch.cpp
+)
+
 
 target_link_libraries(
   hello/hello
@@ -107,6 +112,13 @@ target_link_libraries(
 
 target_link_libraries(
   topology-load/topology-load
+  n3rv
+  zmq
+  pthread
+)
+
+target_link_libraries(
+  topology-fetch/topology-fetch
   n3rv
   zmq
   pthread
