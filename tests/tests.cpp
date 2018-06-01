@@ -1,3 +1,4 @@
+#include "test_servicecontroller.hpp"
 #include "test_topology_parsing.hpp"
 #include <map>
 
@@ -6,6 +7,8 @@ typedef int (*tfctptr)();
 int main() {
 
     std::map<std::string, tfctptr > tests_list;
+    tests_list["test_servicecontroller_instanciate"] = test_servicecontroller_instanciate;
+    tests_list["test_servicecontroller_load_topology"] = test_servicecontroller_load_topology;
     tests_list["test_topology_serialize"] = test_topology_serialize;
     tests_list["test_topology_parse"] = test_topology_parse;
 

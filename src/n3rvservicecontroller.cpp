@@ -103,4 +103,12 @@ namespace n3rv {
         }
     }
 
+    void servicecontroller::terminate() {
+
+        this->zmsock->close();
+        this->zmsock_pub->close();
+
+    }
+
+
 }

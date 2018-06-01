@@ -1,0 +1,33 @@
+{
+	"topology": [
+
+		{
+			"service_class": "pong",
+			"binds": [{
+
+					"name": "pong",
+					"port": 11001,
+					"type": "ZMQ_REP"
+				}
+			],
+
+			"connects": [],
+			"callbacks": [
+				["pong.pong", "pr"]
+			]
+
+		},
+
+		{
+			"service_class": "ping",
+			"binds": [],
+			"connects": [{ "name": "pong.pong", "type": "ZMQ_REQ"} ],
+			"callbacks": [["pong.pong","por"]]
+
+		}
+
+
+
+	]
+}
+

@@ -34,8 +34,13 @@ namespace n3rv {
       /** Loads a topology file for the service controller to distribute */
       int load_topology(std::string path);
       
+      
       /** Runs the service controller once instanciated. */
       void run();
+      
+      /** Stops the binding of CH1/CH2 sockets. */
+      void terminate();
+
       n3rv::logger* ll;
 
     protected:
