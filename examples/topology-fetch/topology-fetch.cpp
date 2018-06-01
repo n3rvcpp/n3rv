@@ -1,5 +1,5 @@
-/** This example show the building of a generic service class, 
- * then the loading of a topology file in order to performs bindings/connections automatically. */
+/** This example shows how to build generic service classes, 
+ * and how each instance of a generic class can fetch its own topology from the service controller. */
 
 #include <n3rv/n3rvservicecontroller.hpp>
 #include <n3rv/n3rvservice.hpp>
@@ -65,7 +65,8 @@ int main(int argc, char* argv[]) {
          sc.ll->add_dest("stdout");
          sc.ll->set_loglevel(4);
          sc.initialize();
-         //We fetch the topology data from sc to determine how the services will behave.
+         //We fetch the topology data from sc to 
+         // determine how the services will behave.
          sc.fetch_topology();
          sc.run();
     }
@@ -73,6 +74,7 @@ int main(int argc, char* argv[]) {
     else if (sclass == "ctl") {
           std::cout << "STARTING CTRL!!" << std::endl;
           n3rv::servicecontroller sc1("0.0.0.0",10001);
+          //We load the topology file in the service controller.
           sc1.load_topology("topology.json");
           sc1.ll->set_loglevel(4);
           sc1.ll->add_dest("stdout");
