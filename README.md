@@ -12,6 +12,16 @@ n3rv is a project that aims to provide a performant and easy-to-use microservice
 
 ![Working Example](/resources/images/screens/sc1.png "working example")
 
+### Key Features
+
+ - Deploy Microservice architectures without needing a Message Queue (By-Bye Kafka !).
+ - Blazing fast messages exchange between services.
+ - Easy to code with.
+ - Integrated hosts/endpoints resolving (no need for DNS).
+ - Takes care of the messages exchange format via JSON serialization. (protobuf coming soon).
+ - Dynamic architecture definition.
+ 
+ 
 How does it work ?
 ------------------
 
