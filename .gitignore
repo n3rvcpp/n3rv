@@ -16,6 +16,7 @@ examples/topology-fetch/topology-fetch
 
 examples/hello/hello
 tests/tests
+tests/n3rvtest.log
 install_manifest.txt
 doc
 doxygen/breathe/build
