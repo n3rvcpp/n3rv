@@ -103,6 +103,9 @@ namespace n3rv {
      * @param ip ip to listen on (0.0.0.0 to listen on all addr).
      * @param port TCP port to listen on.
      * @param bind_type ZMQ socket type to create (ZMQ_REP, ZMQ_PUB,..)
+     * 
+     * Note: If port is set to 0, n3rv will try to find a randomly choosen, available port on the machine.
+     * (Not very firewall-friendly but can solve a few headaches).
      */
     int bind(std::string bind_name, std::string ip, int port , int bind_type );
 

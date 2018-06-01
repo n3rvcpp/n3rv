@@ -78,10 +78,33 @@ namespace n3rv {
 
   int service::bind(std::string bind_name, std::string ip, int port , int bind_type ) {
 
-    std::stringstream ep;
-    ep << "tcp://" << ip << ":" << port;
     this->connections[bind_name].socket = new zmq::socket_t(this->zctx, bind_type);
-    this->connections[bind_name].socket->bind(ep.str().c_str());
+
+    //Port Autobinding (if 0) 
+    if (port == 0) {
+
+      srand(time(nullptr));
+      port = rand() % 50000 + 10000;
+
+      try {
+        std::stringstream ep;
+        ep << "tcp://" << ip << ":" << port;
+        this->connections[bind_name].socket->bind(ep.str().c_str());
+      }
+
+      catch(std::exception e) {
+        return this->bind(bind_name,ip,0,bind_type);
+      }
+
+
+    }
+
+    else {
+      std::stringstream ep;
+      ep << "tcp://" << ip << ":" << port;
+      this->connections[bind_name].socket->bind(ep.str().c_str());
+    }
+     
     this->subscribe(bind_name, this->service_class, port);
 
   }
