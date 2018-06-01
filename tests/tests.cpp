@@ -1,5 +1,7 @@
 #include "test_servicecontroller.hpp"
 #include "test_topology_parsing.hpp"
+#include "test_logger.hpp"
+#include "test_messages.hpp"
 #include <map>
 
 typedef int (*tfctptr)();
@@ -11,6 +13,11 @@ int main() {
     tests_list["test_servicecontroller_load_topology"] = test_servicecontroller_load_topology;
     tests_list["test_topology_serialize"] = test_topology_serialize;
     tests_list["test_topology_parse"] = test_topology_parse;
+    tests_list["test_logger_add_dest_stdout"] = test_logger_add_dest_stdout;
+    tests_list["test_logger_add_dest_file"] = test_logger_add_dest_file; 
+    tests_list["test_logger_set_loglevel"] = test_logger_set_loglevel;
+    tests_list["test_message_serialize_parse"] = test_message_serialize_parse;
+
 
     int test_num = 1;
     int num_ok = 0;
