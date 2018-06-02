@@ -52,9 +52,10 @@ You can find the full API doc of the n3rv framework at the following address: ht
 Project Dependancies
 --------------------
 
-* libzmq 3.2+ (zeromq/libzmq)
+* libzmq 4+ (zeromq/libzmq)
 * rapidjson (miloyip/rapidjson)
 * cmake 2.6+
+* libevent (Optional, if using httpservice)
 
 Build
 -----
