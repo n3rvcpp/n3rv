@@ -186,10 +186,15 @@ namespace n3rv {
      * was not yet in directory, and tries to establish connection. */
     int check_deferred();
 
+    /** Sets the main ZMQ polling timeout, if required 
+     *  @param poll_timeout time (in ms) the poller must wait before returning.
+     */
+    void set_poll_timeout(int poll_timeout);
+
   protected:
    
     zmq::pollitem_t* refresh_pollitems();
-    
+    int poll_timeout;
     /** Directory updates message handling callback */
     static void* directory_update(void* objref, zmq::message_t* dirmsg);
 
@@ -208,7 +213,7 @@ namespace n3rv {
    int last_nconn;
    std::vector<std::string> last_connlist;
    std::vector<n3rv::qdef> deferred;
-
+  
   };
 
 }

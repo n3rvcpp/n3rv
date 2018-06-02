@@ -8,6 +8,7 @@ namespace n3rv {
                    std::string controller_host, 
                    int controller_port) {
 
+        this->poll_timeout = 1000;
 
         this->ll = new logger(LOGLV_NORM);
         this->zctx = zmq::context_t(1);
@@ -168,7 +169,7 @@ namespace n3rv {
     while(1) {
 
       zmq::pollitem_t* items = this->refresh_pollitems(); 
-      zmq::poll (items,this->last_connlist.size(), 1000);
+      zmq::poll (items,this->last_connlist.size(), this->poll_timeout);
 
        for (int j=0;j < this->last_connlist.size(); j++) {
          
@@ -391,6 +392,10 @@ namespace n3rv {
     self->check_deferred();
 
 
+  }
+
+  void service::set_poll_timeout(int poll_timeout) {
+    this->poll_timeout = poll_timeout;
   }
 
 }

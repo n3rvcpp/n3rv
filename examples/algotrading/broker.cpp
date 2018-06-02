@@ -9,6 +9,8 @@ class broker: public n3rv::service {
 
     float cval = 21000;
     int initialize() { 
+
+        this->set_poll_timeout(500);
         this->bind("broker1.stream","0.0.0.0",11001,ZMQ_PUB);
         this->bind("broker1.orders","0.0.0.0",11002,ZMQ_REP);
         this->attach("broker1.orders",process_orders);
@@ -50,7 +52,6 @@ int main() {
     n3rv::start_controller("0.0.0.0",10001,true,4);
 
     broker b0("broker1", "broker", "127.0.0.1", 10001);
-
     b0.ll->add_dest("stdout");
     b0.initialize();
     b0.run();

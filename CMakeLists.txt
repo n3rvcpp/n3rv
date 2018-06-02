@@ -10,12 +10,24 @@ SET (CMAKE_LINKER_FLAGS    "-rdynamic")
 add_library(
 	n3rv SHARED
 	src/n3rvservice.cpp
-  src/n3rvhttpservice.cpp
   src/n3rvservicecontroller.cpp
   src/n3rvlogger.cpp
   src/n3rvproto.cpp
   src/n3rvtopology.cpp
 )
+
+add_library(
+  n3rvhttp
+  src/n3rvhttpservice.cpp
+)
+
+target_link_libraries(
+   n3rvhttp
+   n3rv
+   zmq
+   pthread
+)
+
 
 target_link_libraries(
    n3rv
@@ -28,6 +40,7 @@ find_library (ZMQ zmq)
 
 
 install (TARGETS n3rv DESTINATION /usr/local/lib)
+install (TARGETS n3rvhttp DESTINATION /usr/local/lib)
 install (FILES src/n3rvcommon.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvservice.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvhttpservice.hpp DESTINATION /usr/local/include/n3rv)
