@@ -187,10 +187,11 @@ namespace n3rv {
 
   }
 
-  int service::run_async() {
+  std::thread* service::run_async() {
 
-    std::thread t([this]() {  this->run(); });
-    t.detach();
+    std::thread* t = new std::thread([this]() {  this->run(); });
+    t->detach();
+    return t;
 
   }
 

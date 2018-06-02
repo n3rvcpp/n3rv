@@ -4,6 +4,7 @@
 #include <map>
 #include <iostream>
 #include <sstream>
+#include <thread>
 
 #include <zmq.hpp>
 #include "n3rvcommon.hpp"
@@ -72,7 +73,7 @@ namespace n3rv {
     int run();
 
     /** Start the service asynchronously, by running it in its own dedicated thread. */
-    int run_async();
+    std::thread* run_async();
 
     /** Closes all sockets and destroys ZMQ context */
     int terminate();

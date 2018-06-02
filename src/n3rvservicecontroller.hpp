@@ -66,10 +66,10 @@ namespace n3rv {
    *  @param display_out tells if service controller must display logs on stdout or not.
    *  @param log_level Tells the log level of the service controller.
    */ 
-  int start_controller(std::string binding_addr, unsigned int binding_port, bool display_out, int log_level) {
+  std::thread* start_controller(std::string binding_addr, unsigned int binding_port, bool display_out, int log_level) {
 
       
-      std::thread t([binding_addr, binding_port, display_out, log_level]() {
+      std::thread* t = new std::thread([binding_addr, binding_port, display_out, log_level]() {
 	       
         servicecontroller sc1(binding_addr, binding_port);
         if (display_out) {
@@ -80,7 +80,8 @@ namespace n3rv {
 
       } );
 
-      t.detach();
+      t->detach();
+      return t;
 
   }
 

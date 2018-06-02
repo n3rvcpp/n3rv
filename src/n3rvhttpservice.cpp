@@ -51,13 +51,14 @@ namespace n3rv {
 
     }
 
-    int httpservice::run_http_async() {
+    std::thread* httpservice::run_http_async() {
 
-        std::thread t( [this] {
+        std::thread* t = new std::thread( [this] {
             this->run_http();
         }   );
 
-        t.detach();
+        t->detach();
+        return t;
 
     }
 

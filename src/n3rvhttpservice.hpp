@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <iostream>
 #include <evhttp.h>
+#include <thread>
 
 namespace n3rv {
 
@@ -16,7 +17,7 @@ namespace n3rv {
       static void http_callback(evhttp_request *req, void *);
       int init_http(std::string http_listen_addr, int http_listen_port);      
       int run_http();
-      int run_http_async();
+      std::thread* run_http_async();
 
     protected:
 
