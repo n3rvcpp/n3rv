@@ -24,7 +24,4 @@ int test_http_service() {
     }
 
     return 0;
-
-
-
 }

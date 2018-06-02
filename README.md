@@ -14,8 +14,9 @@ n3rv is a project that aims to provide a performant and easy-to-use microservice
 
 ### Key Features
 
- - Deploy Microservice architectures without needing a Message Queue (By-Bye Kafka !).
+ - Deploy Microservice architectures without needing a Message Queue (Bye-Bye Kafka !).
  - Blazing fast messages exchange between services.
+ - HTTP <=> ZMQ Gateway mechanism (httpservice).
  - Easy to code with.
  - Integrated hosts/endpoints resolving (no need for DNS).
  - Takes care of the messages exchange format via JSON serialization. (protobuf coming soon).
@@ -157,8 +158,6 @@ make
 TOTO
 ----
 
-- Distribution of topologies through the service-controller.
 - undiscriminated Service Class/name node resoution mechanics (with random node selection mech)?
 - Support for protobuf in addition to JSON for inter-services messages exchange.
-- Implementation of a REST HTTP<=>n3rv cluster gateway (probably in a separate project.)
 - Implementation of a WYSIWYG edtior allowing to generate topologies and produce class templates (separate project).
