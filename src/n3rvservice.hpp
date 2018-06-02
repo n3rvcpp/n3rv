@@ -74,6 +74,9 @@ namespace n3rv {
     /** Start the service asynchronously, by running it in its own dedicated thread. */
     int run_async();
 
+    /** Closes all sockets and destroys ZMQ context */
+    int terminate();
+
     /**
      * hkloop is a "hook" function allowing to place some code inside a service's main loop.
      * Indeed, hkloop() is called inside the run() process, so if you need to run code inside the main loop,

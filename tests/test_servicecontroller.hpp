@@ -8,7 +8,7 @@ int test_servicecontroller_instanciate() {
 
     n3rv::servicecontroller sc1("0.0.0.0",10001);
 
-    FILE* fh = popen("netstat -anp 2>/dev/null|egrep '(10001|10002)'","r");
+    FILE* fh = popen("netstat -anp 2>/dev/null|grep LISTEN|egrep '(10001|10002)'","r");
     std::array<char, 255> buff;
     std::string net_out = "";
 

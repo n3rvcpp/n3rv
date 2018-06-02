@@ -2,6 +2,8 @@
 #include "test_topology_parsing.hpp"
 #include "test_logger.hpp"
 #include "test_messages.hpp"
+#include "test_httpservice.hpp"
+
 #include <map>
 
 typedef int (*tfctptr)();
@@ -17,6 +19,7 @@ int main() {
     tests_list["test_logger_add_dest_file"] = test_logger_add_dest_file; 
     tests_list["test_logger_set_loglevel"] = test_logger_set_loglevel;
     tests_list["test_message_serialize_parse"] = test_message_serialize_parse;
+    tests_list["test_http_service"] = test_http_service;
 
 
     int test_num = 1;

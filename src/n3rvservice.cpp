@@ -194,6 +194,22 @@ namespace n3rv {
 
   }
 
+  int service::terminate() {
+
+      for (auto n3sock: this->connections) {
+
+        try {
+          n3sock.second.socket->close();
+        }
+        catch (...) {
+
+        }        
+      }
+
+      //this->zctx.destroy();
+  }
+
+
   void service::hkloop() {
 
   }
