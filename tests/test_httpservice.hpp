@@ -6,6 +6,10 @@ int test_http_service() {
     n3rv::httpservice ht1("foobar","foobar","127.0.0.1",10001);   
 
     ht1.init_http("0.0.0.0",8081);
+
+
+    ht1.attach_http("/foo",n3rv::httpservice::http_callback);
+
     ht1.run_http_async();
 
     FILE* fh = popen("netstat -anp 2>/dev/null|grep LISTEN|grep 8081","r");

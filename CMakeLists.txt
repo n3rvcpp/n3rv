@@ -17,7 +17,7 @@ add_library(
 )
 
 add_library(
-  n3rvhttp
+  n3rvhttp SHARED
   src/n3rvhttpservice.cpp
 )
 

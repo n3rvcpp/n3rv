@@ -16,24 +16,34 @@ namespace n3rv {
         return -1;
       }
  
-      evhttp* ev_server = evhttp_new(this->evb);
+      this->ev_server = evhttp_new(this->evb);
 
       if (!ev_server) {
         this->ll->log(LOGLV_CRIT,"failed to init http server!");
         return -1;
       }
 
-      evhttp_set_gencb(ev_server, httpservice::http_callback , this);
-      
-      auto* bound_sock = evhttp_bind_socket_with_handle(ev_server,
-                                                        this->http_listen_addr.c_str(), 
-                                                        this->http_listen_port);
+    }
 
+    int httpservice::attach_http(std::string uri, httpcb cb) {
+        if (uri == "*") {
+            evhttp_set_gencb(this->ev_server, cb , this);
+        }
+
+        else {
+            evhttp_set_cb(this->ev_server, uri.c_str(), cb, this);
+        }
+
+        return 0;
 
     }
 
+
     int httpservice::run_http() {
 
+        auto* bound_sock = evhttp_bind_socket_with_handle(this->ev_server,
+                                                        this->http_listen_addr.c_str(), 
+                                                        this->http_listen_port);
 
         this->ll->log(LOGLV_XDEBUG,"running httpd message loop");
         
