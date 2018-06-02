@@ -159,6 +159,8 @@ make
 TOTO
 ----
 
-- undiscriminated Service Class/name node resoution mechanics (with random node selection mech)?
+- Implement built-in service controller redudency.
+- undiscriminated Service Class/name node resoution mechanics (with random node selection mech ?)
 - Support for protobuf in addition to JSON for inter-services messages exchange.
 - Implementation of a WYSIWYG edtior allowing to generate topologies and produce class templates (separate project).
+- Extending the service controller to get a web administration interface (unsure)
