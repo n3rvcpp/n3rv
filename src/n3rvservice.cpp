@@ -169,7 +169,10 @@ namespace n3rv {
     while(1) {
 
       zmq::pollitem_t* items = this->refresh_pollitems(); 
-      zmq::poll (items,this->last_connlist.size(), this->poll_timeout);
+      try {
+        zmq::poll (items,this->last_connlist.size(), this->poll_timeout);
+      }
+      catch(const zmq::error_t& e) {}
 
        for (int j=0;j < this->last_connlist.size(); j++) {
          
@@ -203,11 +206,8 @@ namespace n3rv {
         try {
           n3sock.second.socket->close();
         }
-        catch (...) {
-
-        }        
+        catch (const zmq::error_t& e) {}        
       }
-
       //this->zctx.destroy();
   }
 
