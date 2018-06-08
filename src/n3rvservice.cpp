@@ -93,7 +93,7 @@ namespace n3rv {
         this->connections[bind_name].socket->bind(ep.str().c_str());
       }
 
-      catch(std::exception e) {
+      catch(const zmq::error_t& e) {
         return this->bind(bind_name,ip,0,bind_type);
       }
 
