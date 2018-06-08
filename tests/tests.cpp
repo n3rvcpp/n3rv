@@ -7,6 +7,7 @@
 
 
 #include <map>
+#include <regex>
 
 typedef int (*tfctptr)();
 
@@ -24,6 +25,7 @@ int main() {
     tests_list["9.test_http_service"] = test_http_service;
     tests_list["10.test_service_instanciate"] = test_service_instanciate;
     tests_list["11.test_service_bind"] = test_service_bind;
+    tests_list["12.test_service_connect"] = test_service_connect;
 
     int test_num = 1;
     int num_ok = 0;
@@ -35,9 +37,11 @@ int main() {
             for(auto t: tests_list) {
 
                 std::stringstream ss ;
-                ss << i;
+                ss << "^" << i << "\\.(.*)";
 
-                if (t.first.find(ss.str() + ".") != std::string::npos) {
+                std::regex reg1(ss.str());
+
+                if (  regex_match(t.first, reg1)  ) {
                     std::cout << "Launching Test [" << test_num << "/" << total << "]: " << t.first << "..";
                     int test_result = -1;
 
