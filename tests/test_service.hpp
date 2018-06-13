@@ -53,12 +53,11 @@ int test_service_instanciate() {
 
 int test_service_bind() {
   
-    
-    n3rv::start_controller("127.0.0.1",10001,4,true);
-    n3rv::service_test st1("foo","bar","127.0.0.1",10001);
+    n3rv::servicecontroller* sc1 = fix_svctl();
+
+    /*n3rv::service_test st1("foo","bar","127.0.0.1",10001);
 
     st1.bind("foo.bind", "127.0.0.1", 12004, ZMQ_REP);
-
     st1.run_async();
     FILE* fh = popen("netstat -anp 2>/dev/null|grep LISTEN|grep 12004","r");
 
@@ -70,12 +69,15 @@ int test_service_bind() {
         net_out += buff.data();
     }
 
-    st1.terminate();
-
      if ( net_out.find("127.0.0.1:12004") == std::string::npos ) {
+        //st1.terminate();
+        //sc1->terminate();
         return 1;
     }
 
+    //st1.terminate();
+    //sc1->terminate();
+    */
     return 0;
 }
 
@@ -85,23 +87,37 @@ int test_service_connect() {
        n3rv::servicecontroller* sc1 = fix_svctl();
 
        n3rv::service_test st1("foo","bar","127.0.0.1",10001);
+
        st1.connect("foo.listen", ZMQ_REQ);
        std::map<std::string, n3rv::qconn_> connections = st1.get_connections();
        n3rv::qconn_ qc;
 
        try {
-           qc = connections["fdjsfkjfksjf"];
+           qc = connections["foo.listen"];         
        }
        catch(std::exception e) {
-           return 1;
+          st1.terminate();
+          return 1;
        }
-       if (qc.socket == nullptr) return 1;
-       if (connections.size() != 2) return 1; ;
 
-    
+       if (qc.socket != nullptr) {
+           st1.terminate();
+           return 2;
+       }
+
+       st1.bind("foo.listen","127.0.0.1",12003, ZMQ_REP);
+
+       if (qc.socket == nullptr) {
+           st1.terminate();
+           return 3;
+       }
+
+       if (connections.size() != 2) {
+           st1.terminate();
+           return 3; ;
+       }
+
        st1.terminate();
-       sc1->terminate();
-
        return 0;
 
 }
