@@ -58,6 +58,12 @@ add_executable(
 )
 
 
+add_executable(
+	http-gateway/http-gateway
+	http-gateway/http-gateway.cpp
+)
+
+
 target_link_libraries(
   hello/hello
   n3rv
@@ -124,6 +130,17 @@ target_link_libraries(
   pthread
 )
 
+target_link_libraries(
+  http-gateway/http-gateway
+  n3rv
+  n3rvhttp
+  zmq
+  pthread
+)
+
+
+
 find_library (N3RV n3rv)
+find_library (N3RVHTTP n3rvhttp)
 find_library (ZMQ zmq)
 find_library (PTHREAD pthread)
