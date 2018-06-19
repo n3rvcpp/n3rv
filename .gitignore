@@ -14,6 +14,7 @@ examples/algotrading/exec
 examples/algotrading/moneyman
 examples/topology-load/topology-load
 examples/topology-fetch/topology-fetch
+examples/http-gateway/http-gateway
 
 examples/hello/hello
 tests/tests
