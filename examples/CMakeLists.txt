@@ -63,6 +63,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 target_link_libraries(
@@ -70,6 +71,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 target_link_libraries(
@@ -77,6 +79,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 
@@ -85,6 +88,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 target_link_libraries(
@@ -92,6 +96,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 
@@ -100,6 +105,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 target_link_libraries(
@@ -107,6 +113,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 
@@ -115,6 +122,7 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 target_link_libraries(
@@ -122,8 +130,11 @@ target_link_libraries(
   n3rv
   zmq
   pthread
+  protobuf
 )
 
 find_library (N3RV n3rv)
 find_library (ZMQ zmq)
 find_library (PTHREAD pthread)
+find_library (PROTOBUF protobuf)
+

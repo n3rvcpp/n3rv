@@ -1,12 +1,12 @@
 message n3rvmessage {
     required string sender = 1;
     optional string action = 2;
-    optional string args = 3;
-    required string payload = 4;
+    repeated string args = 3;
+    optional string payload = 4;
 }
 
 message n3rvdirectory {
-    repeated n3rvnode = 1;
+    repeated n3rvnode nodes = 1;
 }
 
 message n3rvnode {

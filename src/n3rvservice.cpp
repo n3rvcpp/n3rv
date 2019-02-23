@@ -391,7 +391,6 @@ namespace n3rv {
     self->directory = parse_directory(dirstring);    
     self->check_deferred();
 
-
   }
 
   void service::set_poll_timeout(int poll_timeout) {

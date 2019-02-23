@@ -1,8 +1,6 @@
 #ifndef N3RV_PROTO_HPP
 #define N3RV_PROTO_HPP
 
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
 #include <vector>
 #include <map>
 
@@ -25,8 +23,6 @@ namespace n3rv {
   } message;
 
   
-
-
   /**
    * Serializes message for later sending over the net as a JSON string.
    * @param msg message to serialize.
@@ -35,7 +31,7 @@ namespace n3rv {
   std::string serialize_msg(n3rv::message& msg);
 
   /**
-   * Parses a JSON message comming from a service and 
+   * Parses a Protobuf message comming from a service and 
    * puts it inside a n3rvquery structure.
    * @param msgstr message to parse.
    * @return parsed message.
@@ -43,7 +39,7 @@ namespace n3rv {
   n3rv::message parse_msg(std::string msgstr);
 
   /**
-   * Parses a JSON message directly from zmq message container.
+   * Parses a Protobuf message directly from zmq message container.
    * @param msg ZMQ message to parse.
    * @return parsed message.
    */ 
@@ -51,14 +47,14 @@ namespace n3rv {
 
 
   /**
-   * Performs the JSON-serialization of a services directory. 
+   * Performs the protobuf-serialization of a services directory. 
    * @param directory Directory to serialize.
    * @return String-serialized directory.
    */
   std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory);
 
   /**
-   * Performs parsing of JSON dirstring.
+   * Performs parsing of protobuf dirstring.
    * @param String-serialized directory.
    * @return Unserialized Directory.
    */

@@ -1,4 +1,5 @@
 #include "n3rvproto.hpp"
+#include "n3rvproto.pb.h"
 #include <iostream>
 
 namespace n3rv {
@@ -10,31 +11,18 @@ namespace n3rv {
 
   std::string serialize_msg(n3rv::message& msg) {
     
-    rapidjson::StringBuffer sb; 
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+    std::string result;
+    n3rvmessage msg__;
 
-    writer.StartObject();
+    msg__.set_sender(msg.sender);
+    msg__.set_action(msg.action);
+    msg__.set_payload(msg.payload);
 
-    writer.String("sender");
-    writer.String(msg.sender.c_str());
-
-    writer.String("action");
-    writer.String(msg.action.c_str());
-
-    writer.String("args");
-    writer.StartArray();;
- 
-    for (std::string arg: msg.args ) {
-      writer.String(arg.c_str());
+    for (auto a: msg.args) {
+      msg__.add_args(a);
     }
-    writer.EndArray();
 
-    writer.String("payload");
-    writer.String(msg.payload.c_str());
-    writer.EndObject();
-
-    std::string result = sb.GetString();
-
+    result = msg__.SerializeAsString();
     t128bug(result);
     return result;
 
@@ -56,22 +44,14 @@ namespace n3rv {
    n3rv::message parse_msg(std::string msg) {
 
     n3rv::message msg_;
+    n3rvmessage msg__;
+    msg__.ParseFromString(msg);
+    msg_.sender = msg__.sender();
+    msg_.action = msg__.action();
+    msg_.payload = msg__.payload();
 
-    rapidjson::Document d;
-    d.Parse<0>(msg.c_str()); 
-
-    assert(d.IsObject());
-    assert(d["sender"].IsString());
-    assert(d["action"].IsString());
-    assert(d["args"].IsArray());
-    assert(d["payload"].IsString());
-
-    msg_.sender = d["sender"].GetString();
-    msg_.action = d["action"].GetString();
-    msg_.payload = d["payload"].GetString();
-
-    for (int i=0;i< d["args"].Size();i++) {
-      msg_.args.emplace_back( d["args"][i].GetString() );
+    for (int i=0;i< msg__.args_size();i++) {
+      msg_.args.emplace_back( msg__.args(i));
     }
 
     return msg_;
@@ -81,24 +61,17 @@ namespace n3rv {
 
   std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr) {
 
+
     std::map<std::string, n3rv::qserv> result;
+    n3rvdirectory dir;
+    dir.ParseFromString(dirstr);
 
-    rapidjson::Document d;
-    d.Parse<0>(dirstr.c_str());
-    assert(d.IsArray());
+    for (int i=0;i< dir.nodes_size();i++) {
 
-    for (int i =0; i < d.Size(); i++ ) {
-
-      assert(d[i]["name"].IsString());
-      assert(d[i]["service_class"].IsString());
-      assert(d[i]["ip"].IsString());
-      assert(d[i]["port"].IsInt());
-
-      std::string name = d[i]["name"].GetString();
-      result[name].service_class = d[i]["service_class"].GetString();
-      result[name].ip = d[i]["ip"].GetString();
-      result[name].port = d[i]["port"].GetInt();
-
+      auto name = dir.nodes(i).name();
+      result[name].service_class = dir.nodes(i).service_class();
+      result[name].ip = dir.nodes(i).ip();
+      result[name].port = dir.nodes(i).port();
     }
 
     return result;
@@ -107,36 +80,24 @@ namespace n3rv {
 
   std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory){
 
-    std::string result;
-    rapidjson::StringBuffer sb; 
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(sb);
+     std::string result;
+     n3rvdirectory dir;
 
-    writer.StartArray();
-    
     for(std::map<std::string, n3rv::qserv>::iterator iter = directory.begin(); 
         iter != directory.end(); 
         ++iter) {
 
-       std::string k =  iter->first;
+          std::string k =  iter->first;
+          n3rvnode* node_ = dir.add_nodes(); 
 
-       writer.StartObject();
+          node_->set_name(k.c_str());
+          node_->set_service_class(directory[k].service_class.c_str());
+          node_->set_ip(directory[k].ip.c_str());
+          node_->set_port(directory[k].port);
+      }
 
-       writer.String("name");
-       writer.String(k.c_str());
-       writer.String("service_class");
-       writer.String(directory[k].service_class.c_str());
-       writer.String("ip");
-       writer.String(directory[k].ip.c_str());
-       writer.String("port");
-       writer.Int(directory[k].port);
-
-       writer.EndObject();
-    }
-
-    writer.EndArray();
-    result = sb.GetString();
+    result = dir.SerializeAsString();
     t128bug(result);
-
     return result;
 
   }

@@ -13,6 +13,7 @@ add_library(
   src/n3rvservicecontroller.cpp
   src/n3rvlogger.cpp
   src/n3rvproto.cpp
+  src/n3rvproto.pb.cc
   src/n3rvtopology.cpp
 )
 
@@ -26,6 +27,7 @@ target_link_libraries(
    n3rv
    zmq
    pthread
+   protobuf
 )
 
 
@@ -33,10 +35,12 @@ target_link_libraries(
    n3rv
    zmq
    pthread
+   protobuf
 )
 
 find_library (PTHREAD pthread)
 find_library (ZMQ zmq)
+find_library (PROTOBUF protobuf)
 
 
 install (TARGETS n3rv DESTINATION /usr/local/lib)
