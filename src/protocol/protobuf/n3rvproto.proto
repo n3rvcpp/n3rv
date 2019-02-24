@@ -1,0 +1,17 @@
+message n3rvmessage {
+    required string sender = 1;
+    optional string action = 2;
+    repeated string args = 3;
+    optional string payload = 4;
+}
+
+message n3rvdirectory {
+    repeated n3rvnode nodes = 1;
+}
+
+message n3rvnode {
+    required string name = 1;
+    required string service_class = 2;
+    required string ip = 3;
+    required int32 port = 4;
+}
