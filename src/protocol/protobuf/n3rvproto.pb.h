@@ -102,7 +102,7 @@ class n3rvmessage : public ::google::protobuf::Message {
   inline ::std::string* release_sender();
   inline void set_allocated_sender(::std::string* sender);
 
-  // optional string action = 2;
+  // required string action = 2;
   inline bool has_action() const;
   inline void clear_action();
   static const int kActionFieldNumber = 2;
@@ -130,7 +130,7 @@ class n3rvmessage : public ::google::protobuf::Message {
   inline const ::google::protobuf::RepeatedPtrField< ::std::string>& args() const;
   inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_args();
 
-  // optional string payload = 4;
+  // required string payload = 4;
   inline bool has_payload() const;
   inline void clear_payload();
   static const int kPayloadFieldNumber = 4;
@@ -455,7 +455,7 @@ inline void n3rvmessage::set_allocated_sender(::std::string* sender) {
   // @@protoc_insertion_point(field_set_allocated:n3rvmessage.sender)
 }
 
-// optional string action = 2;
+// required string action = 2;
 inline bool n3rvmessage::has_action() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -585,7 +585,7 @@ n3rvmessage::mutable_args() {
   return &args_;
 }
 
-// optional string payload = 4;
+// required string payload = 4;
 inline bool n3rvmessage::has_payload() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }

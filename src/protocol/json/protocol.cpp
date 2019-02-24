@@ -44,14 +44,9 @@ namespace n3rv {
 
 
    n3rv::message parse_msg(zmq::message_t* msg) {
-    char * data_ = (char*) calloc(  msg->size() + 1 , sizeof(char) );
-    memcpy(data_, msg->data(), msg->size());
-    std::string data_s = data_;
-
+    std::string data_s(static_cast<char*>(msg->data()), msg->size());
     n3rv::message q = parse_msg(data_s);
-    free(data_);
     return q;
-    
   }
 
 

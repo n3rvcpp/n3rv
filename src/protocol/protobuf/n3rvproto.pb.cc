@@ -127,8 +127,8 @@ void protobuf_AddDesc_n3rvproto_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\017n3rvproto.proto\"L\n\013n3rvmessage\022\016\n\006send"
-    "er\030\001 \002(\t\022\016\n\006action\030\002 \001(\t\022\014\n\004args\030\003 \003(\t\022\017"
-    "\n\007payload\030\004 \001(\t\")\n\rn3rvdirectory\022\030\n\005node"
+    "er\030\001 \002(\t\022\016\n\006action\030\002 \002(\t\022\014\n\004args\030\003 \003(\t\022\017"
+    "\n\007payload\030\004 \002(\t\")\n\rn3rvdirectory\022\030\n\005node"
     "s\030\001 \003(\0132\t.n3rvnode\"I\n\010n3rvnode\022\014\n\004name\030\001"
     " \002(\t\022\025\n\rservice_class\030\002 \002(\t\022\n\n\002ip\030\003 \002(\t\022"
     "\014\n\004port\030\004 \002(\005", 213);
@@ -273,7 +273,7 @@ bool n3rvmessage::MergePartialFromCodedStream(
         break;
       }
 
-      // optional string action = 2;
+      // required string action = 2;
       case 2: {
         if (tag == 18) {
          parse_action:
@@ -309,7 +309,7 @@ bool n3rvmessage::MergePartialFromCodedStream(
         break;
       }
 
-      // optional string payload = 4;
+      // required string payload = 4;
       case 4: {
         if (tag == 34) {
          parse_payload:
@@ -361,7 +361,7 @@ void n3rvmessage::SerializeWithCachedSizes(
       1, this->sender(), output);
   }
 
-  // optional string action = 2;
+  // required string action = 2;
   if (has_action()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->action().data(), this->action().length(),
@@ -381,7 +381,7 @@ void n3rvmessage::SerializeWithCachedSizes(
       3, this->args(i), output);
   }
 
-  // optional string payload = 4;
+  // required string payload = 4;
   if (has_payload()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->payload().data(), this->payload().length(),
@@ -412,7 +412,7 @@ void n3rvmessage::SerializeWithCachedSizes(
         1, this->sender(), target);
   }
 
-  // optional string action = 2;
+  // required string action = 2;
   if (has_action()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->action().data(), this->action().length(),
@@ -433,7 +433,7 @@ void n3rvmessage::SerializeWithCachedSizes(
       WriteStringToArray(3, this->args(i), target);
   }
 
-  // optional string payload = 4;
+  // required string payload = 4;
   if (has_payload()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->payload().data(), this->payload().length(),
@@ -463,14 +463,14 @@ int n3rvmessage::ByteSize() const {
           this->sender());
     }
 
-    // optional string action = 2;
+    // required string action = 2;
     if (has_action()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->action());
     }
 
-    // optional string payload = 4;
+    // required string payload = 4;
     if (has_payload()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -538,7 +538,7 @@ void n3rvmessage::CopyFrom(const n3rvmessage& from) {
 }
 
 bool n3rvmessage::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x0000000b) != 0x0000000b) return false;
 
   return true;
 }
