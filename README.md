@@ -14,12 +14,12 @@ n3rv is a project that aims to provide a performant and easy-to-use microservice
 
 ### Key Features
 
- - Deploy Microservice architectures without needing a Message Queue (Bye-Bye Kafka !).
+ - No need for Message Queues (Bye-Bye Kafka !).
  - Blazing fast messages exchange between services.
  - HTTP <=> ZMQ Gateway mechanism (httpservice).
- - Easy to code with.
+ - Easy to use.
  - Integrated hosts/endpoints resolving (no need for DNS).
- - Takes care of the messages exchange format via JSON serialization. (protobuf coming soon).
+ - Supports both protobuf and JSON serialization.
  - Dynamic architecture definition.
  
  
@@ -56,6 +56,7 @@ Project Dependancies
 * rapidjson (miloyip/rapidjson)
 * cmake 2.6+
 * libevent (Optional, if using httpservice)
+  protobuf2 (Optional)
 
 Build
 -----
@@ -69,6 +70,15 @@ cmake .
 make
 make install
 ```
+Protobuf Support
+----------------
+
+In order to enable protobuf serialization in n3rv, you must run call cmake with -DWTH_PROTOBUF=ON
+
+```Shell
+cmake -DWITH_PROTOBUF=ON .
+
+
 
 That's all, you are now ready to build your first µservice architecture with n3rv !
 
@@ -159,8 +169,11 @@ make
 TOTO
 ----
 
-- Implement built-in service controller redudency.
-- undiscriminated Service Class/name node resoution mechanics (with random node selection mech ?)
-- Support for protobuf in addition to JSON for inter-services messages exchange.
+- Implement built-in service controller redudency mechanism.
+- undiscriminated Service Class/name node resoution mechanism.
+- Improve code coverage in tests.
+- Write more detailed documentation.
 - Implementation of a WYSIWYG edtior allowing to generate topologies and produce class templates (separate project).
-- Extending the service controller to get a web administration interface (unsure)
+- Possible Extending the service controller to get a web administration interface.
+- Possible replacement of ZeroMQ by Nanomsg for services I/O.
+
