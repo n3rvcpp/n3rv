@@ -1,4 +1,4 @@
-#include "n3rvproto.hpp"
+#include "../../n3rvproto.hpp"
 #include "n3rvproto.pb.h"
 #include <iostream>
 
