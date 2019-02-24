@@ -38,10 +38,17 @@ namespace n3rv {
       /** Runs the service controller once instanciated. */
       void run();
       
+      /** Asynchronously runs the service controller, returns a handler for the running thread.*/
+      std::thread* run_async();
+
       /** Stops the binding of CH1/CH2 sockets. */
       void terminate();
 
       n3rv::logger* ll;
+
+      /* In case the service controller port was automatically allocated. */
+      int get_port();
+
 
     protected:
 
@@ -56,6 +63,9 @@ namespace n3rv {
       zmq::socket_t* zmsock_pub;
       std::map<std::string, n3rv::qserv> directory;
       topology* topo_;
+
+      int init_bindings(int binding_port);
+
   };
 
 

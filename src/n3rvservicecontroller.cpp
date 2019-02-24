@@ -45,6 +45,12 @@ namespace n3rv {
       this->topo_  = topology::load(path);
   }
 
+  std::thread* servicecontroller::run_async() {
+      
+        std::thread* res = new std::thread([this] {  this->run();  });
+        res->detach();
+        return res;
+    }
 
   void servicecontroller::run() {
 
