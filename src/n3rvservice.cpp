@@ -387,7 +387,7 @@ namespace n3rv {
     service* self = (service*) objref;
 
     self->ll->log(LOGLV_DEBUG,"updating Directory..");
-    std::string dirstring((char*) dirmsg->data(), dirmsg->size());
+    std::string dirstring(static_cast<char*>(dirmsg->data()), dirmsg->size());
     self->directory = parse_directory(dirstring);    
     self->check_deferred();
 
