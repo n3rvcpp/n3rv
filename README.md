@@ -77,8 +77,7 @@ In order to enable protobuf serialization in n3rv, you must run call cmake with 
 
 ```Shell
 cmake -DWITH_PROTOBUF=ON .
-
-
+```
 
 That's all, you are now ready to build your first µservice architecture with n3rv !
 
