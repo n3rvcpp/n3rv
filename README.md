@@ -72,8 +72,13 @@ make install
 ```
 Protobuf Support
 ----------------
+In order to enable protobuf serialization in n3rv, you must first generate the pb code for your version of protobuf:
 
-In order to enable protobuf serialization in n3rv, you must run call cmake with -DWTH_PROTOBUF=ON
+```Shell
+./pbcompile.sh
+```
+
+Then at compile time, you have to call cmake with -DWTH_PROTOBUF=ON
 
 ```Shell
 cmake -DWITH_PROTOBUF=ON .
