@@ -54,30 +54,43 @@ namespace n3rv {
   
 
 
-  std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr) {
+  std::vector<n3rv::qserv> parse_directory(std::string dirstr) {
 
 
-    std::map<std::string, n3rv::qserv> result;
+    std::vector<n3rv::qserv> result;
     n3rvdirectory dir;
     dir.ParseFromString(dirstr);
 
     for (int i=0;i< dir.nodes_size();i++) {
 
-      auto name = dir.nodes(i).name();
-      result[name].service_class = dir.nodes(i).service_class();
-      result[name].ip = dir.nodes(i).ip();
-      result[name].port = dir.nodes(i).port();
+      n3rv::qserv qs;
+      qs.namespace_ = dir.nodes(i).namespace_();
+      qs.service_class = dir.nodes(i).service_class();
+      qs.node_name = dir.nodes(i).name();
+      qs.ip = dir.nodes(i).ip();
+
+      for(int j=0;j<dir.nodes(i).bindings_size();j++) {
+
+        n3rv::binding b;
+        b.name = dir.nodes(i).bindings(j).name();
+        b.port = dir.nodes(i).bindings(j).port();
+        b.socket_type = dir.nodes(i).bindings(j).socket_type();
+      }
+
+      result.emplace_back(qs);
+
     }
 
     return result;
   }
 
 
-  std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory){
+  std::string serialize_directory(std::vector<n3rv::qserv>& directory){
 
      std::string result;
      n3rvdirectory dir;
-
+    
+    /*
     for(std::map<std::string, n3rv::qserv>::iterator iter = directory.begin(); 
         iter != directory.end(); 
         ++iter) {
@@ -88,8 +101,8 @@ namespace n3rv {
           node_->set_name(k.c_str());
           node_->set_service_class(directory[k].service_class.c_str());
           node_->set_ip(directory[k].ip.c_str());
-          node_->set_port(directory[k].port);
-      }
+      }*/
+
 
     result = dir.SerializeAsString();
     t128bug(result);

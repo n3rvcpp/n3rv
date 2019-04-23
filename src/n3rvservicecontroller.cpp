@@ -63,13 +63,20 @@ namespace n3rv {
 
               if ( m.action == "subscribe"  ) {
 
+                //must nlookup() to check if node already available.
+
                 this->ll->log(LOGLV_DEBUG, "subscription ok");
                               
                 n3rv::qserv nserv;
-                nserv.service_class = m.args[0];
+                nserv.namespace_ = m.args[0];
+                nserv.service_class = m.args[1];
+                nserv.node_name = m.args[2];
                 nserv.ip = this->peer_ip(&query);
-                nserv.port = atoi(m.args[1].c_str());
-                this->directory[m.sender] = nserv;
+
+
+
+                //nserv.port = atoi(m.args[3].c_str());
+                this->directory.emplace_back(nserv);
 
                 zmq::message_t reply(2);
                 memcpy(reply.data(),"OK",2);

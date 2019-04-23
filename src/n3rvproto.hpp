@@ -51,14 +51,14 @@ namespace n3rv {
    * @param directory Directory to serialize.
    * @return String-serialized directory.
    */
-  std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory);
+  std::string serialize_directory(std::vector<n3rv::qserv>& directory);
 
   /**
    * Performs parsing of protobuf dirstring.
    * @param String-serialized directory.
    * @return Unserialized Directory.
    */
-  std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr);
+  std::vector<n3rv::qserv> parse_directory(std::string dirstr);
   
   void t128bug(std::string& q);
 

@@ -202,7 +202,7 @@ namespace n3rv {
    std::string name;
    std::string controller_host;
    int controller_port;
-   std::map<std::string, n3rv::qserv> directory;
+   std::vector<n3rv::qserv> directory;
    std::map<std::string, n3rv::qconn> connections;
    zmq::context_t zctx;
 

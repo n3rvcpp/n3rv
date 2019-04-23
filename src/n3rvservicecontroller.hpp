@@ -61,7 +61,7 @@ namespace n3rv {
       zmq::context_t zctx;
       zmq::socket_t* zmsock;
       zmq::socket_t* zmsock_pub;
-      std::map<std::string, n3rv::qserv> directory;
+      std::vector<n3rv::qserv> directory;
       topology* topo_;
 
       int init_bindings(int binding_port);

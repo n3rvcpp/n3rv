@@ -12,8 +12,16 @@ message n3rvdirectory {
 }
 
 message n3rvnode {
-    required string name = 1;
+    required string namespace_ = 1;
     required string service_class = 2;
-    required string ip = 3;
-    required int32 port = 4;
+    required string name = 3;
+    required string ip = 4;
+    required int32 port = 5;
+    repeated n3rvbinding bindings = 6;
+}
+
+message n3rvbinding {
+    required string name = 1;
+    required int32 port = 2;
+    required int32 socket_type = 3;
 }

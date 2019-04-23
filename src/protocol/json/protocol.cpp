@@ -76,9 +76,9 @@ namespace n3rv {
   
 
 
-  std::map<std::string, n3rv::qserv> parse_directory(std::string dirstr) {
+  std::vector<n3rv::qserv> parse_directory(std::string dirstr) {
 
-    std::map<std::string, n3rv::qserv> result;
+    std::vector<n3rv::qserv> result;
 
     rapidjson::Document d;
     d.Parse<0>(dirstr.c_str());
@@ -86,23 +86,34 @@ namespace n3rv {
 
     for (int i =0; i < d.Size(); i++ ) {
 
-      assert(d[i]["name"].IsString());
+      assert(d[i]["namespace_"].IsString());
       assert(d[i]["service_class"].IsString());
+      assert(d[i]["name"].IsString());
       assert(d[i]["ip"].IsString());
-      assert(d[i]["port"].IsInt());
+      assert(d[i]["bindings"].IsArray()); 
 
-      std::string name = d[i]["name"].GetString();
-      result[name].service_class = d[i]["service_class"].GetString();
-      result[name].ip = d[i]["ip"].GetString();
-      result[name].port = d[i]["port"].GetInt();
+  
+      n3rv::qserv qs;
+      qs.namespace_ = d[i]["namespace_"].GetString();
+      qs.service_class = d[i]["service_class"].GetString();
+      qs.node_name = d[i]["name"].GetString();
+      qs.ip = d[i]["ip"].GetString();
 
+      for(int j=0;j< d[i]["bindings"].GetArray().Size();j++) {
+
+          n3rv::binding b;
+          b.name = d[i]["bindings"][j]["name"].GetString();
+          b.port = d[i]["bindings"][j]["port"].GetInt();
+          b.socket_type = d[i]["bindings"][j]["socket_type"].GetInt();
+          qs.bindings.emplace_back(b);
+      }
     }
 
     return result;
   }
 
 
-  std::string serialize_directory(std::map<std::string, n3rv::qserv>& directory){
+  std::string serialize_directory(std::vector<n3rv::qserv>& directory){
 
     std::string result;
     rapidjson::StringBuffer sb; 
@@ -110,22 +121,30 @@ namespace n3rv {
 
     writer.StartArray();
     
-    for(std::map<std::string, n3rv::qserv>::iterator iter = directory.begin(); 
-        iter != directory.end(); 
-        ++iter) {
-
-       std::string k =  iter->first;
+    for (int k=0;k<directory.size();k++) {
 
        writer.StartObject();
-
+       
        writer.String("name");
-       writer.String(k.c_str());
+       writer.String(directory[k].node_name.c_str());
        writer.String("service_class");
        writer.String(directory[k].service_class.c_str());
        writer.String("ip");
        writer.String(directory[k].ip.c_str());
-       writer.String("port");
-       writer.Int(directory[k].port);
+       writer.String("bindings");
+
+       writer.StartArray();
+       
+       for (int l=0;l< directory[k].bindings.size();l++) {
+         writer.StartObject();
+         writer.String("name");
+         writer.String(directory[k].bindings[l].name.c_str());
+         writer.String("port");
+         writer.Int(directory[k].bindings[l].port);
+         writer.String("socket_type");
+         writer.Int(directory[k].bindings[l].socket_type);
+         writer.EndObject();         
+       }
 
        writer.EndObject();
     }

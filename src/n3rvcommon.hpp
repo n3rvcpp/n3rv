@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <zmq.hpp>
+#include <regex>
 
 
 namespace n3rv {
@@ -27,28 +28,48 @@ namespace n3rv {
       std::vector<std::string> peers;
     } qconn;
 
-    /**
-     * qserv aims to store each services directory entries.
-     */
-    typedef struct qserv_ {
-        std::string service_class;
-        std::string ip;
-        unsigned int port;
-    } qserv;
-
-
-    /**
+     /**
      * binding structure aims to store configuration for a zmq socket.
      * (socket_type is a direct allusion to zmq socket types.)
      */
     typedef struct binding_  {
+        void* parent;
+        std::string name;
         unsigned int port;
         unsigned int socket_type;
     } binding;
 
+    /**
+     * qserv aims to store each services directory entries.
+     */
+    typedef struct qserv_ {
+        std::string namespace_;
+        std::string service_class;
+        std::string node_name;
+        std::string ip;
+        std::vector<binding> bindings;
+    } qserv;
+
+
 
     // Main n3rv callbacks signature.
     typedef void* (*fctptr)(void*, zmq::message_t*);
+
+    /**
+     * Tries to Resolve node from directory provided as argument. 
+     */
+    qserv* nlookup(std::vector<qserv_>& dir, std::string service_class, std::string node_name, std::string namespace_ = "*" );
+    
+    /**
+     * Tries to Resolve node from directory provided as argument, given full node addr.
+     */
+    qserv* nlookup(std::vector<qserv_>& dir, std::string addr);
+
+    /** 
+     * Tries to resolve binding from full address.
+     */
+    binding* blookup(std::vector<qserv>& dir, std::string addr);
+
 
 }
 

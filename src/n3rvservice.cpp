@@ -47,12 +47,13 @@ namespace n3rv {
 
     this->ll->log(LOGLV_NORM,"connecting to " + name);
 
-    if (this->directory.find(name) != this->directory.end()) {
-
-      n3rv::qserv s = this->directory[name];  
+    n3rv::binding* b = blookup(this->directory, name);
+    
+    if (b!= nullptr) {
+      n3rv::qserv* n = (n3rv::qserv*) b->parent;
       this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
       std::stringstream ep;
-      ep << "tcp://" << s.ip << ":" << s.port;
+      ep << "tcp://" << n->ip << ":" << b->port;
       this->connections[name].socket->connect(ep.str().c_str());
 
       //Adds sockopt if zmq socket type is ZMQ_SUB
@@ -369,7 +370,10 @@ namespace n3rv {
 
     int res = 0;
     for (auto def: deferred_iter) {
-      if (this->directory.find(def.name) != this->directory.end()) {
+
+      n3rv::binding* b = blookup(this->directory,def.name);
+
+      if (b != nullptr) {
 
         this->ll->log(n3rv::LOGLV_NORM,"reconnecting to " + def.name);
         this->connect(def.name, def.socket_type);
@@ -388,7 +392,9 @@ namespace n3rv {
 
     self->ll->log(LOGLV_DEBUG,"updating Directory..");
     std::string dirstring(static_cast<char*>(dirmsg->data()), dirmsg->size());
-    self->directory = parse_directory(dirstring);    
+    
+    //REWRITE PARSE_DIR
+    //self->directory = parse_directory(dirstring);    
     self->check_deferred();
 
   }
