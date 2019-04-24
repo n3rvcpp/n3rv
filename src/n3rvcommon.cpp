@@ -4,14 +4,25 @@ namespace n3rv {
 
     qserv* nlookup(std::vector<qserv>& dir, std::string addr) {
 
+        std::vector<qserv*> rrlist;
+
+
         std::string lookup_str = regex_replace(addr, std::regex("\\*"), "(.*)");
         for(auto n: dir) {         
             std::string absname = n.namespace_ + "." + n.service_class + "." + n.node_name;   
             if (regex_search(absname,std::regex(lookup_str))) {
-                return &n;
+                rrlist.emplace_back(&n);
             }
         }
-        return nullptr;
+
+        if (rrlist.size() == 1) return rrlist[0];
+        else if (rrlist.size() > 1) {
+            //Round Robin Node Lookup
+            srand(time(NULL));
+            int n_index = rand() % rrlist.size() + 0;
+            return rrlist[n_index];
+        }
+        else return nullptr;
     }
 
     qserv* nlookup(std::vector<qserv>& dir, 
