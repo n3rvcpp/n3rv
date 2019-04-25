@@ -1,19 +1,30 @@
 #include "n3rvservice.hpp"
 #include <thread>
+#include <typeinfo>
+
 
 namespace n3rv {
 
-  service::service(std::string name, 
-                   std::string service_class, 
+
+  service::service(                
                    std::string controller_host, 
-                   int controller_port) {
+                   int controller_port,
+                   std::string name) {
 
         this->poll_timeout = 1000;
+        this->service_class = typeid(this).name();
+        this->namespace_ = "com";
+
+        if (name == "") {
+          std::stringstream ss;
+          ss << this->service_class << "-" << rand() % 99999 + 0;
+          this->name = ss.str();
+        }
+
+        else this->name = name;
 
         this->ll = new logger(LOGLV_NORM);
         this->zctx = zmq::context_t(1);
-        this->name = name;
-        this->service_class = service_class;
         this->controller_host = controller_host;
         this->controller_port = controller_port;
 

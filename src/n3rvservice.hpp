@@ -29,15 +29,14 @@ namespace n3rv {
    public:
 
     /** service class constructor.
-     *  @param name The name of the service, acts as an identifier inside the cluster. 
-     *  @param service_class basically describes the type of node for the instanciated service.
      *  @controller_host the ip/hostname of the controller.
      *  @controller_port the port number on which the controller is listening (ch1). 
+     *  @param name The name of the service, acts as an identifier inside the cluster. 
      */
-    service(std::string name, 
-            std::string service_class, 
-            std::string controller_host, 
-            int controller_port);
+    service(std::string controller_host, 
+            int controller_port,
+            std::string name = "");
+    
     
     logger* ll;
 
@@ -190,6 +189,8 @@ namespace n3rv {
      *  @param poll_timeout time (in ms) the poller must wait before returning.
      */
     void set_poll_timeout(int poll_timeout);
+
+    std::string namespace_;
 
   protected:
    
