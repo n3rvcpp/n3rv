@@ -22,19 +22,24 @@ class worker: public n3rv::service {
     int initialize() {
 
       this->working = false;
-      this->connect("ventiler1",ZMQ_REQ);
-      this->attach("ventiler1",runwork);
+      this->connect("com.vent.ventiler1.ventiler",ZMQ_REQ);
+      this->attach("com.vent.ventiler1.ventiler",runwork);
      
     }
 
     void hkloop() {
+      
+     n3rv::binding* bind = n3rv::blookup(this->directory,"com.vent.ventiler1.ventiler");
+     
+     if (! this->working && bind != nullptr ) {
 
-      if (! this->working && this->directory.find("ventiler1") != this->directory.end() ) {
+        std::cout << "ENTRY EXISTS IN DIR" << std::endl;
+
         this->ll->log(n3rv::LOGLV_DEBUG,"asking for workload..");
 
         n3rv::message m;
         m.action = "WL_REQ";
-        this->send("ventiler1", m,0);        
+        this->send("com.vent.ventiler1.ventiler", m,0);        
         working = true;
       }
       
@@ -82,8 +87,8 @@ class vent: public n3rv::service {
       srand(time(NULL));
 
       this->ll->log(n3rv::LOGLV_NORM, "binding service..");
-      this->bind("ventiler1","127.0.0.1",11003,ZMQ_REP);
-      this->attach("ventiler1", "wl_dist");
+      this->bind("ventiler","127.0.0.1",11003,ZMQ_REP);
+      this->attach("ventiler", "wl_dist");
     } 
 
     void map_callbacks() {
@@ -110,7 +115,7 @@ class vent: public n3rv::service {
       msg.action = "WL_DIST";
       msg.args.emplace_back(ss.str());
 
-      self->send("ventiler1",msg,0);
+      self->send("ventiler",msg,0);
 
       }
 
@@ -121,7 +126,7 @@ class vent: public n3rv::service {
 
 int main(int argc, char** argv) {
 
-  std::cout << "N3rv Workers Example -- Copyright 2018 Quotek" << std::endl;
+  std::cout << "N3rv Workers Example -- Copyright 2019 Quotek" << std::endl;
   std::cout << "=============================================" << std::endl;
 
   if ( strcmp(argv[2],"ctl") == 0 ) {
@@ -137,7 +142,8 @@ int main(int argc, char** argv) {
 
   else if (strcmp(argv[4], "worker") == 0) {
 
-    worker w1(argv[2],argv[4], argv[6], atoi(argv[8]));
+    worker w1(argv[6], atoi(argv[8]));
+    w1.set_uid("com","worker",argv[2]);
     w1.ll->add_dest("stdout");
     w1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     w1.ll->log(n3rv::LOGLV_NORM,"Running Worker..");
@@ -149,7 +155,8 @@ int main(int argc, char** argv) {
 
   else if (strcmp(argv[4],"vent") == 0) {
 
-    vent v1(argv[2],argv[4], argv[6], atoi(argv[8]));
+    vent v1(argv[6], atoi(argv[8]));
+    v1.set_uid("com.vent.ventiler1");
     v1.ll->add_dest("stdout");
     v1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     v1.ll->log(n3rv::LOGLV_NORM,"Running Ventiler..");

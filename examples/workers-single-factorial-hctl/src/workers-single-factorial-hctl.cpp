@@ -6,6 +6,7 @@
 #include <n3rv/n3rvservicecontroller.hpp>
 #include <n3rv/n3rvservice.hpp>
 #include <n3rv/n3rvlogger.hpp>
+#include <n3rv/n3rvcommon.hpp>
 #include <iostream>
 
 
@@ -20,19 +21,19 @@ class worker: public n3rv::service {
     int initialize() {
 
       this->working = false;
-      this->connect("ventiler1",ZMQ_REQ);
-      this->attach("ventiler1",runwork);
+      this->connect("com.vent.*.ventiler",ZMQ_REQ);
+      this->attach("com.vent.*.ventiler",runwork);
      
     }
 
     void hkloop() {
 
-      if (! this->working && this->directory.find("ventiler1") != this->directory.end() ) {
+      if (! this->working && n3rv::nlookup(this->directory,"com.vent.*") != nullptr ) {
         this->ll->log(n3rv::LOGLV_DEBUG,"asking for workload..");
 
         n3rv::message m;
         m.action = "WL_REQ";
-        this->send("ventiler1", m,0);        
+        this->send("com.vent.*.ventiler", m,0);        
         working = true;
       }
       
@@ -76,8 +77,8 @@ class vent: public n3rv::service {
     int initialize() {
 
       this->ll->log(n3rv::LOGLV_NORM, "binding service..");
-      this->bind("ventiler1","127.0.0.1",11003,ZMQ_REP);
-      this->attach("ventiler1", wl_dist);
+      this->bind("ventiler","127.0.0.1",11003,ZMQ_REP);
+      this->attach("ventiler", wl_dist);
     } 
 
 
@@ -118,7 +119,8 @@ int main(int argc, char** argv) {
 
   if (strcmp(argv[4], "worker") == 0) {
 
-    worker w1(argv[2],argv[4], argv[6], atoi(argv[8]));
+    worker w1(argv[6], atoi(argv[8]));
+    w1.set_uid("com",argv[4],argv[2]);
     w1.ll->add_dest("stdout");
     w1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     w1.ll->log(n3rv::LOGLV_NORM,"Running Worker..");
@@ -133,7 +135,9 @@ int main(int argc, char** argv) {
     //We start a hidden session of the controller along with the ventiler.
     n3rv::start_controller("0.0.0.0",10001,false,4);
 
-    vent v1(argv[2],argv[4], argv[6], atoi(argv[8]));
+    vent v1(argv[6], atoi(argv[8]));
+    v1.set_uid("com",argv[4], argv[2]);
+
     v1.ll->add_dest("stdout");
     v1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     v1.ll->log(n3rv::LOGLV_NORM,"Running Ventiler..");
