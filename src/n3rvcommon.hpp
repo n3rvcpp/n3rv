@@ -33,6 +33,7 @@ namespace n3rv {
      * (socket_type is a direct allusion to zmq socket types.)
      */
     typedef struct binding_  {
+        void* parent;
         std::string name;
         unsigned int port;
         unsigned int socket_type;
@@ -48,16 +49,6 @@ namespace n3rv {
         std::string ip;
         std::vector<binding> bindings;
     } qserv;
-
-    /**
-     * Result of binding lookup: must retrieve both parent node & binding.
-     */
-    typedef struct blookup_res {
-        std::string ip;
-        binding* bind;
-    } blookup_res;
-
-
 
     // Main n3rv callbacks signature.
     typedef void* (*fctptr)(void*, zmq::message_t*);
@@ -75,7 +66,7 @@ namespace n3rv {
     /** 
      * Tries to resolve binding from full address.
      */
-    blookup_res blookup(std::vector<qserv>& dir, std::string addr);
+    binding* blookup(std::vector<qserv>& dir, std::string addr);
 
 
 }

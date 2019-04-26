@@ -84,13 +84,13 @@ namespace n3rv {
 
     this->ll->log(LOGLV_NORM,"connecting to " + name);
 
-    blookup_res blr =  blookup(this->directory, name);
-     
-    if (blr.bind != nullptr) {
+    binding* b =  blookup(this->directory, name);
+
+    if (b != nullptr) {
 
       this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
       std::stringstream ep;
-      ep << "tcp://" << blr.ip << ":" << blr.bind->port;
+      ep << "tcp://" << ((n3rv::qserv*) b->parent)->ip << ":" << b->port;
 
       this->connections[name].socket->connect(ep.str().c_str());
 
@@ -413,9 +413,9 @@ namespace n3rv {
     int res = 0;
     for (auto def: deferred_iter) {
 
-      blookup_res blr = blookup(this->directory,def.name);
-      if (blr.bind != nullptr) {
-
+      binding* b = blookup(this->directory,def.name);
+      if (b != nullptr) {
+        
         this->ll->log(n3rv::LOGLV_NORM,"reconnecting to " + def.name);
         this->connect(def.name, def.socket_type);
         this->deferred.erase(this->deferred.begin() + res);

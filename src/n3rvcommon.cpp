@@ -40,13 +40,10 @@ namespace n3rv {
         
     }
 
-    blookup_res blookup(std::vector<qserv>& dir, 
+    binding* blookup(std::vector<qserv>& dir, 
                       std::string addr) {
 
-          blookup_res result;
-          result.ip = "";
-          result.bind = nullptr;
-
+         
           //extracts binding name
           int bpos = 0;
           for(int i=addr.length()-1;i>=0;i--) {
@@ -57,7 +54,7 @@ namespace n3rv {
           }
 
           if (bpos == 0) {
-              return result;
+              return nullptr;
           }
 
           std::string naddr = addr.substr(0,bpos);
@@ -66,19 +63,18 @@ namespace n3rv {
           qserv* s = nlookup(dir, naddr);
 
           if (s == nullptr) {
-              return result;
+              return nullptr;
           }
 
           for (int i =0;i < s->bindings.size(); i++ ) {
             
             if (s->bindings[i].name == bname) {             
-                    result.ip = s->ip;
-                    result.bind = &(s->bindings[i]);
-                    break;
+                    s->bindings[i].parent = (void*) s;
+                    return &(s->bindings[i]);
             }
           }
 
-          return result;
+          return nullptr;
     }
 
 }
