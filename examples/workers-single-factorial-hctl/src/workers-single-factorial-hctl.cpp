@@ -28,7 +28,7 @@ class worker: public n3rv::service {
 
     void hkloop() {
 
-      if (! this->working && n3rv::nlookup(this->directory,"com.vent.*") != nullptr ) {
+      if (! this->working && n3rv::blookup(this->directory,"com.vent.*ventiler") != nullptr ) {
         this->ll->log(n3rv::LOGLV_DEBUG,"asking for workload..");
 
         n3rv::message m;
@@ -113,7 +113,7 @@ class vent: public n3rv::service {
 
 int main(int argc, char** argv) {
 
-  std::cout << "N3rv Workers Example -- Copyright 2018 Quotek" << std::endl;
+  std::cout << "N3rv Workers Example -- Copyright 2019 Quotek" << std::endl;
   std::cout << "=============================================" << std::endl;
 
 

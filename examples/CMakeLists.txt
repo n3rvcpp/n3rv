@@ -35,27 +35,26 @@ add_executable(
 	workers-single-factorial-hctl/src/workers-single-factorial-hctl.cpp
 )
 
+add_executable(
+	algotrading/broker
+	algotrading/broker.cpp
+)
 
-#add_executable(
-#	algotrading/broker
-#	algotrading/broker.cpp
-#)
-#
-#add_executable(
-#	algotrading/eval
-#	algotrading/eval.cpp
-#)
-#
-#add_executable(
-#	algotrading/exec
-#	algotrading/exec.cpp
-#)
-#
-#add_executable(
-#	algotrading/moneyman
-#	algotrading/moneyman.cpp
-#)
-#
+add_executable(
+	algotrading/eval
+	algotrading/eval.cpp
+)
+
+add_executable(
+	algotrading/exec
+	algotrading/exec.cpp
+)
+
+add_executable(
+	algotrading/moneyman
+	algotrading/moneyman.cpp
+)
+
 #add_executable(
 #	topology-load/topology-load
 #	topology-load/topology-load.cpp
@@ -68,10 +67,10 @@ add_executable(
 
 
 target_link_libraries(hello/hello ${LIBS})
-#target_link_libraries(algotrading/broker ${LIBS})
-#target_link_libraries(algotrading/eval ${LIBS})
-#target_link_libraries(algotrading/exec ${LIBS})
-#target_link_libraries(algotrading/moneyman ${LIBS})
+target_link_libraries(algotrading/broker ${LIBS})
+target_link_libraries(algotrading/eval ${LIBS})
+target_link_libraries(algotrading/exec ${LIBS})
+target_link_libraries(algotrading/moneyman ${LIBS})
 target_link_libraries(workers-single-factorial/workers-single-factorial ${LIBS})
 target_link_libraries(workers-single-factorial-hctl/workers-single-factorial-hctl ${LIBS})
 #target_link_libraries(topology-load/topology-load ${LIBS})

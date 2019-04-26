@@ -11,9 +11,9 @@ class broker: public n3rv::service {
     int initialize() { 
 
         this->set_poll_timeout(500);
-        this->bind("broker1.stream","0.0.0.0",11001,ZMQ_PUB);
-        this->bind("broker1.orders","0.0.0.0",11002,ZMQ_REP);
-        this->attach("broker1.orders",process_orders);
+        this->bind("stream","0.0.0.0",11001,ZMQ_PUB);
+        this->bind("orders","0.0.0.0",11002,ZMQ_REP);
+        this->attach("orders",process_orders);
     }
     void hkloop() {
 
@@ -33,7 +33,7 @@ class broker: public n3rv::service {
         msg.payload = ss.str();
 
         this->ll->log(n3rv::LOGLV_NORM,"GENERATED MARKET PRICE:" + msg.payload);
-        this->send("broker1.stream",msg,0);
+        this->send("stream",msg,0);
 
     }
 
@@ -51,7 +51,8 @@ int main() {
     //we start an hidden svc controller with broker.
     n3rv::start_controller("0.0.0.0",10001,true,4);
 
-    broker b0("broker1", "broker", "127.0.0.1", 10001);
+    broker b0("127.0.0.1", 10001);
+    b0.set_uid("quotek.broker.broker1");
     b0.ll->add_dest("stdout");
     b0.initialize();
     b0.run();
