@@ -24,57 +24,57 @@ add_executable(
 )
 
 
-add_executable(
-	workers-single-factorial/workers-single-factorial
-	workers-single-factorial/src/workers-single-factorial.cpp
-)
-
-
-add_executable(
-	workers-single-factorial-hctl/workers-single-factorial-hctl
-	workers-single-factorial-hctl/src/workers-single-factorial-hctl.cpp
-)
-
-add_executable(
-	algotrading/broker
-	algotrading/broker.cpp
-)
-
-add_executable(
-	algotrading/eval
-	algotrading/eval.cpp
-)
-
-add_executable(
-	algotrading/exec
-	algotrading/exec.cpp
-)
-
-add_executable(
-	algotrading/moneyman
-	algotrading/moneyman.cpp
-)
-
-add_executable(
-	topology-load/topology-load
-	topology-load/topology-load.cpp
-)
-
-add_executable(
-	topology-fetch/topology-fetch
-	topology-fetch/topology-fetch.cpp
-)
+#add_executable(
+#	workers-single-factorial/workers-single-factorial
+#	workers-single-factorial/src/workers-single-factorial.cpp
+#)
+#
+#
+#add_executable(
+#	workers-single-factorial-hctl/workers-single-factorial-hctl
+#	workers-single-factorial-hctl/src/workers-single-factorial-hctl.cpp
+#)
+#
+#add_executable(
+#	algotrading/broker
+#	algotrading/broker.cpp
+#)
+#
+#add_executable(
+#	algotrading/eval
+#	algotrading/eval.cpp
+#)
+#
+#add_executable(
+#	algotrading/exec
+#	algotrading/exec.cpp
+#)
+#
+#add_executable(
+#	algotrading/moneyman
+#	algotrading/moneyman.cpp
+#)
+#
+#add_executable(
+#	topology-load/topology-load
+#	topology-load/topology-load.cpp
+#)
+#
+#add_executable(
+#	topology-fetch/topology-fetch
+#	topology-fetch/topology-fetch.cpp
+#)
 
 
 target_link_libraries(hello/hello ${LIBS})
-target_link_libraries(algotrading/broker ${LIBS})
-target_link_libraries(algotrading/eval ${LIBS})
-target_link_libraries(algotrading/exec ${LIBS})
-target_link_libraries(algotrading/moneyman ${LIBS})
-target_link_libraries(workers-single-factorial/workers-single-factorial ${LIBS})
-target_link_libraries(workers-single-factorial-hctl/workers-single-factorial-hctl ${LIBS})
-target_link_libraries(topology-load/topology-load ${LIBS})
-target_link_libraries(topology-fetch/topology-fetch ${LIBS})
+#target_link_libraries(algotrading/broker ${LIBS})
+#target_link_libraries(algotrading/eval ${LIBS})
+#target_link_libraries(algotrading/exec ${LIBS})
+#target_link_libraries(algotrading/moneyman ${LIBS})
+#target_link_libraries(workers-single-factorial/workers-single-factorial ${LIBS})
+#target_link_libraries(workers-single-factorial-hctl/workers-single-factorial-hctl ${LIBS})
+#target_link_libraries(topology-load/topology-load ${LIBS})
+#target_link_libraries(topology-fetch/topology-fetch ${LIBS})
 
 find_library (N3RV n3rv)
 find_library (ZMQ zmq)

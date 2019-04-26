@@ -86,7 +86,7 @@ namespace n3rv {
 
     for (int i =0; i < d.Size(); i++ ) {
 
-      assert(d[i]["namespace_"].IsString());
+      assert(d[i]["namespace"].IsString());
       assert(d[i]["service_class"].IsString());
       assert(d[i]["name"].IsString());
       assert(d[i]["ip"].IsString());
@@ -94,7 +94,7 @@ namespace n3rv {
 
   
       n3rv::qserv qs;
-      qs.namespace_ = d[i]["namespace_"].GetString();
+      qs.namespace_ = d[i]["namespace"].GetString();
       qs.service_class = d[i]["service_class"].GetString();
       qs.node_name = d[i]["name"].GetString();
       qs.ip = d[i]["ip"].GetString();
@@ -107,6 +107,8 @@ namespace n3rv {
           b.socket_type = d[i]["bindings"][j]["socket_type"].GetInt();
           qs.bindings.emplace_back(b);
       }
+
+      result.emplace_back(qs);
     }
 
     return result;
@@ -124,11 +126,12 @@ namespace n3rv {
     for (int k=0;k<directory.size();k++) {
 
        writer.StartObject();
-       
-       writer.String("name");
-       writer.String(directory[k].node_name.c_str());
+       writer.String("namespace");
+       writer.String(directory[k].namespace_.c_str());
        writer.String("service_class");
        writer.String(directory[k].service_class.c_str());
+       writer.String("name");
+       writer.String(directory[k].node_name.c_str());
        writer.String("ip");
        writer.String(directory[k].ip.c_str());
        writer.String("bindings");
@@ -146,6 +149,7 @@ namespace n3rv {
          writer.EndObject();         
        }
 
+       writer.EndArray();
        writer.EndObject();
     }
 

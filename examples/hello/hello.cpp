@@ -11,6 +11,10 @@
       //here you can declare connections to other services 
       // to bind and/or establish, and other service initialization directices.
       int initialize() {
+
+        //Sets a global identifier for service node.
+        this->set_uid("com.hellosend.hello1");
+
         //creates a new ZMQ socket binding of type PUBLISH
         this->bind("hello","0.0.0.0", 11001, ZMQ_PUB);
       }
@@ -28,9 +32,12 @@
     class helloreceive: public n3rv::service {
       using n3rv::service::service;
       public:
+
       int initialize() {
-          this->connect("hello",ZMQ_SUB);
-          this->attach("hello", hello_recv);
+          
+          this->set_uid("com.hellorecv.recv1");
+          this->connect("com.hellosend.*.hello",ZMQ_SUB);
+          this->attach("com.hellosend.*.hello", hello_recv);
       }
 
       //data receive callback.
@@ -47,13 +54,14 @@
 
        n3rv::start_controller("0.0.0.0",10001,true,4);
 
-       hellosend hs("hello","hello","127.0.0.1",10001);
+       hellosend hs("127.0.0.1",10001);
        hs.initialize();
        hs.run_async();
 
-       helloreceive hr("hellorecv","hellorecv","127.0.0.1",10001);
-       hr.initialize();
+       helloreceive hr("127.0.0.1",10001);
        hr.ll->add_dest("stdout");
+       
+       hr.initialize();
        hr.run();
 
 }

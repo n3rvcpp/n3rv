@@ -63,24 +63,45 @@ namespace n3rv {
 
               if ( m.action == "subscribe"  ) {
 
-                //must nlookup() to check if node already available.
+                if (m.args.size() < 5) {
+                  zmq::message_t reply(3);
+                  memcpy(reply.data(),"ERR",3);
+                  zmsock->send(reply);
+                  this->ll->log(LOGLV_DEBUG, "subscription error: missing arg");
+                  continue;
+                }
 
-                this->ll->log(LOGLV_DEBUG, "subscription ok");
-                              
-                n3rv::qserv nserv;
-                nserv.namespace_ = m.args[0];
-                nserv.service_class = m.args[1];
-                nserv.node_name = m.args[2];
-                nserv.ip = this->peer_ip(&query);
+                n3rv::binding b;
+                b.name = m.args[3];
+                b.port = atoi(m.args[4].c_str());
+
+                //tries to lookup qserv before creating a new one.    
+                n3rv::qserv* nserv = nlookup(this->directory,m.args[1],m.args[2]);
+
+                //we found node, we just add binding
+                if (nserv != nullptr)  {
+                    nserv->bindings.emplace_back(b);
+                }
+
+                //node didn't exist, we create it (with binding), and add it to the directory
+                else {
+                  nserv = new n3rv::qserv();
+                  nserv->namespace_ = m.args[0];
+                  nserv->service_class = m.args[1];
+                  nserv->node_name = m.args[2];
+                  nserv->ip = this->peer_ip(&query);
+                  nserv->bindings.emplace_back(b);
+                  this->directory.emplace_back(*nserv);
+                }
 
 
-
-                //nserv.port = atoi(m.args[3].c_str());
-                this->directory.emplace_back(nserv);
 
                 zmq::message_t reply(2);
                 memcpy(reply.data(),"OK",2);
                 zmsock->send(reply);
+
+                this->ll->log(LOGLV_DEBUG, "subscription ok");
+
 
                 sleep(1);
                 std::string newdict =  serialize_directory(this->directory) ;

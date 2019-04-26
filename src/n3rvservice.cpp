@@ -1,27 +1,21 @@
 #include "n3rvservice.hpp"
 #include <thread>
-#include <typeinfo>
-
+#include <regex>
+#include <iostream>
 
 namespace n3rv {
 
 
   service::service(                
                    std::string controller_host, 
-                   int controller_port,
-                   std::string name) {
+                   int controller_port) {
+
+
+        this->namespace_ = "";
+        this->service_class = "";
+        this->name = "";
 
         this->poll_timeout = 1000;
-        this->service_class = typeid(this).name();
-        this->namespace_ = "com";
-
-        if (name == "") {
-          std::stringstream ss;
-          ss << this->service_class << "-" << rand() % 99999 + 0;
-          this->name = ss.str();
-        }
-
-        else this->name = name;
 
         this->ll = new logger(LOGLV_NORM);
         this->zctx = zmq::context_t(1);
@@ -54,17 +48,50 @@ namespace n3rv {
 
   }
 
+  void service::set_uid(std::string namespace_, std::string service_class, std::string name) {
+
+    this->namespace_ = namespace_;
+    this->service_class = service_class;
+    this->name = name;
+
+  }
+
+  void service::set_uid(std::string uid) {
+
+    std::vector<std::string> uid_parts;
+    std::regex dotsplit("\\.");
+    std::sregex_token_iterator iter(uid.begin(),
+    uid.end(),
+    dotsplit,
+    -1);
+    std::sregex_token_iterator end;
+    for ( ; iter != end; ++iter) uid_parts.emplace_back(*iter);
+
+    if (uid_parts.size() != 3) {
+      this->ll->log(LOGLV_CRIT, "cannot set UID: Invalid string");
+      return;
+    }
+
+    this->namespace_ = uid_parts[0];
+    this->service_class = uid_parts[1];
+    this->name = uid_parts[2];
+
+  }
+
+
+
   int service::connect(std::string name, int connection_type) {
 
     this->ll->log(LOGLV_NORM,"connecting to " + name);
 
-    n3rv::binding* b = blookup(this->directory, name);
-    
-    if (b!= nullptr) {
-      n3rv::qserv* n = (n3rv::qserv*) b->parent;
+    blookup_res blr =  blookup(this->directory, name);
+     
+    if (blr.bind != nullptr) {
+
       this->connections[name].socket = new zmq::socket_t(this->zctx, connection_type );
       std::stringstream ep;
-      ep << "tcp://" << n->ip << ":" << b->port;
+      ep << "tcp://" << blr.ip << ":" << blr.bind->port;
+
       this->connections[name].socket->connect(ep.str().c_str());
 
       //Adds sockopt if zmq socket type is ZMQ_SUB
@@ -118,7 +145,7 @@ namespace n3rv {
       this->connections[bind_name].socket->bind(ep.str().c_str());
     }
      
-    this->subscribe(bind_name, this->service_class, port);
+    this->subscribe(bind_name, port);
 
   }
 
@@ -310,13 +337,17 @@ namespace n3rv {
 
 
 
-  int service::subscribe(std::string name, std::string sclass, int port) {
+  int service::subscribe(std::string binding_name, int port) {
 
       n3rv::message m;
       
       m.sender = name;
       m.action = "subscribe";
-      m.args.emplace_back(sclass);
+      m.args.emplace_back(this->namespace_);
+      m.args.emplace_back(this->service_class);
+      m.args.emplace_back(this->name);
+      
+      m.args.emplace_back(binding_name);
 
       std::stringstream ss;
       ss << port;
@@ -382,9 +413,8 @@ namespace n3rv {
     int res = 0;
     for (auto def: deferred_iter) {
 
-      n3rv::binding* b = blookup(this->directory,def.name);
-
-      if (b != nullptr) {
+      blookup_res blr = blookup(this->directory,def.name);
+      if (blr.bind != nullptr) {
 
         this->ll->log(n3rv::LOGLV_NORM,"reconnecting to " + def.name);
         this->connect(def.name, def.socket_type);
@@ -392,6 +422,7 @@ namespace n3rv {
 
         res++;
       }
+
     }
     return res;
   }
@@ -403,9 +434,7 @@ namespace n3rv {
 
     self->ll->log(LOGLV_DEBUG,"updating Directory..");
     std::string dirstring(static_cast<char*>(dirmsg->data()), dirmsg->size());
-    
-    //REWRITE PARSE_DIR
-    //self->directory = parse_directory(dirstring);    
+    self->directory = parse_directory(dirstring);   
     self->check_deferred();
 
   }

@@ -30,6 +30,7 @@ else()
 
 add_library(
 	n3rv SHARED
+  src/n3rvcommon.cpp
 	src/n3rvservice.cpp
   src/n3rvservicecontroller.cpp
   src/n3rvlogger.cpp

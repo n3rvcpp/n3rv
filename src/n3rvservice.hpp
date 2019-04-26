@@ -34,17 +34,20 @@ namespace n3rv {
      *  @param name The name of the service, acts as an identifier inside the cluster. 
      */
     service(std::string controller_host, 
-            int controller_port,
-            std::string name = "");
-    
-    
+            int controller_port);
+       
     logger* ll;
-
 
     /** Service class initializer. Empty for base service class, but inheriting classes
      *  can use it to initialize new connections and make attachements.
      */
     virtual int initialize();
+
+    /** Sets UID for node. This method MUST be imperatively called before any connect()/binding action. */
+    void set_uid(std::string namespace_, std::string service_class, std::string name);
+
+    /** Sets UID for node. This method MUST be imperatively called before any connect()/binding action. */
+    void set_uid(std::string uid);
 
 
     /** service class destructor. */
@@ -55,10 +58,9 @@ namespace n3rv {
      *  This method is called automatically by bind() on TCP sockets, except specific cases
      *  you don't need to call it yourself.
      *  @param name Name of the binding to register.
-     *  @param sclass service class of the binding to register.
      *  @param port port of the binding to register.
      */
-    int subscribe(std::string name, std::string sclass, int port);
+    int subscribe(std::string binding_name, int port);
 
 
     /** Gracefuly Unregisters the service from the controller,
@@ -110,7 +112,7 @@ namespace n3rv {
      * Note: If port is set to 0, n3rv will try to find a randomly choosen, available port on the machine.
      * (Not very firewall-friendly but can solve a few headaches).
      */
-    int bind(std::string bind_name, std::string ip, int port , int bind_type );
+    int bind(std::string binding_name, std::string ip, int port , int bind_type );
 
     /**
      * binds a new RAW ZMQ socket if the service needs a listening socket (ZMQ_REP, ZMQ_PUB, etc..)
@@ -190,8 +192,6 @@ namespace n3rv {
      */
     void set_poll_timeout(int poll_timeout);
 
-    std::string namespace_;
-
   protected:
    
     zmq::pollitem_t* refresh_pollitems();
@@ -199,6 +199,7 @@ namespace n3rv {
     /** Directory updates message handling callback */
     static void* directory_update(void* objref, zmq::message_t* dirmsg);
 
+   std::string namespace_;
    std::string service_class;
    std::string name;
    std::string controller_host;

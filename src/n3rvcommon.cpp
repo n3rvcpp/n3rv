@@ -1,23 +1,27 @@
 #include "n3rvcommon.hpp"
+#include <iostream>
 
 namespace n3rv {
 
     qserv* nlookup(std::vector<qserv>& dir, std::string addr) {
 
         std::vector<qserv*> rrlist;
+        std::string lookup_str = regex_replace(addr, 
+                                               std::regex("\\*"), 
+                                               "(.*?)", 
+                                                std::regex_constants::match_any);
 
+        for(int i=0;i< dir.size(); i++) {         
+            std::string absname = dir[i].namespace_ + "." + dir[i].service_class + "." + dir[i].node_name;   
 
-        std::string lookup_str = regex_replace(addr, std::regex("\\*"), "(.*)");
-        for(auto n: dir) {         
-            std::string absname = n.namespace_ + "." + n.service_class + "." + n.node_name;   
             if (regex_search(absname,std::regex(lookup_str))) {
-                rrlist.emplace_back(&n);
+                rrlist.emplace_back(&(dir[i]));
             }
         }
 
         if (rrlist.size() == 1) return rrlist[0];
         else if (rrlist.size() > 1) {
-            //Round Robin Node Lookup
+            //Rand Node Lookup
             srand(time(NULL));
             int n_index = rand() % rrlist.size() + 0;
             return rrlist[n_index];
@@ -36,8 +40,12 @@ namespace n3rv {
         
     }
 
-    binding* blookup(std::vector<qserv>& dir, 
+    blookup_res blookup(std::vector<qserv>& dir, 
                       std::string addr) {
+
+          blookup_res result;
+          result.ip = "";
+          result.bind = nullptr;
 
           //extracts binding name
           int bpos = 0;
@@ -48,22 +56,29 @@ namespace n3rv {
               }
           }
 
-          if (bpos == 0) return nullptr;
+          if (bpos == 0) {
+              return result;
+          }
 
-          std::string naddr = addr.substr(0,bpos-1);
-          std::string bname = addr.substr(bpos, addr.length() - bpos);
+          std::string naddr = addr.substr(0,bpos);
+          std::string bname = addr.substr(bpos+1, addr.length() - bpos);
+
           qserv* s = nlookup(dir, naddr);
 
-          if (s == nullptr) return nullptr;
+          if (s == nullptr) {
+              return result;
+          }
 
-          for (auto b: s->bindings) {
-            b.parent  = s;
-            if (b.name == bname) {
-                    return &b;
+          for (int i =0;i < s->bindings.size(); i++ ) {
+            
+            if (s->bindings[i].name == bname) {             
+                    result.ip = s->ip;
+                    result.bind = &(s->bindings[i]);
+                    break;
             }
           }
 
-          return nullptr;
+          return result;
     }
 
 }
