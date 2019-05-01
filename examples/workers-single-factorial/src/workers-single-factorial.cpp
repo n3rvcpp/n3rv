@@ -18,18 +18,18 @@ class worker: public n3rv::service {
   public:
 
     bool working;
-
+    n3rv::qhandler* ventiler;
     int initialize() {
 
       this->working = false;
-      this->connect("com.vent.ventiler1.ventiler",ZMQ_REQ);
-      this->attach("com.vent.ventiler1.ventiler",runwork);
+      this->ventiler = this->connect("com.vent.ventiler1.ventiler",ZMQ_REQ);
+      this->attach(this->ventiler,runwork);
      
     }
 
     void hkloop() {
       
-     n3rv::binding* bind = n3rv::blookup(this->directory,"com.vent.ventiler1.ventiler");
+     n3rv::binding* bind = n3rv::blookup(this->directory,"com.vent.*.ventiler");
      
      if (! this->working && bind != nullptr ) {
 
@@ -39,7 +39,7 @@ class worker: public n3rv::service {
 
         n3rv::message m;
         m.action = "WL_REQ";
-        this->send("com.vent.ventiler1.ventiler", m,0);        
+        this->send(this->ventiler, m,0);        
         working = true;
       }
       
@@ -80,6 +80,8 @@ class vent: public n3rv::service {
 
   public:
 
+    n3rv::qhandler* ventiler;
+
     int initialize() {
 
       this->map_callbacks();
@@ -87,14 +89,9 @@ class vent: public n3rv::service {
       srand(time(NULL));
 
       this->ll->log(n3rv::LOGLV_NORM, "binding service..");
-      this->bind("ventiler","127.0.0.1",11003,ZMQ_REP);
-      this->attach("ventiler", "wl_dist");
+      this->ventiler = this->bind("ventiler","127.0.0.1",ZMQ_REP);
+      this->attach(this->ventiler, vent::wl_dist);
     } 
-
-    void map_callbacks() {
-      this->cbmap["wl_dist"] = wl_dist;
-    }
-
 
     /** Once a workload query has been sent, this callback generates 
      * a new workload (factorial computation) to the asking worker. */
@@ -115,7 +112,7 @@ class vent: public n3rv::service {
       msg.action = "WL_DIST";
       msg.args.emplace_back(ss.str());
 
-      self->send("ventiler",msg,0);
+      self->send(self->ventiler,msg,0);
 
       }
 

@@ -7,13 +7,16 @@ class exec: public n3rv::service {
 
     public:
 
+    n3rv::qhandler* exech;
+    n3rv::qhandler* moneyman;
+
     int initialize() { 
 
-        this->bind("exec","0.0.0.0",11004, ZMQ_PULL);
-        this->connect("quotek.moneyman.*.moneyman", ZMQ_REQ);
+        this->exech = this->bind("exec","0.0.0.0", ZMQ_PULL,11003);
+        this->moneyman = this->connect("quotek.moneyman.*.moneyman", ZMQ_REQ);
         //this->attach("broker1.orders",broker_resp_process);
-        this->attach("exec", process_orders);
-        this->attach("quotek.moneyman.*.moneyman", mm_answers);
+        this->attach(this->exech, process_orders);
+        this->attach(this->moneyman, mm_answers);
 
     }
 
@@ -29,7 +32,7 @@ class exec: public n3rv::service {
 
             //processing of retrieved data
             self->ll->log(n3rv::LOGLV_NORM,"Forwarding order to money manager..");
-            self->send("quotek.moneyman.*.moneyman", zmsg,0);
+            self->send(self->moneyman, zmsg,0);
 
         }
 

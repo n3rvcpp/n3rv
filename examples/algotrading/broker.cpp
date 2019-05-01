@@ -7,13 +7,16 @@ class broker: public n3rv::service {
 
     public:
 
+    n3rv::qhandler* stream;
+    n3rv::qhandler* orders;
+
     float cval = 21000;
     int initialize() { 
 
         this->set_poll_timeout(500);
-        this->bind("stream","0.0.0.0",11001,ZMQ_PUB);
-        this->bind("orders","0.0.0.0",11002,ZMQ_REP);
-        this->attach("orders",process_orders);
+        this->stream = this->bind("stream","0.0.0.0",ZMQ_PUB,11001);
+        this->orders = this->bind("orders","0.0.0.0",ZMQ_REP,11002);
+        this->attach(this->orders,process_orders);
     }
     void hkloop() {
 
@@ -33,7 +36,7 @@ class broker: public n3rv::service {
         msg.payload = ss.str();
 
         this->ll->log(n3rv::LOGLV_NORM,"GENERATED MARKET PRICE:" + msg.payload);
-        this->send("stream",msg,0);
+        this->send(this->stream,msg,0);
 
     }
 

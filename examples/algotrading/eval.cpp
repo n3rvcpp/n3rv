@@ -7,12 +7,15 @@ class eval: public n3rv::service {
 
     public:
 
+    n3rv::qhandler* stream;
+    n3rv::qhandler* exec;
+
     float dow_price = 0;
     int initialize() { 
 
-        this->connect("quotek.broker.*.stream", ZMQ_SUB);
-        this->attach("quotek.broker.*.stream",process_data);
-        this->connect("quotek.exec.*.exec",ZMQ_PUSH);
+        this->stream = this->connect("quotek.broker.*.stream", ZMQ_SUB);
+        this->attach(this->stream,process_data);
+        this->exec = this->connect("quotek.exec.*.exec",ZMQ_PUSH);
 
     }
 
@@ -30,7 +33,7 @@ class eval: public n3rv::service {
         ss.str("");
         ss << limit;
         msg.args.emplace_back(ss.str());
-        this->send("quotek.exec.*.exec",msg,0);
+        this->send(this->exec,msg,0);
 
         return 0;
 

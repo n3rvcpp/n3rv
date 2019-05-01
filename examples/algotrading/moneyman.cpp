@@ -19,6 +19,9 @@ class moneyman: public n3rv::service {
 
     public:
 
+    n3rv::qhandler* moneyman_;
+    n3rv::qhandler* stream;
+
     std::vector<position> portfolio;
     float RUN_PNL;
     float GLOB_PNL;
@@ -27,12 +30,12 @@ class moneyman: public n3rv::service {
 
         this->GLOB_PNL = 0;
 
-        this->connect("quotek.broker.*.stream", ZMQ_SUB);
-        this->bind("moneyman","0.0.0.0",11005, ZMQ_REP);
+        this->stream = this->connect("quotek.broker.*.stream", ZMQ_SUB);
+        this->moneyman_ = this->bind("moneyman","0.0.0.0", ZMQ_REP,11004);
         //this->connect("broker1.orders", ZMQ_REQ);
         //this->attach("broker1.orders",broker_resp_process);
-        this->attach("moneyman", process_mmqueries);
-        this->attach("quotek.broker.*.stream", update_portfolio);
+        this->attach(this->moneyman_, process_mmqueries);
+        this->attach(this->stream, update_portfolio);
     }
 
 
@@ -71,7 +74,7 @@ class moneyman: public n3rv::service {
                 ord.args.emplace_back("too risky");
             }
 
-            self->send("moneyman",ord,0);
+            self->send(self->moneyman_,ord,0);
 
 
         }
@@ -128,7 +131,7 @@ class moneyman: public n3rv::service {
             }
 
             std::stringstream ss;
-            ss << "PNL:" << self->GLOB_PNL + self->RUN_PNL << " (RUNNING:" << self->RUN_PNL << " )";
+            ss << "P&L:" << self->GLOB_PNL + self->RUN_PNL << " (RUNNING:" << self->RUN_PNL << " )";
             self->ll->log(n3rv::LOGLV_NORM,ss.str());
         }
 

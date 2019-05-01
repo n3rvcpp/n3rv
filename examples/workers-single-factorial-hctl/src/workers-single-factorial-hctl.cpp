@@ -17,23 +17,23 @@ class worker: public n3rv::service {
   public:
 
     bool working;
-
+    n3rv::qhandler* ventiler;
     int initialize() {
 
       this->working = false;
-      this->connect("com.vent.*.ventiler",ZMQ_REQ);
-      this->attach("com.vent.*.ventiler",runwork);
+      this->ventiler = this->connect("com.vent.*.ventiler",ZMQ_REQ);
+      this->attach(this->ventiler,runwork);
      
     }
 
     void hkloop() {
 
-      if (! this->working && n3rv::blookup(this->directory,"com.vent.*ventiler") != nullptr ) {
+      if (! this->working && n3rv::blookup(this->directory,"com.vent.*.ventiler") != nullptr ) {
         this->ll->log(n3rv::LOGLV_DEBUG,"asking for workload..");
 
         n3rv::message m;
         m.action = "WL_REQ";
-        this->send("com.vent.*.ventiler", m,0);        
+        this->send(this->ventiler, m,0);        
         working = true;
       }
       
@@ -74,11 +74,13 @@ class vent: public n3rv::service {
 
   public:
 
+    n3rv::qhandler* ventiler;
+
     int initialize() {
 
       this->ll->log(n3rv::LOGLV_NORM, "binding service..");
-      this->bind("ventiler","127.0.0.1",11003,ZMQ_REP);
-      this->attach("ventiler", wl_dist);
+      this->ventiler = this->bind("ventiler","127.0.0.1",ZMQ_REP);
+      this->attach(this->ventiler, wl_dist);
     } 
 
 
@@ -102,7 +104,7 @@ class vent: public n3rv::service {
       msg.action = "WL_DIST";
       msg.args.emplace_back(ss.str());
 
-      self->send("workers_ch",msg,0);
+      self->send(self->ventiler,msg,0);
 
       }
 
@@ -136,7 +138,7 @@ int main(int argc, char** argv) {
     n3rv::start_controller("0.0.0.0",10001,false,4);
 
     vent v1(argv[6], atoi(argv[8]));
-    v1.set_uid("com",argv[4], argv[2]);
+    v1.set_uid("com.vent.ventiler1");
 
     v1.ll->add_dest("stdout");
     v1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
