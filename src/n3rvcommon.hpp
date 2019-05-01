@@ -13,6 +13,7 @@ namespace n3rv {
      */
     typedef struct qhandler_ {
         std::string cid;
+        std::string peer_uid;
     } qhandler;
 
     /** stores deffered connections for later use, 
@@ -21,7 +22,7 @@ namespace n3rv {
     typedef struct qdef_ {
         std::string name;
         int socket_type;
-        qhandler** hdl;
+        qhandler* hdl;
     } qdef;
 
     /** qconn aims to store information about 

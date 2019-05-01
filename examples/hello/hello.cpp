@@ -50,7 +50,7 @@
       static void* hello_recv(void* objref, zmq::message_t* zmsg) {
           helloreceive* self = (helloreceive*) objref;      
           n3rv::message msg = n3rv::parse_msg(zmsg);
-          self->ll->log(n3rv::LOGLV_NORM, msg.payload);
+          self->ll->log(n3rv::LOGLV_NORM, msg.payload + " from " + self->hello->peer_uid);
       }
 
 

@@ -96,7 +96,7 @@ namespace n3rv {
      * @param name identifier of the remote service inside the directory.
      * @param connection_type Type of connection to the remote host, directly related to ZMQ (ZMQ_REQ, ZMQ_SUB, etc..). 
      */
-    qhandler* connect(std::string name, int connection_type);
+    qhandler* connect(std::string name, int connection_type, qhandler* hdlref = nullptr);
 
     /**
      * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)

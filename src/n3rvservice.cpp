@@ -46,7 +46,7 @@ namespace n3rv {
         ss.clear();
         
         ss << "tcp://" << controller_host << ":" << (controller_port + 1);
-        this->connections[this->ctlr_ch1->cid].socket->connect(ss.str().c_str());
+        this->connections[this->ctlr_ch2->cid].socket->connect(ss.str().c_str());
         this->connections[this->ctlr_ch2->cid].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
         
         // Attaches controller's channel 2 to directory updater callback. 
@@ -86,21 +86,29 @@ namespace n3rv {
 
 
 
-  qhandler* service::connect(std::string name, int connection_type) {
+  qhandler* service::connect(std::string name, int connection_type, qhandler* hdlref) {
 
-    qhandler* hdl = new qhandler();
+    qhandler* hdl;
+    
+    if (hdlref == nullptr) {
+      hdl = new qhandler();
+      hdl->cid = randstr(9);
+    }
+
+    else {
+      hdl = hdlref;
+    }
+    
     this->ll->log(LOGLV_NORM,"connecting to " + name);
-
     binding* b =  blookup(this->directory, name);
 
     if (b != nullptr) {
-
-      hdl->cid = randstr(9);
       
+      qserv* s = (qserv*) b->parent;
+
       this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, connection_type );
       std::stringstream ep;
-      ep << "tcp://" << ((n3rv::qserv*) b->parent)->ip << ":" << b->port;
-
+      ep << "tcp://" << s->ip << ":" << b->port;
       this->connections[hdl->cid].socket->connect(ep.str().c_str());
 
       //Adds sockopt if zmq socket type is ZMQ_SUB
@@ -108,6 +116,11 @@ namespace n3rv {
         this->connections[hdl->cid].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
       }
 
+      hdl->peer_uid = s->namespace_ + "." + 
+                      s->service_class + "." + 
+                      s->node_name + "." +
+                      b->name;
+                      
     }
 
     else {
@@ -115,7 +128,7 @@ namespace n3rv {
       n3rv::qdef cqd;
       cqd.name = name;
       cqd.socket_type = connection_type;
-      cqd.hdl  = &hdl;
+      cqd.hdl  = hdl;
       this->deferred.emplace_back(cqd);
     }
 
@@ -444,7 +457,7 @@ namespace n3rv {
       if (b != nullptr) {
         
         this->ll->log(n3rv::LOGLV_NORM,"reconnecting to " + def.name);
-        *(def.hdl) = this->connect(def.name, def.socket_type);
+        this->connect(def.name, def.socket_type,def.hdl);
         this->deferred.erase(this->deferred.begin() + res);
 
         res++;
