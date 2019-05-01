@@ -150,6 +150,18 @@ namespace n3rv {
 
   qhandler* service::bind(std::string bind_name, std::string ip , int bind_type, int port ) {
 
+    if (this->namespace_ == "" || 
+        this->service_class == "" || 
+        this->name == "") {
+      this->ll->log(LOGLV_CRIT, "Cannot create binding: Please ensure to call set_uid() beforehand.");
+      return nullptr;
+    }
+
+    if (bind_name == "") {
+       this->ll->log(LOGLV_CRIT, "Cannot bind with an empty name");
+      return nullptr;
+    }
+    
     qhandler* hdl = new qhandler();
     hdl->cid = randstr(8);
 
