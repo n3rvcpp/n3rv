@@ -27,7 +27,6 @@ namespace n3rv {
     /** service class constructor.
      *  @controller_host the ip/hostname of the controller.
      *  @controller_port the port number on which the controller is listening (ch1). 
-     *  @param name The name of the service, acts as an identifier inside the cluster. 
      */
     service(std::string controller_host, 
             int controller_port);
@@ -39,10 +38,16 @@ namespace n3rv {
      */
     virtual int initialize();
 
-    /** Sets UID for node. This method MUST be imperatively called before any connect()/binding action. */
+    /** Sets UID for node. This method MUST be imperatively called before any bind() operation. 
+     *  @param namespace_ namespace choosen for the service.
+     *  @param service_class service class (usually you can choose the service-inhereted class name)
+     *  @param name Name of the node.
+     */
     void set_uid(std::string namespace_, std::string service_class, std::string name);
 
-    /** Sets UID for node. This method MUST be imperatively called before any connect()/binding action. */
+    /** Sets UID for node. This method MUST be imperatively called before any connect()/binding action. 
+     *  @param uid Node UID, at the following format "namespace_.service_class.node_name"
+     */
     void set_uid(std::string uid);
 
 
@@ -53,7 +58,7 @@ namespace n3rv {
      *  for it to update its directory and advise others a new node is available.
      *  This method is called automatically by bind() on TCP sockets, except specific cases
      *  you don't need to call it yourself.
-     *  @param name Name of the binding to register.
+     *  @param binding_name Name of the binding to register.
      *  @param port port of the binding to register.
      */
     int subscribe(std::string binding_name, int port);
@@ -95,6 +100,8 @@ namespace n3rv {
      * starts a new connection (zmq_socket) to a remote service available inside the directory.
      * @param name identifier of the remote service inside the directory.
      * @param connection_type Type of connection to the remote host, directly related to ZMQ (ZMQ_REQ, ZMQ_SUB, etc..). 
+     * @param hdlref optional, used for internal purpose when we have to reconnect using existing qhandler object.
+     * @return n3rv connection handler.
      */
     qhandler* connect(std::string name, int connection_type, qhandler* hdlref = nullptr);
 
@@ -102,11 +109,13 @@ namespace n3rv {
      * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)
      * @param bind_name Name of the binding.
      * @param ip ip to listen on (0.0.0.0 to listen on all addr).
-     * @param port TCP port to listen on.
      * @param bind_type ZMQ socket type to create (ZMQ_REP, ZMQ_PUB,..)
+     * @param port TCP port to listen on.
      * 
      * Note: If port is set to 0, n3rv will try to find a randomly choosen, available port on the machine.
      * (Not very firewall-friendly but can solve a few headaches).
+     *
+     * @return n3rv connection handler.
      */
     qhandler* bind(std::string bind_name, std::string ip , int bind_type, int port = 0 );
 
@@ -115,13 +124,16 @@ namespace n3rv {
      * @param bind_name name of the bound connection, to identify it.
      * @param endpoint string, to tell on what parameters to bind the socket.
      * @param type kind of ZMQ socket to bind: ZMQ_REP, ZMQ_PUB, etc..
+     * @return n3rv connection handler.
      */
     qhandler* zbind(std::string bind_name, std::string endpoint, int bind_type );
 
 
     /** Attaches a service connection to its message handler callback !
+     *  @param hdl n3rv connection handler, created with connect(), bind() or zbind().
      *  @param connection_name Name of the connection to attach callback to.
-     *  @callback callback function. 
+     *  @callback callback function.
+     *  @return 0 if attach went correctly, >0 otherwise. 
      */
     int attach(qhandler* hdl, fctptr callback);
 
@@ -129,6 +141,7 @@ namespace n3rv {
      *  Warning: this method only works if service::cbmap was filled at map_callbacks() time.
      *  @param connection_name Name of the connection to attach callback to.
      *  @param callback_name string name of the callback to atach to connection.
+     *  @return 0 if attach went correctly, >0 otherwise.
      */ 
     int attach(qhandler* hdl, std::string callback_name);
 
@@ -145,19 +158,19 @@ namespace n3rv {
     std::map<std::string, qhandler*> load_topology(topology* topo);
 
     /** Retrieves a service connection from the internal connections list.
-     *  @param connection_name name of the connection to retrieve.
+     *  @param hdl n3rv connection handler.
      *  @return the related connection object. */
     n3rv::qconn& get_connection(qhandler& hdl);
 
     /** Conveniency function to send string data on a specified connection. 
-     *  @param connection_name name of the connection to send data to.
+     *  @param hdl n3rv connection handler to send data to.
      *  @param data string to send.
      *  @param flags ZMQ send flags.
      */
     int send(qhandler* hdl, std::string& data, int flags);
 
     /** Conveniency function to send raw data on a specified connection. 
-     *  @param connection_name name of the connection to send data to.
+     *  @param hdl n3rv connection handler to send data to.
      *  @param data memory pointer of data to send.
      *  @param size size of the memory data block.
      *  @param flags ZMQ send flags.
@@ -165,14 +178,14 @@ namespace n3rv {
     int send(qhandler* hdl, void* data, size_t size, int flags);
 
     /** Conveniency function to send n3rv::mesage data on a specified connection. 
-     *  @param connection_name name of the connection to send data to.
+     *  @param hdl n3rv connection handler to send data to.
      *  @param msg n3rv::message to send.
      *  @param flags ZMQ send flags.
     */
     int send(qhandler* hdl, message& msg, int flags);
 
     /** Conveniency function to send direct zmq::message_t data on a specified connection. 
-     *  @param connection_name name of the connection to send data to.
+     *  @param hdl n3rv connection handler to send data to.
      *  @param msg ZMQ message_t to send.
      *  @param flags ZMQ send flags. 
      */
@@ -195,6 +208,7 @@ namespace n3rv {
 
     zmq::pollitem_t* refresh_pollitems();
     int poll_timeout;
+    
     /** Directory updates message handling callback */
     static void* directory_update(void* objref, zmq::message_t* dirmsg);
 
