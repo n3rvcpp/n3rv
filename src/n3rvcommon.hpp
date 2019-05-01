@@ -8,15 +8,21 @@
 
 namespace n3rv {
 
+     /** Connction handler returned by connect() or bind() 
+     *  used for send/recv operations. 
+     */
+    typedef struct qhandler_ {
+        std::string cid;
+    } qhandler;
+
     /** stores deffered connections for later use, 
      *  when service becomes available in directory.
      */
     typedef struct qdef_ {
         std::string name;
         int socket_type;
+        qhandler** hdl;
     } qdef;
-
-
 
     /** qconn aims to store information about 
      *  connections and manages zmq sockets. */
@@ -52,6 +58,12 @@ namespace n3rv {
 
     // Main n3rv callbacks signature.
     typedef void* (*fctptr)(void*, zmq::message_t*);
+
+
+    /**
+     * Generates a random string of length "length"
+     */
+    std::string randstr(size_t length);
 
     /**
      * Tries to Resolve node from directory provided as argument. 

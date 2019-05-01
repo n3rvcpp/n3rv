@@ -1,7 +1,20 @@
 #include "n3rvcommon.hpp"
 #include <iostream>
+#include <algorithm>
+#include <functional>
+#include <random>
 
 namespace n3rv {
+
+    std::string randstr(std::size_t length) {
+        std::string result;
+        std::random_device rd;
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<int> dist('a', 'z');
+        std::generate_n(std::back_inserter(result), length, [&]{return dist(mt);});
+        return result;
+    }
+
 
     qserv* nlookup(std::vector<qserv>& dir, std::string addr) {
 

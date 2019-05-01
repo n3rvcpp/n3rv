@@ -1,3 +1,4 @@
+#include <n3rv/n3rvcommon.hpp>
 #include <n3rv/n3rvservice.hpp>
 #include <n3rv/n3rvservicecontroller.hpp>
 #include <iostream>
@@ -8,6 +9,8 @@
       using n3rv::service::service;
       public:
 
+      n3rv::qhandler* hello;
+
       //here you can declare connections to other services 
       // to bind and/or establish, and other service initialization directices.
       int initialize() {
@@ -16,13 +19,14 @@
         this->set_uid("com.hellosend.hello1");
 
         //creates a new ZMQ socket binding of type PUBLISH
-        this->bind("hello","0.0.0.0", 11001, ZMQ_PUB);
+        hello = this->bind("hello","0.0.0.0", ZMQ_PUB);
+
       }
 
       void hkloop() {
           n3rv::message msg;
           msg.payload = "Hello World";
-          this->send("hello",msg,0);
+          this->send(hello,msg,0);
       }
 
     };
@@ -33,11 +37,13 @@
       using n3rv::service::service;
       public:
 
+      n3rv::qhandler* hello;
+
       int initialize() {
           
           this->set_uid("com.hellorecv.recv1");
-          this->connect("com.hellosend.*.hello",ZMQ_SUB);
-          this->attach("com.hellosend.*.hello", hello_recv);
+          hello = this->connect("com.hellosend.*.hello",ZMQ_SUB);
+          this->attach(hello, hello_recv);
       }
 
       //data receive callback.

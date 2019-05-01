@@ -12,13 +12,9 @@
 #include "n3rvlogger.hpp"
 #include "n3rvtopology.hpp"
 
-
-#define CTLR_CH1 "controller_ch1"
-#define CTLR_CH2 "controller_ch2"
-
 namespace n3rv {
 
-
+  
   /**
    * The main class of the n3rv framework. 
    * Each microservice inside a n3rv infrastructure inherits the service class,
@@ -100,7 +96,7 @@ namespace n3rv {
      * @param name identifier of the remote service inside the directory.
      * @param connection_type Type of connection to the remote host, directly related to ZMQ (ZMQ_REQ, ZMQ_SUB, etc..). 
      */
-    int connect(std::string name, int connection_type);
+    qhandler* connect(std::string name, int connection_type);
 
     /**
      * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)
@@ -112,7 +108,7 @@ namespace n3rv {
      * Note: If port is set to 0, n3rv will try to find a randomly choosen, available port on the machine.
      * (Not very firewall-friendly but can solve a few headaches).
      */
-    int bind(std::string binding_name, std::string ip, int port , int bind_type );
+    qhandler* bind(std::string bind_name, std::string ip , int bind_type, int port = 0 );
 
     /**
      * binds a new RAW ZMQ socket if the service needs a listening socket (ZMQ_REP, ZMQ_PUB, etc..)
@@ -120,21 +116,21 @@ namespace n3rv {
      * @param endpoint string, to tell on what parameters to bind the socket.
      * @param type kind of ZMQ socket to bind: ZMQ_REP, ZMQ_PUB, etc..
      */
-    int bind(std::string bind_name, std::string endpoint, int bind_type );
+    qhandler* zbind(std::string bind_name, std::string endpoint, int bind_type );
 
 
     /** Attaches a service connection to its message handler callback !
      *  @param connection_name Name of the connection to attach callback to.
      *  @callback callback function. 
      */
-    int attach(std::string connection_name, fctptr callback);
+    int attach(qhandler* hdl, fctptr callback);
 
     /** Attaches a service connection to its message handler callback !
      *  Warning: this method only works if service::cbmap was filled at map_callbacks() time.
      *  @param connection_name Name of the connection to attach callback to.
      *  @param callback_name string name of the callback to atach to connection.
      */ 
-    int attach(std::string connection_name, std::string callback_name);
+    int attach(qhandler* hdl, std::string callback_name);
 
     /* Tries to download the topology from the service controller, and if available 
      * automatically bind ports, connects to remote endpoints and attach callbacks. */
@@ -142,23 +138,23 @@ namespace n3rv {
 
     /** Loads a topology file and automatically bind ports, 
      * connects to remote endpoints and attach callbacks */
-    int load_topology(std::string topology_file);
+    std::map<std::string, qhandler*> load_topology(std::string topology_file);
 
     /** Uses a previously define topology object to automatically bind ports, 
      * connects to remote endpoints and attach callbacks */
-    int load_topology(topology* topo);
+    std::map<std::string, qhandler*> load_topology(topology* topo);
 
     /** Retrieves a service connection from the internal connections list.
      *  @param connection_name name of the connection to retrieve.
      *  @return the related connection object. */
-    n3rv::qconn& get_connection(std::string connection_name);
+    n3rv::qconn& get_connection(qhandler& hdl);
 
     /** Conveniency function to send string data on a specified connection. 
      *  @param connection_name name of the connection to send data to.
      *  @param data string to send.
      *  @param flags ZMQ send flags.
      */
-    int send(std::string connection_name, std::string& data, int flags);
+    int send(qhandler* hdl, std::string& data, int flags);
 
     /** Conveniency function to send raw data on a specified connection. 
      *  @param connection_name name of the connection to send data to.
@@ -166,21 +162,21 @@ namespace n3rv {
      *  @param size size of the memory data block.
      *  @param flags ZMQ send flags.
      */
-    int send(std::string connection_name, void* data, size_t size, int flags);
+    int send(qhandler* hdl, void* data, size_t size, int flags);
 
     /** Conveniency function to send n3rv::mesage data on a specified connection. 
      *  @param connection_name name of the connection to send data to.
      *  @param msg n3rv::message to send.
      *  @param flags ZMQ send flags.
     */
-    int send(std::string connection_name, message& msg, int flags);
+    int send(qhandler* hdl, message& msg, int flags);
 
     /** Conveniency function to send direct zmq::message_t data on a specified connection. 
      *  @param connection_name name of the connection to send data to.
      *  @param msg ZMQ message_t to send.
      *  @param flags ZMQ send flags. 
      */
-    int send(std::string connection_name, zmq::message_t* zmsg, int flags);
+    int send(qhandler* hdl, zmq::message_t* zmsg, int flags);
 
 
     /** Checks for deferred connections whose endpoint 
@@ -194,6 +190,9 @@ namespace n3rv {
 
   protected:
    
+    qhandler* ctlr_ch1;
+    qhandler* ctlr_ch2;
+
     zmq::pollitem_t* refresh_pollitems();
     int poll_timeout;
     /** Directory updates message handling callback */
