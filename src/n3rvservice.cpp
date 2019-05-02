@@ -312,7 +312,9 @@ namespace n3rv {
   }
 
 
-  int service::fetch_topology() {
+  std::map<std::string, qhandler*> service::fetch_topology() {
+
+      std::map<std::string, qhandler*> res;
 
       n3rv::message m;  
       m.action = "topology";
@@ -330,16 +332,16 @@ namespace n3rv {
       
       if (topo_resp != "ERR: NO TOPOLOGY") {
         topology* t = topology::parse(topo_resp);
-        this->load_topology(t);
+        res = this->load_topology(t);
       }
-      return 0;
+      return res;
   }
 
 
 
   std::map<std::string, qhandler*> service::load_topology(std::string path) {
     topology* t = topology::load(path);
-    this->load_topology(t);
+    return this->load_topology(t);
   }
 
   std::map<std::string, qhandler*> service::load_topology(topology* t) {
@@ -380,9 +382,6 @@ namespace n3rv {
 
         for (auto& cb: n.callbacks) {
           this->attach(res[cb.uid], cb.callback_name);
-          std::cout << "QH_CID:" << res[cb.uid]->cid << std::endl;
-          std::cout << "CB_NAME:" << cb.callback_name << std::endl;
-          std::cout << "CB_REF:" << this->cbmap[cb.callback_name] << std::endl;
         }
         break;
       }

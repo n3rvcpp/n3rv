@@ -146,15 +146,18 @@ namespace n3rv {
     int attach(qhandler* hdl, std::string callback_name);
 
     /* Tries to download the topology from the service controller, and if available 
-     * automatically bind ports, connects to remote endpoints and attach callbacks. */
-    int fetch_topology();
+     * automatically bind ports, connects to remote endpoints and attach callbacks. 
+     * @return a dictionary of uid/qhandler* key/values*/
+    std::map<std::string, qhandler*> fetch_topology();
 
     /** Loads a topology file and automatically bind ports, 
-     * connects to remote endpoints and attach callbacks */
+     * connects to remote endpoints and attach callbacks 
+     * @return a dictionary of uid/qhandler* key/values*/
     std::map<std::string, qhandler*> load_topology(std::string topology_file);
 
-    /** Uses a previously define topology object to automatically bind ports, 
-     * connects to remote endpoints and attach callbacks */
+    /** Uses a previously defined topology object to automatically bind ports, 
+     * connects to remote endpoints and attach callbacks.
+     * @return a dictionary of uid/qhandler* key/values */
     std::map<std::string, qhandler*> load_topology(topology* topo);
 
     /** Retrieves a service connection from the internal connections list.

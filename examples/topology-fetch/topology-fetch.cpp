@@ -12,25 +12,29 @@ class genericservice: public n3rv::service {
 
     bool plock;
 
+    std::map<std::string, n3rv::qhandler*> hdlist;
+
+
     int initialize() {      
        this->map_callbacks();
        this->plock = false;
     }
 
     void map_callbacks() {
-        this->cbmap["pr"] = ping_received;
-        this->cbmap["por"] = pong_received;
+        this->cbmap["ping_received"] = ping_received;
+        this->cbmap["pong_received"] = pong_received;
     }
 
     void hkloop() {
         if (this->service_class == "ping") {
 
-            if (this->directory.find("pong.pong") != this->directory.end() && ! this->plock) {
+            if (n3rv::blookup(this->directory, "com.pong.*.pong") && ! this->plock) {
                  n3rv::message ping_msg;
                  ping_msg.action = "PING";
                  this->ll->log(n3rv::LOGLV_NORM, "Sending Ping..");
-                 this->send("pong.pong",ping_msg,0);
+                 this->send(this->hdlist["pong_conn"],ping_msg,0);
                  this->plock = true;
+                 sleep(1);
 
             }         
         }
@@ -50,7 +54,7 @@ class genericservice: public n3rv::service {
         self->ll->log(n3rv::LOGLV_NORM, "Received ping, sending back\"pong\"");
         n3rv::message pong_msg;
         pong_msg.action = "PONG";
-        self->send("pong.pong", pong_msg,0);
+        self->send(self->hdlist["pong"], pong_msg,0);
     }
 };
 
@@ -61,20 +65,23 @@ int main(int argc, char* argv[]) {
     std::string sclass = argv[1];
 
     if (sclass == "ping" || sclass == "pong") {
-         genericservice sc(sclass,sclass, "127.0.0.1", 10001);
+         genericservice sc("127.0.0.1", 10001);
+         sc.set_uid("com." + sclass + "." + sclass + "1");
          sc.ll->add_dest("stdout");
          sc.ll->set_loglevel(4);
          sc.initialize();
-         //We fetch the topology data from sc to 
+
+         //We fetch the topology data from service controller to 
          // determine how the services will behave.
-         sc.fetch_topology();
+         sc.hdlist = sc.fetch_topology();
          sc.run();
     }
 
     else if (sclass == "ctl") {
           std::cout << "STARTING CTRL!!" << std::endl;
           n3rv::servicecontroller sc1("0.0.0.0",10001);
-          //We load the topology file in the service controller.
+          
+          //We load a topology file in the service controller.
           sc1.load_topology("topology.json");
           sc1.ll->set_loglevel(4);
           sc1.ll->add_dest("stdout");

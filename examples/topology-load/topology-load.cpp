@@ -32,12 +32,12 @@ class genericservice: public n3rv::service {
                  ping_msg.action = "PING";
                  this->ll->log(n3rv::LOGLV_NORM, "Sending Ping..");
                  this->send(this->hdlist["pong_conn"],ping_msg,0);
+                 sleep(1);
                  this->plock = true;
 
             }         
         }
     }
-
 
     static void* pong_received(void* objref, zmq::message_t* zmsg) {
         genericservice* self = (genericservice*) objref;
@@ -72,12 +72,7 @@ int main(int argc, char* argv[]) {
 
          //We load a topology file to determine how the services will behave.
          sc.hdlist = sc.load_topology("topology.json");
-
-         //test, we try to reatach manually
-         if (sclass == "pong") {
-            //sc.attach(sc.hdlist["pong"], genericservice::ping_received);
-         }
-
+         
          sc.run();
     }
 

@@ -58,11 +58,10 @@ add_executable(
 	topology-load/topology-load.cpp
 )
 #
-#add_executable(
-#	topology-fetch/topology-fetch
-#	topology-fetch/topology-fetch.cpp
-#)
-
+add_executable(
+	topology-fetch/topology-fetch
+	topology-fetch/topology-fetch.cpp
+)
 
 target_link_libraries(hello/hello ${LIBS})
 target_link_libraries(algotrading/broker ${LIBS})
@@ -72,7 +71,7 @@ target_link_libraries(algotrading/moneyman ${LIBS})
 target_link_libraries(workers-single-factorial/workers-single-factorial ${LIBS})
 target_link_libraries(workers-single-factorial-hctl/workers-single-factorial-hctl ${LIBS})
 target_link_libraries(topology-load/topology-load ${LIBS})
-#target_link_libraries(topology-fetch/topology-fetch ${LIBS})
+target_link_libraries(topology-fetch/topology-fetch ${LIBS})
 
 find_library (N3RV n3rv)
 find_library (ZMQ zmq)
