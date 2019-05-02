@@ -31,7 +31,7 @@ class moneyman: public n3rv::service {
         this->GLOB_PNL = 0;
 
         this->stream = this->connect("quotek.broker.*.stream", ZMQ_SUB);
-        this->moneyman_ = this->bind("moneyman","0.0.0.0", ZMQ_REP,11004);
+        this->moneyman_ = this->bind("moneyman","0.0.0.0", ZMQ_REP);
         //this->connect("broker1.orders", ZMQ_REQ);
         //this->attach("broker1.orders",broker_resp_process);
         this->attach(this->moneyman_, process_mmqueries);

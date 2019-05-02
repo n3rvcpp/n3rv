@@ -12,7 +12,7 @@ class exec: public n3rv::service {
 
     int initialize() { 
 
-        this->exech = this->bind("exec","0.0.0.0", ZMQ_PULL,11003);
+        this->exech = this->bind("exec","0.0.0.0", ZMQ_PULL);
         this->moneyman = this->connect("quotek.moneyman.*.moneyman", ZMQ_REQ);
         //this->attach("broker1.orders",broker_resp_process);
         this->attach(this->exech, process_orders);

@@ -20,7 +20,10 @@ class eval: public n3rv::service {
     }
 
     int send_order(std::string asset, int size, float stop, float limit) {
-        
+
+        //if exec is not connected yet, we discard order.       
+        if ( this->connections.find(this->exec->cid) == this->connections.end()  ) return 1;
+
         n3rv::message msg;
         msg.action = "market_order";
         msg.args.emplace_back(asset);

@@ -14,8 +14,8 @@ class broker: public n3rv::service {
     int initialize() { 
 
         this->set_poll_timeout(500);
-        this->stream = this->bind("stream","0.0.0.0",ZMQ_PUB,11001);
-        this->orders = this->bind("orders","0.0.0.0",ZMQ_REP,11002);
+        this->stream = this->bind("stream","0.0.0.0",ZMQ_PUB);
+        this->orders = this->bind("orders","0.0.0.0",ZMQ_REP);
         this->attach(this->orders,process_orders);
     }
     void hkloop() {
