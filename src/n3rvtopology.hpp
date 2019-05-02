@@ -6,47 +6,50 @@
 
 namespace n3rv {
 
-    typedef struct tbinding_ {
+    typedef struct jbinding_ {
 
         public:
-            std::string name;
+            std::string binding_name;
             int port;
             std::string type;
 
-    } tbinding;
+    } jbinding;
 
 
-    typedef struct connection_ {
+    typedef struct jconnection_ {
         public:
-            std::string name;
+            std::string uid;
+            std::string lookup;
             std::string type;
 
-    } connection;
+    } jconnection;
 
-    typedef struct callback_ {
+    typedef struct jcallback_ {
         public:
-            std::string connection_name;
+            std::string uid;
             std::string callback_name;
 
-    } callback;
+    } jcallback;
 
-    /** Node structure allows to describe a full service class,
+    /** service_class struc allows to describe a full service class,
      *  with all its binding, connections and callback fucntions.
      */
-    typedef struct node_ {
+    typedef struct jservice_class_ {
 
         public:
-            /** List of ports a service class must bind. */
-            std::vector<tbinding> bindings;
+
+            /** Namespace of the service class. */
+            std::string namespace_;
+
+            /** List of bindings the service class must create. */
+            std::vector<jbinding> bindings;
             /** List of connections to remote endpoints 
              *  a service class must establish. */
-            std::vector<connection> connections;
+            std::vector<jconnection> connections;
             /** List of [connection, callback] attacchement, 
              *  which declare how to process messages. */
-            std::vector<callback> callbacks;
-    } node;
-
-
+            std::vector<jcallback> callbacks;
+    } jservice_class ;
 
     /** This class is meant to store and manimulate topology representations, 
      *  in order to help services dynamically know which endpoints to bind or contact. */
@@ -54,8 +57,8 @@ namespace n3rv {
 
     public:
 
-        /** Dictionary of Nodes, mapped with their service class. */
-        std::map<std::string, node> nodes;
+        /** Map of available service classes inside topology. */
+        std::map<std::string, jservice_class> svclasses;
 
         /** Loads a topology from a JSON-formatted topology file. 
          *  @param topology_file Path of the topology file to load.

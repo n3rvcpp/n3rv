@@ -361,24 +361,28 @@ namespace n3rv {
     zmq_sockmap["ZMQ_ROUTER"] = ZMQ_ROUTER;
     zmq_sockmap["ZMQ_PAIR"] = ZMQ_PAIR;
 
-    for (auto& nmap : t->nodes) {
+    for (auto& nmap : t->svclasses) {
 
       auto& key = nmap.first;
       auto& n = nmap.second;
 
-      if ( key == this->service_class  ) {
+      if ( n.namespace_ == this->namespace_ && key == this->service_class  ) {
 
         for (auto& b: n.bindings) {
-          this->bind(this->name + "." + b.name, "0.0.0.0", b.port, zmq_sockmap[b.type] );
+          qhandler* h = this->bind(b.binding_name, "0.0.0.0", zmq_sockmap[b.type], b.port );
+          res[b.binding_name] = h;
         }
 
         for (auto c: n.connections) {
-          qhandler* h = this->connect(c.name, zmq_sockmap[c.type]);
-          res[c.name] = h;
+          qhandler* h = this->connect(c.lookup, zmq_sockmap[c.type]);
+          res[c.uid] = h;
         }
 
         for (auto& cb: n.callbacks) {
-          this->attach(res[cb.connection_name], cb.callback_name);
+          this->attach(res[cb.uid], cb.callback_name);
+          std::cout << "QH_CID:" << res[cb.uid]->cid << std::endl;
+          std::cout << "CB_NAME:" << cb.callback_name << std::endl;
+          std::cout << "CB_REF:" << this->cbmap[cb.callback_name] << std::endl;
         }
         break;
       }
