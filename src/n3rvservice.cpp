@@ -10,6 +10,7 @@ namespace n3rv {
                    std::string controller_host, 
                    int controller_port) {
 
+        srand(time(nullptr));
 
         this->namespace_ = "";
         this->service_class = "";
@@ -170,8 +171,9 @@ namespace n3rv {
     //Port Autobinding (if 0) 
     if (port == 0) {
 
-      srand(time(nullptr));
-      port = rand() % 50000 + 10000;
+      /*we use a binding range of 40000-50000 to mitigate collision 
+        possibilities */
+      port = (rand() % 10001 ) + 40000;
 
       try {
         std::stringstream ep;
@@ -180,10 +182,14 @@ namespace n3rv {
       }
 
       catch(const zmq::error_t& e) {
-        return this->bind(bind_name, ip, bind_type, 0);
+
+        if (e.num() == 98) {
+          std::stringstream ss;
+          ss << "Port " << port << " is already bound, trying another one..";
+          this->ll->log(LOGLV_WARN, ss.str());
+          return this->bind(bind_name, ip, bind_type, 0);
+        }
       }
-
-
     }
 
     else {
