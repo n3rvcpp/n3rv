@@ -30,6 +30,8 @@ namespace n3rv {
        *  @param binding_port TCP port to bind controller on.
       */    
       servicecontroller(std::string binding_addr, unsigned int binding_port);
+
+      ~servicecontroller();
       
       /** Loads a topology file for the service controller to distribute */
       int load_topology(std::string path);

@@ -2,6 +2,7 @@
 	"topology": [
 
 		{
+			"namespace": "com",
 			"service_class": "pong",
 			"binds": [{
 
@@ -13,16 +14,17 @@
 
 			"connects": [],
 			"callbacks": [
-				["pong.pong", "pr"]
+				["pong", "ping_received"]
 			]
 
 		},
 
 		{
+			"namespace": "com",
 			"service_class": "ping",
 			"binds": [],
-			"connects": [{ "name": "pong.pong", "type": "ZMQ_REQ"} ],
-			"callbacks": [["pong.pong","por"]]
+			"connects": [{ "uid": "pong_conn", "lookup": "com.pong.*.pong", "type": "ZMQ_REQ"} ],
+			"callbacks": [["pong_conn","pong_received"]]
 
 		}
 

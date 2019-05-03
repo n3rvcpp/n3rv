@@ -55,6 +55,10 @@ namespace n3rv {
 
   }
 
+  service::~service() {
+    this->terminate();
+  }
+
   void service::set_uid(std::string namespace_, std::string service_class, std::string name) {
 
     this->namespace_ = namespace_;
@@ -203,11 +207,6 @@ namespace n3rv {
 
   }
 
-
-  service::~service() {
-
-  }
-
   int service::initialize() {
 
   }
@@ -299,9 +298,20 @@ namespace n3rv {
         try {
           n3sock.second.socket->close();
         }
-        catch (const zmq::error_t& e) {}        
+        catch (const zmq::error_t& e) {
+          std::cout << e.what() << std::endl;
+        }        
       }
-      //this->zctx.destroy();
+
+      /*
+      try {
+          this->zctx.close();
+      }
+      catch (const zmq::error_t& e) {
+        std::cout << e.what() << std::endl;
+      }*/
+
+      
   }
 
 

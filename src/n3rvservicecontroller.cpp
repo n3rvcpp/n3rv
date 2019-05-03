@@ -29,8 +29,11 @@ namespace n3rv {
         this->ll->log(LOGLV_NORM, "binding service Controller on " + ss.str() + ".." );
         zmsock_pub->bind(ss.str().c_str());
 
-      }
+  }
 
+  servicecontroller::~servicecontroller() {
+    this->terminate();
+  }
 
   std::string servicecontroller::peer_ip(zmq::message_t* zmsg) {
 

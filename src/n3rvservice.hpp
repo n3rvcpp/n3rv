@@ -30,7 +30,12 @@ namespace n3rv {
      */
     service(std::string controller_host, 
             int controller_port);
-       
+
+    /** service class destructor, 
+     *  closes all open zmq sockets and zmq context.
+     */
+    ~service();
+      
     logger* ll;
 
     /** Service class initializer. Empty for base service class, but inheriting classes
@@ -50,9 +55,6 @@ namespace n3rv {
      */
     void set_uid(std::string uid);
 
-
-    /** service class destructor. */
-    ~service();
 
     /** Registers the service on the controller, 
      *  for it to update its directory and advise others a new node is available.

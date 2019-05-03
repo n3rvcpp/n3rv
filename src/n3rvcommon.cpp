@@ -18,9 +18,11 @@ namespace n3rv {
 
     qserv* nlookup(std::vector<qserv>& dir, std::string addr) {
 
+        std::regex rgx("\\*");
+
         std::vector<qserv*> rrlist;
         std::string lookup_str = regex_replace(addr, 
-                                               std::regex("\\*"), 
+                                               rgx, 
                                                "(.*?)", 
                                                 std::regex_constants::match_any);
 

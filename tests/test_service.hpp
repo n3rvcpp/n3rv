@@ -12,14 +12,6 @@ namespace n3rv {
 
         }
 
-        std::string get_name() {
-            return this->name;
-        }
-
-        std::string get_service_class() {
-            return this->service_class;
-        }
-
         std::string get_controller_host() {
             return this->controller_host;
         }
@@ -38,14 +30,11 @@ namespace n3rv {
 
 int test_service_instanciate() {
 
-    n3rv::service_test st1("foo","bar","127.0.0.1",10001);
+    n3rv::service_test st1("127.0.0.1",10001);
 
-    if (st1.get_name() != "foo") return 1;
-    if (st1.get_service_class() != "bar") return 1;
     if (st1.get_controller_host() != "127.0.0.1") return 1;
-    if (st1.get_controller_port() != 10001) return 1;
-
-    st1.terminate();
+    if (st1.get_controller_port() != 10001) return 2;
+    if (st1.get_connections().size() < 2) return 3;
 
     return 0;
 
@@ -55,9 +44,11 @@ int test_service_bind() {
   
     
     n3rv::start_controller("127.0.0.1",10001,4,true);
-    n3rv::service_test st1("foo","bar","127.0.0.1",10001);
+    
+    n3rv::service_test st1("127.0.0.1",10001);
+    st1.set_uid("com.class.node1");
 
-    st1.bind("foo.bind", "127.0.0.1", 12004, ZMQ_REP);
+    n3rv::qhandler* q1 = st1.bind("foo", "127.0.0.1", ZMQ_REP, 12004);
 
     st1.run_async();
     FILE* fh = popen("netstat -anp 2>/dev/null|grep LISTEN|grep 12004","r");
@@ -70,8 +61,6 @@ int test_service_bind() {
         net_out += buff.data();
     }
 
-    st1.terminate();
-
      if ( net_out.find("127.0.0.1:12004") == std::string::npos ) {
         return 1;
     }
@@ -82,25 +71,25 @@ int test_service_bind() {
 int test_service_connect() {
 
 
-       n3rv::servicecontroller* sc1 = fix_svctl();
+       n3rv::start_controller("0.0.0.0",10001,4,true);
 
-       n3rv::service_test st1("foo","bar","127.0.0.1",10001);
-       st1.connect("foo.listen", ZMQ_REQ);
-       std::map<std::string, n3rv::qconn_> connections = st1.get_connections();
+       n3rv::service_test st1("127.0.0.1",10001);
+       st1.set_uid("com.class.node1");
+
+       n3rv::qhandler* h = st1.connect("com.class.node2.foo", ZMQ_REQ);
+       
+       /*std::map<std::string, n3rv::qconn_> connections = st1.get_connections();
        n3rv::qconn_ qc;
 
        try {
-           qc = connections["fdjsfkjfksjf"];
+           qc = connections[h->cid];
        }
        catch(std::exception e) {
            return 1;
        }
-       if (qc.socket == nullptr) return 1;
-       if (connections.size() != 2) return 1; ;
-
-    
-       st1.terminate();
-       sc1->terminate();
+       if (qc.socket == nullptr) return 2;
+       if (connections.size() != 2) return 3;
+       */
 
        return 0;
 

@@ -11,20 +11,20 @@ int test_topology_serialize() {
 
     n3rv::topology t;
 
-    n3rv::node_ n;
+    n3rv::jservice_class svc;
 
-    n3rv::tbinding_ b;
-    b.name ="foo.bar";
+    n3rv::jbinding_ b;
+    b.binding_name ="foo";
     b.type="ZMQ_PUB";
     b.port = 11001;
-    n.bindings.emplace_back(b);
+    svc.bindings.emplace_back(b);
 
-    n3rv::callback cb;
-    cb.connection_name="foo.bar";
+    n3rv::jcallback cb;
+    cb.uid="foo";
     cb.callback_name="fb_callback";
-    n.callbacks.emplace_back(cb);
+    svc.callbacks.emplace_back(cb);
 
-    t.nodes["foo_class"] = n;
+    t.svclasses["foo_class"] = svc;
 
     std::string serialized_topo = t.serialize();
     
