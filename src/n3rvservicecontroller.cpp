@@ -2,15 +2,15 @@
 
 namespace n3rv {
 
-  servicecontroller::servicecontroller(std::string binding_addr, unsigned int binding_port) {
+  servicecontroller::servicecontroller(const char* binding_addr, unsigned int binding_port, logger* ll) {
 
-        this->ll = new logger(LOGLV_NORM);
-
+        this->ll = (ll == nullptr) ? new logger(LOGLV_NORM) :ll;
+        
         this->zctx = zmq::context_t(2);
         this->zmsock = new zmq::socket_t(this->zctx, ZMQ_REP);
         this->zmsock_pub = new zmq::socket_t(this->zctx, ZMQ_PUB);
 
-        this->binding_addr = binding_addr; 
+        this->binding_addr = std::string(binding_addr); 
         this->binding_port = binding_port;
 
         this->topo_ = nullptr;
@@ -144,7 +144,6 @@ namespace n3rv {
 
         this->zmsock->close();
         this->zmsock_pub->close();
-
     }
 
 

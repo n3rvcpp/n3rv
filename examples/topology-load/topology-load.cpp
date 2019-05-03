@@ -61,13 +61,13 @@ class genericservice: public n3rv::service {
 int main(int argc, char* argv[]) {
 
     std::string sclass = argv[1];
+    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+    ll->add_dest("stdout");
 
     if (sclass == "ping" || sclass == "pong") {
 
-         genericservice sc("127.0.0.1", 10001);
-         sc.set_uid("com." + sclass + "." + sclass + "1");
-         sc.ll->add_dest("stdout");
-         sc.ll->set_loglevel(4);
+         genericservice sc("127.0.0.1", 10001,ll);
+         sc.set_uid(("com." + sclass + "." + sclass + "1").c_str());
          sc.initialize();
 
          //We load a topology file to determine how the services will behave.
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 
     else if (sclass == "ctl") {
           std::cout << "STARTING CTRL!!" << std::endl;
-          n3rv::start_controller("0.0.0.0",10001,true,4);
+          n3rv::start_controller("0.0.0.0",10001,ll);
           while(true) {}
     }
 

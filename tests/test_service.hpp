@@ -43,8 +43,13 @@ int test_service_instanciate() {
 int test_service_bind() {
   
     
-    n3rv::start_controller("127.0.0.1",10001,4,true);
-    
+    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+    ll->add_dest("stdout");
+
+    n3rv::servicecontroller sc("0.0.0.0",10001,ll);
+    sc.run_async();
+
+
     n3rv::service_test st1("127.0.0.1",10001);
     st1.set_uid("com.class.node1");
 
@@ -60,6 +65,7 @@ int test_service_bind() {
         fgets(buff.data(),255,fh);
         net_out += buff.data();
     }
+    fclose(fh);
 
      if ( net_out.find("127.0.0.1:12004") == std::string::npos ) {
         return 1;
@@ -70,26 +76,21 @@ int test_service_bind() {
 
 int test_service_connect() {
 
+       n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+       ll->add_dest("stdout");
 
-       n3rv::start_controller("0.0.0.0",10001,4,true);
+       n3rv::servicecontroller sc("0.0.0.0",10003,ll);
+       sc.run_async();
 
-       n3rv::service_test st1("127.0.0.1",10001);
+
+       //n3rv::servicecontroller sc("0.0.0.0",10001,ll);
+       //sc.run_async();
+
+       n3rv::service_test st1("127.0.0.1",10003,ll);
        st1.set_uid("com.class.node1");
 
-       n3rv::qhandler* h = st1.connect("com.class.node2.foo", ZMQ_REQ);
-       
-       /*std::map<std::string, n3rv::qconn_> connections = st1.get_connections();
-       n3rv::qconn_ qc;
+       while(1) {sleep(1);}
 
-       try {
-           qc = connections[h->cid];
-       }
-       catch(std::exception e) {
-           return 1;
-       }
-       if (qc.socket == nullptr) return 2;
-       if (connections.size() != 2) return 3;
-       */
 
        return 0;
 

@@ -58,14 +58,16 @@
 
     int main() {
 
-       n3rv::start_controller("0.0.0.0",10001,true,4);
+       n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+       ll->add_dest("stdout");
 
-       hellosend hs("127.0.0.1",10001);
+       n3rv::start_controller("0.0.0.0",10001,ll);
+
+       hellosend hs("127.0.0.1",10001,ll);
        hs.initialize();
        hs.run_async();
 
-       helloreceive hr("127.0.0.1",10001);
-       hr.ll->add_dest("stdout");
+       helloreceive hr("127.0.0.1",10001,ll);
        
        hr.initialize();
        hr.run();

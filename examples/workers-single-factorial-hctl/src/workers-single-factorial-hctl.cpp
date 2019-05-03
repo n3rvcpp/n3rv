@@ -118,13 +118,14 @@ int main(int argc, char** argv) {
   std::cout << "N3rv Workers Example -- Copyright 2019 Quotek" << std::endl;
   std::cout << "=============================================" << std::endl;
 
+  n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+  ll->add_dest("stdout");
+
 
   if (strcmp(argv[4], "worker") == 0) {
 
-    worker w1(argv[6], atoi(argv[8]));
+    worker w1(argv[6], atoi(argv[8]),ll);
     w1.set_uid("com",argv[4],argv[2]);
-    w1.ll->add_dest("stdout");
-    w1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     w1.ll->log(n3rv::LOGLV_NORM,"Running Worker..");
 
     w1.initialize();
@@ -135,13 +136,10 @@ int main(int argc, char** argv) {
   else if (strcmp(argv[4],"vent") == 0) {
 
     //We start a hidden session of the controller along with the ventiler.
-    n3rv::start_controller("0.0.0.0",10001,false,4);
+    n3rv::start_controller("0.0.0.0",10001,ll);
 
-    vent v1(argv[6], atoi(argv[8]));
+    vent v1(argv[6], atoi(argv[8]),ll);
     v1.set_uid("com.vent.ventiler1");
-
-    v1.ll->add_dest("stdout");
-    v1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
     v1.ll->log(n3rv::LOGLV_NORM,"Running Ventiler..");
 
     v1.initialize();

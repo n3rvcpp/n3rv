@@ -3,7 +3,7 @@
 
 int test_http_service() {
 
-    n3rv::start_controller("0.0.0.0",10001,4,true);
+    n3rv::scioctl* sctl = n3rv::start_controller("0.0.0.0",10001);
 
     n3rv::httpservice ht1("127.0.0.1",10001);   
     ht1.set_uid("com.http.node1");
@@ -22,10 +22,30 @@ int test_http_service() {
         fgets(buff.data(),255,fh);
         net_out += buff.data();
     }
+    fclose(fh);
+
+
 
     if ( net_out.find("0.0.0.0:8081") == std::string::npos ) {
+        sctl->ctl->terminate();
         return 1;
     }
 
+    fh = popen("wget -qO- http://127.0.0.1:8081/foo","r");
+    std::string http_out;
+    while( ! feof(fh) ) {
+        fgets(buff.data(),255,fh);
+        http_out += buff.data();
+    }
+    fclose(fh);
+
+
+    if (http_out != "<html><body>Hello World!</body></html>") {
+        sctl->ctl->terminate();
+        return 2;
+    }
+
+    sctl->ctl->terminate();
+    
     return 0;
 }

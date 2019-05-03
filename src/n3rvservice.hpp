@@ -28,8 +28,9 @@ namespace n3rv {
      *  @controller_host the ip/hostname of the controller.
      *  @controller_port the port number on which the controller is listening (ch1). 
      */
-    service(std::string controller_host, 
-            int controller_port);
+    service(const char* controller_host, 
+            int controller_port,
+            logger* ll = nullptr);
 
     /** service class destructor, 
      *  closes all open zmq sockets and zmq context.
@@ -48,12 +49,12 @@ namespace n3rv {
      *  @param service_class service class (usually you can choose the service-inhereted class name)
      *  @param name Name of the node.
      */
-    void set_uid(std::string namespace_, std::string service_class, std::string name);
+    void set_uid(const char* namespace_, const char* service_class, const char* name);
 
     /** Sets UID for node. This method MUST be imperatively called before any connect()/binding action. 
      *  @param uid Node UID, at the following format "namespace_.service_class.node_name"
      */
-    void set_uid(std::string uid);
+    void set_uid(const char* uid);
 
 
     /** Registers the service on the controller, 
@@ -63,7 +64,7 @@ namespace n3rv {
      *  @param binding_name Name of the binding to register.
      *  @param port port of the binding to register.
      */
-    int subscribe(std::string binding_name, int port);
+    int subscribe(const char* binding_name, int port);
 
 
     /** Gracefuly Unregisters the service from the controller,
@@ -105,7 +106,7 @@ namespace n3rv {
      * @param hdlref optional, used for internal purpose when we have to reconnect using existing qhandler object.
      * @return n3rv connection handler.
      */
-    qhandler* connect(std::string name, int connection_type, qhandler* hdlref = nullptr);
+    qhandler* connect(const char* name, int connection_type, qhandler* hdlref = nullptr);
 
     /**
      * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)
@@ -119,7 +120,7 @@ namespace n3rv {
      *
      * @return n3rv connection handler.
      */
-    qhandler* bind(std::string bind_name, std::string ip , int bind_type, int port = 0 );
+    qhandler* bind(const char* bind_name, const char* ip , int bind_type, int port = 0 );
 
     /**
      * binds a new RAW ZMQ socket if the service needs a listening socket (ZMQ_REP, ZMQ_PUB, etc..)
@@ -128,7 +129,7 @@ namespace n3rv {
      * @param type kind of ZMQ socket to bind: ZMQ_REP, ZMQ_PUB, etc..
      * @return n3rv connection handler.
      */
-    qhandler* zbind(std::string bind_name, std::string endpoint, int bind_type );
+    qhandler* zbind(const char* bind_name, const char* endpoint, int bind_type );
 
 
     /** Attaches a service connection to its message handler callback !

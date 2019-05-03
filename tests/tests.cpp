@@ -16,7 +16,7 @@ int main() {
     std::map<std::string, tfctptr > tests_list;
 
     tests_list["000.test_nlookup_direct"] = test_nlookup_direct;
-    tests_list["001.test_nlookup_glob"] = test_nlookup_glob;
+    /*tests_list["001.test_nlookup_glob"] = test_nlookup_glob;
     tests_list["002.test_blookup_direct"] = test_blookup_direct;
     tests_list["003.test_blookup_glob"] = test_blookup_glob;
 
@@ -27,11 +27,12 @@ int main() {
     tests_list["050.test_logger_add_dest_stdout"] = test_logger_add_dest_stdout;
     tests_list["060.test_logger_add_dest_file"] = test_logger_add_dest_file; 
     tests_list["070.test_logger_set_loglevel"] = test_logger_set_loglevel;
-    tests_list["080.test_message_serialize_parse"] = test_message_serialize_parse;
+    tests_list["080.test_message_serialize_parse"] = test_message_serialize_parse;*/
     tests_list["100.test_service_instanciate"] = test_service_instanciate;
-    tests_list["110.test_service_connect"] = test_service_connect;
+    
+    //tests_list["110.test_http_service"] = test_http_service;
     tests_list["120.test_service_bind"] = test_service_bind;
-    //tests_list["130.test_http_service"] = test_http_service;
+    tests_list["130.test_service_connect"] = test_service_connect;
 
 
     int test_num = 1;

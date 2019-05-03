@@ -50,9 +50,12 @@ class broker: public n3rv::service {
 };
 
 int main() {
+    
+    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+    ll->add_dest("stdout");
 
     //we start an hidden svc controller with broker.
-    n3rv::start_controller("0.0.0.0",10001,true,4);
+    n3rv::start_controller("0.0.0.0",10001,ll);
 
     broker b0("127.0.0.1", 10001);
     b0.set_uid("quotek.broker.broker1");

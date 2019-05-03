@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
 
     if (sclass == "ping" || sclass == "pong") {
          genericservice sc("127.0.0.1", 10001);
-         sc.set_uid("com." + sclass + "." + sclass + "1");
+         sc.set_uid(("com." + sclass + "." + sclass + "1").c_str());
          sc.ll->add_dest("stdout");
          sc.ll->set_loglevel(4);
          sc.initialize();
