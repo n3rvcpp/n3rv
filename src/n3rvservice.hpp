@@ -77,6 +77,9 @@ namespace n3rv {
      */
     int run();
 
+    /** Stops the main running loop.*/
+    void stop();
+
     /** Start the service asynchronously, by running it in its own dedicated thread. */
     std::thread* run_async();
 
@@ -209,6 +212,8 @@ namespace n3rv {
 
   protected:
    
+    bool running;
+
     qhandler* ctlr_ch1;
     qhandler* ctlr_ch2;
 

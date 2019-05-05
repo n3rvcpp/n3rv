@@ -41,6 +41,9 @@ namespace n3rv {
       /** Runs the service controller once instanciated. */
       void run();
       
+      /** Stops the service controller main loop. */
+      void stop();
+
       /** Asynchronously runs the service controller, returns a handler for the running thread.*/
       std::thread* run_async();
 
@@ -59,6 +62,7 @@ namespace n3rv {
        *  @param zmsg originating ZMQ message.
        *  @return send's ip string. */
       std::string peer_ip(zmq::message_t* zmsg);
+      bool running;
       std::string binding_addr;
       unsigned int binding_port;
       zmq::context_t zctx;

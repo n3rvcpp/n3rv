@@ -20,6 +20,8 @@ namespace n3rv {
         this->service_class = "";
         this->name = "";
 
+        this->running = false;
+
         this->poll_timeout = 1000;
         this->zctx = zmq::context_t(1);
         this->controller_host = std::string(controller_host);
@@ -56,6 +58,7 @@ namespace n3rv {
   }
 
   service::~service() {
+    this->stop();
     this->terminate();
   }
 
@@ -150,6 +153,7 @@ namespace n3rv {
 
     this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
     this->connections[hdl->cid].socket->bind(endpoint);
+    this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER,0);
 
     return hdl;
 
@@ -175,6 +179,7 @@ namespace n3rv {
 
     
     this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
+    this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER,0);
     
     //Port Autobinding (if 0) 
     if (port == 0) {
@@ -260,11 +265,12 @@ namespace n3rv {
   int service::run() {
 
     zmq::message_t message;
-
+ 
+    this->running = true;
     /** Main service loop, listens to open connections and forwards 
      * the data to the correct handler.
      */
-    while(1) {
+    while(this->running) {
 
       zmq::pollitem_t* items = this->refresh_pollitems(); 
       try {
@@ -295,6 +301,10 @@ namespace n3rv {
     t->detach();
     return t;
 
+  }
+
+  void service::stop() {
+    this->running = false;
   }
 
   int service::terminate() {

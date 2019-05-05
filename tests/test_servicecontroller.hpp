@@ -3,27 +3,14 @@
 #include <cstdio>
 #include <iostream>
 #include <array>
+#include "testutils.hpp"
 
 int test_servicecontroller_instanciate() {
 
     n3rv::servicecontroller sc1("0.0.0.0",10001);
-
-    FILE* fh = popen("netstat -anp 2>/dev/null|grep LISTEN|egrep '(10001|10002)'","r");
-    std::array<char, 255> buff;
-    std::string net_out = "";
-
-    while( ! feof(fh) ) {
-        fgets(buff.data(),255,fh);
-        net_out += buff.data();
-    }
-
+    if (! test_listen(10001) ) return 1;
+    if (! test_listen(10002)) return 2;
     sc1.terminate();
-
-    if (  net_out.find("0.0.0.0:10001") == std::string::npos ||
-          net_out.find("0.0.0.0:10002") == std::string::npos ) {
-              return 1;
-          }
-
     return 0;
 }
 

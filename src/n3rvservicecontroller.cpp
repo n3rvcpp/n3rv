@@ -6,6 +6,8 @@ namespace n3rv {
 
         this->ll = (ll == nullptr) ? new logger(LOGLV_NORM) :ll;
         
+        this->running = false;
+
         this->zctx = zmq::context_t(2);
         this->zmsock = new zmq::socket_t(this->zctx, ZMQ_REP);
         this->zmsock_pub = new zmq::socket_t(this->zctx, ZMQ_PUB);
@@ -58,7 +60,8 @@ namespace n3rv {
   void servicecontroller::run() {
 
         zmq::message_t query;
-        while(true) {
+        this->running = true;
+        while(this->running) {
             
             if (zmsock->recv(&query) != 0 ) {
 
@@ -138,6 +141,10 @@ namespace n3rv {
 
             }
         }
+    }
+
+    void servicecontroller::stop() {
+      this->running = false;
     }
 
     void servicecontroller::terminate() {

@@ -1,6 +1,8 @@
 #include <n3rv/n3rvservice.hpp>
 #include <n3rv/n3rvservicecontroller.hpp>
 #include "fixtures.hpp"
+#include "testutils.hpp"
+#include <thread>
 
 namespace n3rv {
 
@@ -30,47 +32,41 @@ namespace n3rv {
 
 int test_service_instanciate() {
 
+    int result = 0;
+
     n3rv::service_test st1("127.0.0.1",10001);
 
-    if (st1.get_controller_host() != "127.0.0.1") return 1;
-    if (st1.get_controller_port() != 10001) return 2;
-    if (st1.get_connections().size() < 2) return 3;
+    if (st1.get_controller_host() != "127.0.0.1") result = 1;
+    if (st1.get_controller_port() != 10001) result = 2;
+    if (st1.get_connections().size() < 2) result =  3;
 
-    return 0;
+    st1.stop();
+    st1.terminate();
+
+    return result;
 
 }
 
 int test_service_bind() {
-  
-    
-    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
-    ll->add_dest("stdout");
 
-    n3rv::servicecontroller sc("0.0.0.0",10001,ll);
+    n3rv::servicecontroller sc("0.0.0.0",10001);
     sc.run_async();
 
+    n3rv::service_test* st1 = new n3rv::service_test("127.0.0.1",10001);
+    st1->set_uid("com.class.node1");
+    n3rv::qhandler* q1 = st1->bind("foo", "0.0.0.0", ZMQ_REP, 12004);
 
-    n3rv::service_test st1("127.0.0.1",10001);
-    st1.set_uid("com.class.node1");
+    st1->run_async();
 
-    n3rv::qhandler* q1 = st1.bind("foo", "127.0.0.1", ZMQ_REP, 12004);
-
-    st1.run_async();
-    FILE* fh = popen("netstat -anp 2>/dev/null|grep LISTEN|grep 12004","r");
-
-    std::array<char, 255> buff;
-    std::string net_out = "";
-
-    while( ! feof(fh) ) {
-        fgets(buff.data(),255,fh);
-        net_out += buff.data();
-    }
-    fclose(fh);
-
-     if ( net_out.find("127.0.0.1:12004") == std::string::npos ) {
+    if (! test_listen(12004)) {
+        delete st1;
         return 1;
     }
 
+    delete st1;
+
+    if (test_listen(12004)) return 2;
+    
     return 0;
 }
 
@@ -79,18 +75,11 @@ int test_service_connect() {
        n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
        ll->add_dest("stdout");
 
-       n3rv::servicecontroller sc("0.0.0.0",10003,ll);
-       sc.run_async();
-
-
        //n3rv::servicecontroller sc("0.0.0.0",10001,ll);
        //sc.run_async();
 
-       n3rv::service_test st1("127.0.0.1",10003,ll);
-       st1.set_uid("com.class.node1");
-
-       while(1) {sleep(1);}
-
+       //n3rv::service_test st1("127.0.0.1",10003,ll);
+       //st1.set_uid("com.class.node1");
 
        return 0;
 
