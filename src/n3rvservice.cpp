@@ -27,6 +27,13 @@ namespace n3rv {
         this->controller_host = std::string(controller_host);
         this->controller_port = controller_port;
 
+        this->connect_controller();
+
+  }
+
+
+  int service::connect_controller() {
+
         // Controller has 2 I/O channels: 1 for req/resp and one for multicast 
         // (the later mostly for directory updates). Therefore, each service must 
         // connect to the 2 of them.
@@ -54,7 +61,6 @@ namespace n3rv {
         
         // Attaches controller's channel 2 to directory updater callback. 
         this->attach(this->ctlr_ch2,this->directory_update);
-
   }
 
   service::~service() {
@@ -180,7 +186,7 @@ namespace n3rv {
     
     this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
     this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER,0);
-    
+
     //Port Autobinding (if 0) 
     if (port == 0) {
 
@@ -244,7 +250,7 @@ namespace n3rv {
       std::string k = iter->first;
       zmq::socket_t* s = iter->second.socket;
 
-      if (k == this->ctlr_ch1->cid) continue;
+      if (k == this->ctlr_ch1->cid || s == nullptr ) continue;
 
       this->last_connlist.emplace_back(k);
       

@@ -223,6 +223,10 @@ namespace n3rv {
     /** Directory updates message handling callback */
     static void* directory_update(void* objref, zmq::message_t* dirmsg);
 
+    /** Controller connection procedure */
+    int connect_controller();
+
+
    std::string namespace_;
    std::string service_class;
    std::string name;
