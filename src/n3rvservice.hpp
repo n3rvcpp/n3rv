@@ -226,15 +226,17 @@ namespace n3rv {
     /** Controller connection procedure */
     int connect_controller();
 
+    /** prepends an uid with missing scope parts */
+    std::string add_scope(const char* name);
 
-   std::string namespace_;
-   std::string service_class;
-   std::string name;
-   std::string controller_host;
-   int controller_port;
-   std::vector<n3rv::qserv> directory;
-   std::map<std::string, n3rv::qconn> connections;
-   zmq::context_t zctx;
+    std::string namespace_;
+    std::string service_class;
+    std::string name;
+    std::string controller_host;
+    int controller_port;
+    std::vector<n3rv::qserv> directory;
+    std::map<std::string, n3rv::qconn> connections;
+    zmq::context_t zctx;
 
 
    std::map<std::string, fctptr> cbmap;

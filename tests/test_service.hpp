@@ -63,10 +63,12 @@ int test_service_bind() {
         return 1;
     }
 
-    delete st1;
+    sc.stop();
 
+    //tests unbinding
+    delete st1;
     if (test_listen(12004)) return 2;
-    
+
     return 0;
 }
 
@@ -75,12 +77,24 @@ int test_service_connect() {
        n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
        ll->add_dest("stdout");
 
-       //n3rv::servicecontroller sc("0.0.0.0",10001,ll);
-       //sc.run_async();
+       n3rv::servicecontroller sc("0.0.0.0",10001,ll);
+       sc.run_async();
 
-       //n3rv::service_test st1("127.0.0.1",10003,ll);
-       //st1.set_uid("com.class.node1");
+       n3rv::service_test* st1 = new n3rv::service_test("127.0.0.1",10001,ll);
+       st1->set_uid("com.class.node1");
 
+       n3rv::qhandler* h = st1->bind("foo","0.0.0.0",ZMQ_REP);
+
+       st1->run_async();
+
+       n3rv::qhandler* h2 = st1->connect("com.class.node1.foo",ZMQ_REQ);
+       
+       sleep(5);
+
+       if (st1->get_connections()[h2->cid].socket == nullptr) return 1;
+
+       //delete st1;
+       //sc.stop();
        return 0;
 
 }

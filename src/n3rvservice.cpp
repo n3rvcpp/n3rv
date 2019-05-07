@@ -115,14 +115,19 @@ namespace n3rv {
       hdl = hdlref;
     }
     
-    this->ll->log(LOGLV_NORM,"connecting to " + std::string(name));
-    binding* b =  blookup(this->directory, name);
+    std::string fullname = this->add_scope(name);
+
+    this->ll->log(LOGLV_NORM,"connecting to " + fullname);
+    binding* b =  blookup(this->directory, fullname);
 
     if (b != nullptr) {
       
       qserv* s = (qserv*) b->parent;
 
-      this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, connection_type );
+      //we create a new socket but only if it is null (for hdlref)
+      if ( this->connections[hdl->cid].socket == nullptr) 
+           this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, connection_type );
+           
       std::stringstream ep;
       ep << "tcp://" << s->ip << ":" << b->port;
       this->connections[hdl->cid].socket->connect(ep.str().c_str());
@@ -535,6 +540,22 @@ namespace n3rv {
     self->directory = parse_directory(dirstring);   
     self->check_deferred();
 
+  }
+
+  std::string service::add_scope(const char* name) {
+
+    std::string res = std::string(name);
+    int n_dots = 0;
+
+    for(auto& c: res) {
+      if (c == '.') n_dots++;
+    }
+
+    if (n_dots < 1) res = this->name + "." + res;
+    if (n_dots < 2) res = this->service_class + "." + res;
+    if (n_dots < 3) res = this->namespace_ + "." + res;
+
+    return res;
   }
 
   void service::set_poll_timeout(int poll_timeout) {
