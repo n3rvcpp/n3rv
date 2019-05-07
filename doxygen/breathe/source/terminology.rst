@@ -20,8 +20,8 @@ Service Class
 In n3rv, a service class is a service implementation that tells how an instanciated node 
 should behave: 
 
-                - which communication channels it should open/connect to
-                - How it should process the exchanged data (business rules). 
+- which communication channels it should open/connect to
+- How it should process the exchanged data (business rules). 
 
 Concretely, a service class is a C++ class definition that inherits from the n3rv::service 
 superclass. 

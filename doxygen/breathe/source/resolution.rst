@@ -1,5 +1,5 @@
-Bindings Resolution Mechanism
-=============================
+Resolution Mechanism
+====================
 
 A n3rv cluster can regroup dozens of nodes of different service classes, and hundreds 
 of different bindings at the same time. Therefore, a convenient objects resolution mechanism was

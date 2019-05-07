@@ -1,9 +1,9 @@
-A faw words on Security
-=======================
+A word on Security
+==================
 
-Besides the usual coding best-practices, the n3rv framework *DOES NOT* implement any security
+Besides the usual coding best-practices, the n3rv framework **DOES NOT** implement any security
 mechanism for nodes authentication and data exchange, and probably never will. 
-Therefore the use of multiple hosts inside a n3rv cluster necessarly implies *A TRUSTED NETWORK (LAN/VPN)*.
+Therefore the use of multiple hosts inside a n3rv cluster necessarly implies **A TRUSTED NETWORK (LAN/VPN)**.
 
 Knowing this, if you plan to use multiple n3rv nodes over the Internet, i HIGHLY RECOMMAND that you use it on 
 top of L2TP/IPSEC, OpenVPN, SSH Tunnels or similar solution.
@@ -24,4 +24,8 @@ Also in order to ensure the security of data exchanges between your nodes, you c
 TLS layer (with libreSSL / OpenSSL) that would encrypt the n3rv payloads before sending 
 them over the net (encrypt right before zmq::send/ decypt right after zmq::recv).
 I sugget you have a look at service::send() and service::run() inside the service.cpp source file
-of the library.
+of the library. Just keep in mind that adding a crypto layer to your services may result in 
+a degradation of the performance (data throughput).
+
+
+
