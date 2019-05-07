@@ -31,8 +31,8 @@ namespace n3rv {
   std::string serialize_msg(n3rv::message& msg);
 
   /**
-   * Parses a Protobuf message comming from a service and 
-   * puts it inside a n3rvquery structure.
+   * Parses a serialized message comming from a service and 
+   * puts it inside a n3rv message structure.
    * @param msgstr message to parse.
    * @return parsed message.
    */
