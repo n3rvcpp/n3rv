@@ -170,6 +170,19 @@ namespace n3rv {
 
   }
 
+  void service::zsockopt(qhandler* hdl, 
+                        int option_name, 
+                        const void* option_value, 
+                        size_t option_len) {
+      
+      if (option_len == -1) option_len = sizeof(int);
+      zmq::socket_t* sock = this->connections[hdl->cid].socket;
+      if (sock != nullptr) sock->setsockopt(option_name,option_value, option_len);
+
+  }
+
+
+
   qhandler* service::bind(const char* bind_name, const char* ip , int bind_type, int port ) {
 
   

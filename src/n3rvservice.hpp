@@ -134,6 +134,14 @@ namespace n3rv {
      */
     qhandler* zbind(const char* bind_name, const char* endpoint, int bind_type );
 
+    /**
+     * Allows to deal with underlying ZeroMQ stack and set socket options for a given connection
+     * @param hdl n3rv connection handler pointer
+     * @param option_name ZMQ option to set.
+     * @param option_value ZMQ value to give to option.
+     * @param option_len size of option value.
+     */
+    void zsockopt(qhandler* hdl, int option_name, const void* option_value, size_t option_len = -1 );
 
     /** Attaches a service connection to its message handler callback !
      *  @param hdl n3rv connection handler, created with connect(), bind() or zbind().
