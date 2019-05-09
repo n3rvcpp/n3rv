@@ -32,6 +32,7 @@ v0.2:
 *****
 
 - Added support for protcol buffers messages exchange.
+- Added support for syslog in logger.
 - New lookup mechanism, allowing to deal with lots of subscribed nodes and bindings.
 - Additionnal work on unit tests and code coverage
 - Documentation largely extended

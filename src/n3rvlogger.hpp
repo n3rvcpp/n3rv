@@ -30,7 +30,9 @@ namespace n3rv {
         public:
 
             /** Adds a destination for the log stream.
-             *  @param dest destination of the logs, eg "file:///var/log/n3rv.log", "stdout", or "syslog:name" */ 
+             *  @param dest destination of the logs, eg "file:///var/log/n3rv.log", "stdout", or "syslog:name:facility" 
+             *  Note: available syslog facilities are "local0" to "local7", and "user"
+             */
             void add_dest(const char* dest);
 
             /** >> Operator overloading, allows to write content directly to buffer.

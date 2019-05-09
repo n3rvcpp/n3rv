@@ -34,7 +34,7 @@ The main superclass class of the project, every user defined service class inher
 Logger Class
 ^^^^^^^^^^^^
 
-Provides timestamped logging to your service, which output can be files and/or stdout.
+Provides timestamped logging to your service, which output can be syslog, files and/or stdout.
 :doc:`See Class Documentation <api_logger>`
 
 Service Controller Class
@@ -43,6 +43,13 @@ Service Controller Class
 This class allows to instanciate a service controller, which plays 
 the role of endpoints directory.
 :doc:`See Class Documentation <api_servicecontroller>`
+
+HTTP Service Class
+^^^^^^^^^^^^^^^^^^
+
+n3rv::httpservice is an extension of the n3rv::service superclass which provides additionnal http 
+server capacities with libevent
+:doc:`See Class Documentation <api_httpservice>`
 
 Topology Class
 ^^^^^^^^^^^^^^
