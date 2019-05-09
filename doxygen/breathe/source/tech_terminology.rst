@@ -6,7 +6,7 @@ actually deals with, but don't worry: if you are already familiar with
 multicomponents network architectures, nothing hard here.
 
 Namespace
----------
+*********
 
 A namespace is a named logical space within which your nodes can communicate. 
 
@@ -15,7 +15,7 @@ property of a node just adds an extra level of hierarchy so that you can organiz
 networks more easilly.
 
 Service Class
--------------
+*************
 
 In n3rv, a service class is a service implementation that tells how an instanciated node 
 should behave: 
@@ -27,7 +27,7 @@ Concretely, a service class is a C++ class definition that inherits from the n3r
 superclass. 
 
 Node
-----
+****
 
 The main building block of a n3rv architecture, a node is the running version 
 of a service class, once it has been instanciated. You can of course run multiple 
@@ -37,7 +37,7 @@ unique uid, which is a dot-separated concatenation of the node's namespace, its 
 name and its short name.
 
 Binding
--------
+*******
 
 To communicate with each others and establish connections, your nodes will need 
 to create bindings. Bindings are created by your nodes each time they call bind() on a ZMQ socket.
@@ -46,7 +46,7 @@ for the binding to be reachable by your other network's nodes. Inside a n3rv net
 is identified by a unique id, which is composed of the Node's uid plus the binding short name.
 
 Service Controller
-------------------
+******************
 
 A service controller is an essential component of a n3rv network, it allows to 
 keep an uptodate directory of all your nodes and bindings in the network, and regularly 
@@ -54,7 +54,7 @@ sends updates of said directory to your nodes so they don't have to ask whenever
 reach a specific location.
 
 Topology
---------
+********
 
 In the n3rv vocab, a topology is a description of how your different service classes interract
 with each other and which communication channels (bindings/connections) they must open.
@@ -62,7 +62,14 @@ Topology files allow to reconfigure the architecture of your network and (partia
 the behaviour of your nodes without even needing to recompile your code.
 
 cluster
--------
+*******
 
 A cluster is a group of n3rv nodes communicating with each other (being in the same namespace or not) 
 along with their service controllers.
+
+Objects Hierachy
+----------------
+
+In order to help you grasp all the previous objects definitions, 
+you will find below the hierarchy diagram of the n3rv framework.
+

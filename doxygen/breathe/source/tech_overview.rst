@@ -7,7 +7,6 @@ Technical Overview
    :titlesonly:
 
   tech_terminology
-  tech_ohierarchy
   tech_serviceclass
   tech_servicecontroller
   tech_messages
