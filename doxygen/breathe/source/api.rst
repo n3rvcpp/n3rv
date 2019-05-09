@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-API Documentation
-=================
+API Reference
+=============
 
 This section covers the full n3rv API documention. You will find below everything you need in order 
 to get the best of the framework, and produce fast and reliable multiservices architectures.

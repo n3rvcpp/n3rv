@@ -9,16 +9,11 @@ use it at its full potential.
    :hidden:
    :includehidden:
    :titlesonly:
-
-   terminology
-   ohierarchy
-   messages
-   polling
-   resolution
+     
+   introduction
+   start
+   tech_overview
    api
-   topologies
-   logging
-   httpgateway
    security
    faq
 
