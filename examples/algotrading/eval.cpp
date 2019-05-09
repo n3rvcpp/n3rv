@@ -55,20 +55,20 @@ class eval: public n3rv::service {
             self->dow_price = atoi( msg.payload.c_str() );
 
             //processing of retrieved data
-            self->ll->log(n3rv::LOGLV_NORM,"DOW_PRICE:" + msg.payload );
+            self->ll->log(n3rv::LOGLV_NOTICE,"DOW_PRICE:" + msg.payload );
 
             if (self->dow_price != 0 && self->dow_price <= 20900 ) {
-                self->ll->log(n3rv::LOGLV_NORM,"SELL SIGNAL!");
+                self->ll->log(n3rv::LOGLV_NOTICE,"SELL SIGNAL!");
                 self->send_order("DOW_IA",-1, -5000, 2000);
             }
 
             else if (self->dow_price >= 21200) {
-                self->ll->log(n3rv::LOGLV_NORM,"BUY SIGNAL!");
+                self->ll->log(n3rv::LOGLV_NOTICE,"BUY SIGNAL!");
                 self->send_order("DOW_IA",1, -5000, 2000);
             }
         
             else if (self->dow_price != 0) {
-                self->ll->log(n3rv::LOGLV_NORM,"NO SIGNAL!");
+                self->ll->log(n3rv::LOGLV_NOTICE,"NO SIGNAL!");
             }
 
         }

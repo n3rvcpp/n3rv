@@ -52,7 +52,7 @@ class worker: public n3rv::service {
         n3rv::message msg = n3rv::parse_msg(zmsg);
 
         worker* self = (worker*) objref;
-        self->ll->log(n3rv::LOGLV_XDEBUG,"starting work..");
+        self->ll->log(n3rv::LOGLV_DEBUG,"starting work..");
         self->working = true;
   
         int facto_pl = atoi(msg.args[0].c_str());
@@ -67,7 +67,7 @@ class worker: public n3rv::service {
         //prints results (could be sent back to ventiler or to another serivce).
         std::stringstream ss;
         ss << res;
-        self->ll->log(n3rv::LOGLV_NORM, "work result: " +  ss.str());
+        self->ll->log(n3rv::LOGLV_NOTICE, "work result: " +  ss.str());
 
         //self->working = false;
 
@@ -88,7 +88,7 @@ class vent: public n3rv::service {
 
       srand(time(NULL));
 
-      this->ll->log(n3rv::LOGLV_NORM, "binding service..");
+      this->ll->log(n3rv::LOGLV_NOTICE, "binding service..");
       this->ventiler = this->bind("ventiler","127.0.0.1",ZMQ_REP);
       this->attach(this->ventiler, vent::wl_dist);
     } 
@@ -102,7 +102,7 @@ class vent: public n3rv::service {
       if (m_.action == "WL_REQ") {
 
         vent* self = (vent*) objref;
-      self->ll->log(n3rv::LOGLV_NORM,"distributing new workload..");
+      self->ll->log(n3rv::LOGLV_NOTICE,"distributing new workload..");
 
       int factor_val = rand() % 30 + 2;
       std::stringstream ss;
@@ -131,8 +131,8 @@ int main(int argc, char** argv) {
     n3rv::servicecontroller sc("0.0.0.0", atoi(argv[4]));
 
     sc.ll->add_dest("stdout");
-    sc.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
-    sc.ll->log(n3rv::LOGLV_NORM, "Running Service Controller..");
+    sc.ll->set_loglevel(n3rv::LOGLV_DEBUG);
+    sc.ll->log(n3rv::LOGLV_NOTICE, "Running Service Controller..");
     sc.run();
 
   }
@@ -142,8 +142,8 @@ int main(int argc, char** argv) {
     worker w1(argv[6], atoi(argv[8]));
     w1.set_uid("com","worker",argv[2]);
     w1.ll->add_dest("stdout");
-    w1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
-    w1.ll->log(n3rv::LOGLV_NORM,"Running Worker..");
+    w1.ll->set_loglevel(n3rv::LOGLV_DEBUG);
+    w1.ll->log(n3rv::LOGLV_NOTICE,"Running Worker..");
 
     w1.initialize();
     w1.run();
@@ -155,8 +155,8 @@ int main(int argc, char** argv) {
     vent v1(argv[6], atoi(argv[8]));
     v1.set_uid("com.vent.ventiler1");
     v1.ll->add_dest("stdout");
-    v1.ll->set_loglevel(n3rv::LOGLV_XDEBUG);
-    v1.ll->log(n3rv::LOGLV_NORM,"Running Ventiler..");
+    v1.ll->set_loglevel(n3rv::LOGLV_DEBUG);
+    v1.ll->log(n3rv::LOGLV_NOTICE,"Running Ventiler..");
 
     v1.initialize();
     v1.run();

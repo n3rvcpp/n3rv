@@ -4,7 +4,7 @@ namespace n3rv {
 
   servicecontroller::servicecontroller(const char* binding_addr, unsigned int binding_port, logger* ll) {
 
-        this->ll = (ll == nullptr) ? new logger(LOGLV_NORM) :ll;
+        this->ll = (ll == nullptr) ? new logger(LOGLV_NOTICE) :ll;
         
         this->running = false;
 
@@ -19,7 +19,7 @@ namespace n3rv {
 
         std::stringstream ss;
         ss << "tcp://" << this->binding_addr << ":" << this->binding_port;     
-        this->ll->log(LOGLV_NORM, "binding service Controller on " + ss.str() + "..");
+        this->ll->log(LOGLV_NOTICE, "binding service Controller on " + ss.str() + "..");
 
         zmsock->bind(ss.str().c_str());
         //zmsock->setsockopt(ZMQ_RCVTIMEO,1);
@@ -28,7 +28,7 @@ namespace n3rv {
         ss.clear();
 
         ss << "tcp://" << this->binding_addr << ":" << (this->binding_port + 1);
-        this->ll->log(LOGLV_NORM, "binding service Controller on " + ss.str() + ".." );
+        this->ll->log(LOGLV_NOTICE, "binding service Controller on " + ss.str() + ".." );
         zmsock_pub->bind(ss.str().c_str());
 
   }

@@ -22,7 +22,7 @@ class logger_test: public n3rv::logger {
 
 int test_logger_add_dest_stdout() {
 
-    logger_test ll(n3rv::LOGLV_XDEBUG);
+    logger_test ll(n3rv::LOGLV_DEBUG);
     ll.add_dest("stdout");
 
     std::vector<std::string> dests = ll.get_dests();
@@ -42,7 +42,7 @@ int test_logger_add_dest_stdout() {
 
 int test_logger_add_dest_file() {
 
-    logger_test ll(n3rv::LOGLV_XDEBUG);
+    logger_test ll(n3rv::LOGLV_DEBUG);
     ll.add_dest("file://n3rvtest.log");
 
     std::vector<std::string> dests = ll.get_dests();
@@ -63,8 +63,8 @@ int test_logger_add_dest_file() {
 
 int test_logger_set_loglevel() {
 
-        logger_test ll(n3rv::LOGLV_XDEBUG);
-        if ( ll.get_loglevel() !=  n3rv::LOGLV_XDEBUG ) return 1;
+        logger_test ll(n3rv::LOGLV_DEBUG);
+        if ( ll.get_loglevel() !=  n3rv::LOGLV_DEBUG ) return 1;
         ll.set_loglevel(n3rv::LOGLV_NORM);
         if ( ll.get_loglevel() !=  n3rv::LOGLV_NORM ) return 1;
         return 0;

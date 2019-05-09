@@ -12,7 +12,7 @@ namespace n3rv {
                    int controller_port,
                    logger* ll) {
 
-        this->ll = (ll == nullptr) ? new logger(LOGLV_NORM) :ll;
+        this->ll = (ll == nullptr) ? new logger(LOGLV_NOTICE) :ll;
         
         srand(time(nullptr));
 
@@ -51,7 +51,7 @@ namespace n3rv {
         std::stringstream ss;
         ss << "tcp://" << controller_host << ":" << controller_port;
 
-        this->ll->log(LOGLV_NORM, "Connecting to " + std::string(controller_host) + " controller.." );
+        this->ll->log(LOGLV_NOTICE, "Connecting to " + std::string(controller_host) + " controller.." );
         this->connections[this->ctlr_ch1->cid].socket->connect(ss.str().c_str());
 
         std::stringstream ss2;
@@ -117,7 +117,7 @@ namespace n3rv {
     
     std::string fullname = this->add_scope(name);
 
-    this->ll->log(LOGLV_NORM,"connecting to " + fullname);
+    this->ll->log(LOGLV_NOTICE,"connecting to " + fullname);
     binding* b =  blookup(this->directory, fullname);
 
     if (b != nullptr) {
@@ -523,7 +523,7 @@ namespace n3rv {
 
   int service::check_deferred() {
 
-    this->ll->log(n3rv::LOGLV_XDEBUG,"checking deferred list..");
+    this->ll->log(n3rv::LOGLV_DEBUG,"checking deferred list..");
     std::vector<n3rv::qdef> deferred_iter(this->deferred);
 
     int res = 0;
@@ -532,7 +532,7 @@ namespace n3rv {
       binding* b = blookup(this->directory,def.name);
       if (b != nullptr) {
         
-        this->ll->log(n3rv::LOGLV_NORM,"reconnecting to " + def.name);
+        this->ll->log(n3rv::LOGLV_NOTICE,"reconnecting to " + def.name);
         this->connect(def.name.c_str(), def.socket_type,def.hdl);
         this->deferred.erase(this->deferred.begin() + res);
 

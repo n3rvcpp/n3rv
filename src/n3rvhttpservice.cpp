@@ -45,7 +45,7 @@ namespace n3rv {
                                                         this->http_listen_addr.c_str(), 
                                                         this->http_listen_port);
 
-        this->ll->log(LOGLV_XDEBUG,"running httpd message loop");
+        this->ll->log(LOGLV_DEBUG,"running httpd message loop");
         
         int  res = event_base_dispatch(this->evb);
         if (res == -1) {

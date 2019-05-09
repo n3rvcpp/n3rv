@@ -35,7 +35,7 @@ class broker: public n3rv::service {
         ss << cval;
         msg.payload = ss.str();
 
-        this->ll->log(n3rv::LOGLV_NORM,"GENERATED MARKET PRICE:" + msg.payload);
+        this->ll->log(n3rv::LOGLV_NOTICE,"GENERATED MARKET PRICE:" + msg.payload);
         this->send(this->stream,msg,0);
 
     }
@@ -51,7 +51,7 @@ class broker: public n3rv::service {
 
 int main() {
     
-    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
     ll->add_dest("stdout");
 
     //we start an hidden svc controller with broker.

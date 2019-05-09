@@ -30,7 +30,7 @@ class genericservice: public n3rv::service {
             if ( n3rv::blookup(this->directory, "com.pong.*.pong") && ! this->plock) {
                  n3rv::message ping_msg;
                  ping_msg.action = "PING";
-                 this->ll->log(n3rv::LOGLV_NORM, "Sending Ping..");
+                 this->ll->log(n3rv::LOGLV_NOTICE, "Sending Ping..");
                  this->send(this->hdlist["pong_conn"],ping_msg,0);
                  sleep(1);
                  this->plock = true;
@@ -49,7 +49,7 @@ class genericservice: public n3rv::service {
 
         genericservice* self = (genericservice*) objref;
 
-        self->ll->log(n3rv::LOGLV_NORM, "Received ping, sending back\"pong\"");
+        self->ll->log(n3rv::LOGLV_NOTICE, "Received ping, sending back\"pong\"");
         n3rv::message pong_msg;
         pong_msg.action = "PONG";
         self->send(self->hdlist["pong"], pong_msg,0);
@@ -61,7 +61,7 @@ class genericservice: public n3rv::service {
 int main(int argc, char* argv[]) {
 
     std::string sclass = argv[1];
-    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
     ll->add_dest("stdout");
 
     if (sclass == "ping" || sclass == "pong") {

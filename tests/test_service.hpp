@@ -74,7 +74,7 @@ int test_service_bind() {
 
 int test_service_connect() {
 
-       n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_XDEBUG);
+       n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
        ll->add_dest("stdout");
 
        n3rv::servicecontroller sc("0.0.0.0",10001,ll);

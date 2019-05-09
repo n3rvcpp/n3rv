@@ -31,7 +31,7 @@ class exec: public n3rv::service {
         if ( msg.action == "market_order") {
 
             //processing of retrieved data
-            self->ll->log(n3rv::LOGLV_NORM,"Forwarding order to money manager..");
+            self->ll->log(n3rv::LOGLV_NOTICE,"Forwarding order to money manager..");
             self->send(self->moneyman, zmsg,0);
 
         }
@@ -45,11 +45,11 @@ class exec: public n3rv::service {
         n3rv::message msg = n3rv::parse_msg(zmsg);
 
         if (msg.action == "ack") {
-            self->ll->log(n3rv::LOGLV_NORM,"Position Accepted by Money Manager");
+            self->ll->log(n3rv::LOGLV_NOTICE,"Position Accepted by Money Manager");
         }
 
         else if (msg.action == "error") {
-            self->ll->log(n3rv::LOGLV_NORM,"Position Refused by Money Manager:" + msg.args[0]);
+            self->ll->log(n3rv::LOGLV_NOTICE,"Position Refused by Money Manager:" + msg.args[0]);
         }
 
     }

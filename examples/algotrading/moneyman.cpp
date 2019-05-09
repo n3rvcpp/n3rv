@@ -49,7 +49,7 @@ class moneyman: public n3rv::service {
         if ( msg.action == "market_order") {
          
             //processing of retrieved data
-            self->ll->log(n3rv::LOGLV_NORM,"Processing Market Order..");
+            self->ll->log(n3rv::LOGLV_NOTICE,"Processing Market Order..");
 
             n3rv::message ord;
 
@@ -90,7 +90,7 @@ class moneyman: public n3rv::service {
 
         if ( msg.action == "market_price") {
          
-            self->ll->log(n3rv::LOGLV_NORM,"Recalculating PNL..");
+            self->ll->log(n3rv::LOGLV_NOTICE,"Recalculating PNL..");
 
             self->RUN_PNL = 0;
 
@@ -113,13 +113,13 @@ class moneyman: public n3rv::service {
                     self->RUN_PNL += pos.pnl;
 
                     if (pos.pnl <= pos.stop) {
-                        self->ll->log(n3rv::LOGLV_NORM,"Closing Position (Stop)");
+                        self->ll->log(n3rv::LOGLV_NOTICE,"Closing Position (Stop)");
                         self->GLOB_PNL += pos.pnl;
                         self->portfolio.erase(self->portfolio.begin() + pnum);
                     }
 
                     else if (pos.pnl >= pos.limit) {
-                        self->ll->log(n3rv::LOGLV_NORM,"Closing Position (Limit)");
+                        self->ll->log(n3rv::LOGLV_NOTICE,"Closing Position (Limit)");
                         self->GLOB_PNL += pos.pnl;
                         self->portfolio.erase(self->portfolio.begin() + pnum);
                     }
@@ -132,7 +132,7 @@ class moneyman: public n3rv::service {
 
             std::stringstream ss;
             ss << "P&L:" << self->GLOB_PNL + self->RUN_PNL << " (RUNNING:" << self->RUN_PNL << " )";
-            self->ll->log(n3rv::LOGLV_NORM,ss.str());
+            self->ll->log(n3rv::LOGLV_NOTICE,ss.str());
         }
 
     }
