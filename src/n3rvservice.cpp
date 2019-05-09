@@ -307,10 +307,8 @@ namespace n3rv {
          if (items[j].revents & ZMQ_POLLIN) {
 
             this->connections[this->last_connlist[j]].socket->recv(&message);
-
-            if ( this->chmap.find(this->last_connlist[j]) != this->chmap.end() ) {
-              (*this->chmap[this->last_connlist[j]])(this, &message);
-            }
+            n3rv::fctptr p = this->chmap[this->last_connlist[j]];
+            if (p != nullptr) (*p)(this, &message);        
          }
        }
 
