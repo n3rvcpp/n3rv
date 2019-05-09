@@ -1,8 +1,8 @@
 #include "n3rvtopology.hpp"
 #include <iostream>
 #include <fstream>
-#include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
+#include "protocol/json/rapidjson/document.h"
+#include "protocol/json/rapidjson/prettywriter.h"
 
 
 #define topo_ "topology"
