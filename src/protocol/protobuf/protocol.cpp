@@ -75,6 +75,9 @@ namespace n3rv {
         b.name = dir.nodes(i).bindings(j).name();
         b.port = dir.nodes(i).bindings(j).port();
         b.socket_type = dir.nodes(i).bindings(j).socket_type();
+
+        qs.bindings.emplace_back(b);
+
       }
 
       result.emplace_back(qs);
@@ -90,20 +93,24 @@ namespace n3rv {
      std::string result;
      n3rvdirectory dir;
     
-    /*
-    for(std::map<std::string, n3rv::qserv>::iterator iter = directory.begin(); 
-        iter != directory.end(); 
-        ++iter) {
+    for(int i=0;i<directory.size();i++) {
 
-          std::string k =  iter->first;
           n3rvnode* node_ = dir.add_nodes(); 
+          qserv* s = &(directory[i]);
 
-          node_->set_name(k.c_str());
-          node_->set_service_class(directory[k].service_class.c_str());
-          node_->set_ip(directory[k].ip.c_str());
-      }*/
+          node_->set_namespace_(s->namespace_);
+          node_->set_name(s->node_name);
+          node_->set_service_class(s->service_class);
+          node_->set_ip(s->ip);
 
-
+          for (int j=0;j<s->bindings.size();j++) {
+            binding* b = &(s->bindings[j]);
+            n3rvbinding* bser = node_->add_bindings();
+            bser->set_name(b->name);
+            bser->set_port(b->port);
+            bser->set_socket_type(b->socket_type);
+          }
+    }
     result = dir.SerializeAsString();
     t128bug(result);
     return result;

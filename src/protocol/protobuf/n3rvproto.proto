@@ -16,7 +16,6 @@ message n3rvnode {
     required string service_class = 2;
     required string name = 3;
     required string ip = 4;
-    required int32 port = 5;
     repeated n3rvbinding bindings = 6;
 }
 
