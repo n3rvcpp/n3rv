@@ -12,7 +12,7 @@ Prior knowledge
 n3rv was primarly designed to make the programmer's life easy, but there is still a minimum
 skillset to have in order to use the library. Concretely you will need:
 
-- Basic C++ coding skills.
+- C++ coding skills.
 - Basic knowledge of a C++ toolchain in order to compile your code.
 - Prior knowledge of ZeroMQ is not absolutely necessary but still really helpful.
 - Notions of programming in multithreaded environments are also of great help.
@@ -27,10 +27,10 @@ OS and tooling
 n3rv is mainly designed to work on Unix systems, although the windows-native porting effort shouldn't be that hard. 
 Nevertheless, if you plan to use n3rv on Windows environments, i highly recommand that you use 
 a cygwin environment to build the n3rv library.
-|
-|Note that you can setup a full cygwin environment on windows using the resources located here: https://cygwin.com/install.html
-|
-|So in definitive and in order to build and use n3rv, you will need:
+ 
+| Note that you can setup a full cygwin environment on windows using https://cygwin.com/install.html
+
+So in definitive and in order to build and use n3rv, you will need:
 
 - A Linux/*BSD System or Cygwin env
 - git 

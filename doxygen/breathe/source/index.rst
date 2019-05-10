@@ -1,5 +1,5 @@
-n3rv v0.2 Documentation !
-=========================
+n3rv Documentation
+==================
 
 Welcome to the n3rv framework documentation. The following content
 will help your to understand the inner workings of the library and

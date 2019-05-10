@@ -1,4 +1,4 @@
-Logger Class
+n3rv::logger
 ============
 
 .. doxygenclass:: n3rv::logger

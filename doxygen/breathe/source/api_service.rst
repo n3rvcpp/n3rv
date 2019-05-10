@@ -1,4 +1,4 @@
-Service Class
+n3rv::service
 =============
 
 .. doxygenclass:: n3rv::service

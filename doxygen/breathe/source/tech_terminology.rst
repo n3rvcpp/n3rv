@@ -1,6 +1,10 @@
 n3rv Terminology
 ================
 
+
+Terminology
+-----------
+
 The n3rv framework uses a specific vocabulary to describe all the objects it 
 actually deals with, but don't worry: if you are already familiar with 
 multicomponents network architectures, nothing hard here.
@@ -23,7 +27,7 @@ should behave:
 - which communication channels it should open/connect to
 - How it should process the exchanged data (business rules). 
 
-Concretely, a service class is a C++ class definition that inherits from the n3rv::service 
+Concretely, a service class is a C++ class definition that inherits from the `n3rv::service` 
 superclass. 
 
 Node

@@ -1,4 +1,4 @@
-Topology Class
+n3rv::topology
 ==============
 
 .. doxygenclass:: n3rv::topology

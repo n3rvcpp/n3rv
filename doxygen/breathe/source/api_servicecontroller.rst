@@ -1,5 +1,5 @@
-Service Controller Class
-========================
+n3rv::servicecontroller
+=======================
 
 .. doxygenclass:: n3rv::servicecontroller
   :members:
