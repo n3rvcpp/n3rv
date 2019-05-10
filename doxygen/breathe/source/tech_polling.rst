@@ -4,8 +4,8 @@ Polling System
 As you may have noticed, the `n3rv::service` superclass does not have a `recv()` method, 
 and this is perfectly normal. n3rv data receiving mechanism is event-driven: When running,
 n3rv services use ZeroMQ's polling mechanism to detect if data is available on a given socket.
-If this is effectively the case, the message is dequeued, parsed and then passed to 
-a user-defined receive callback.
+If this is effectively the case, the message is dequeued and then passed to a user-defined 
+receive callback.
 
 | Below is a simplified version of a service running loop:
 .. code-block:: c++
@@ -103,9 +103,24 @@ In your callback, to get back acces to your object, you will want to make:
 msg
 ***
 
+When data is received by a ZMQ socket, Receive callbacks have direct acces the raw zmq
+data instead of just `n3rv::message` objects. This is a deliberate choice, allowing to
+be more flexible. Nevertheless if you want to retrieve n3rv message inside your receive callbacks,
+you just have to call `n3rv::parse_msg()`:
 
+.. code-block:: c++
 
+  static void* receive_callback (void* objref, zmq::message_t* msg) {
 
+    /*we call parse_msg to get message from zmq raw data */
+    n3rv::message m = n3rv::parse_msg(msg);
+
+    /* Now you can process the message and act accordingly */
+    if (m.action == "RPC_CALL") {
+      /* ... */
+    }
+
+  }
 
 
 Polling Timeout

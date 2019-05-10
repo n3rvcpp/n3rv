@@ -24,13 +24,18 @@ Architecture
 
 Q: Can i attach multiple receive callbacks to a single ZMQ socket ?
 *******************************************************************
-A: No, you can't. If you call attach() more than once on the same qhandler* pointer, the last attached callback will win! 
+A: No, you can't. If you call `service::attach()` more than once on the same qhandler*, the last attached callback will win! 
 But you can break your message processing logics into multiple functions that your single callback will call conditionally.
+
+Q: Inversly, can i attach the same callback on multiple sockets ?
+*****************************************************************
+A: Yes you can, no problem. You can even have a single receive callback for all your sockets,
+but that would be poor design.
 
 Q: In many cases, ZeroMQ allows a single socket to connect to multiple endpoints. Can i do that with n3rv ?
 ***********************************************************************************************************
-A: Yes you can ! n3rv::service::connect() has a qhandler* ref overloading, which means you can
-use it to connect() multiple times with the same connection (& incidentally zeroMQ socket) reference.
+A: Yes you can ! `n3rv::service::connect()` has a qhandler* ref overloading, which means you can
+use it to connect multiple times with the same handler (& incidentally zeroMQ socket) reference.
 
 Q: Can i use multiple service controllers inside a n3rv cluster, for redundency purpose ?
 *****************************************************************************************
