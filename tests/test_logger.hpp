@@ -65,8 +65,8 @@ int test_logger_set_loglevel() {
 
         logger_test ll(n3rv::LOGLV_DEBUG);
         if ( ll.get_loglevel() !=  n3rv::LOGLV_DEBUG ) return 1;
-        ll.set_loglevel(n3rv::LOGLV_NORM);
-        if ( ll.get_loglevel() !=  n3rv::LOGLV_NORM ) return 1;
+        ll.set_loglevel(n3rv::LOGLV_NOTICE);
+        if ( ll.get_loglevel() !=  n3rv::LOGLV_NOTICE ) return 1;
         return 0;
 
 }
