@@ -97,6 +97,21 @@ namespace n3rv {
      */
      virtual void hkloop();
     
+     /**
+      * Another, more elaborate mechanism to add extra code in the running loop.
+      * callbacks added with this function get executed for every loop iteration.
+      * @param cbid callback identifier.
+      * @param cb callback function pointer.
+      */
+     void register_main(const char* cbid, mlptr cb);
+     
+     /**
+      *  used to unregister a previously regestered main loop callback
+      *  @param cbid callback identifier.
+      *  @return 0 if unregister was succesful, >0 otherwise.*/
+     int unregister_main(const char* cbid);
+
+
     /** This method is used essentially to map callback function pointers to an identifier string.
      *  Can be very useful for text-defined topologies.
      */     
@@ -249,6 +264,9 @@ namespace n3rv {
 
    std::map<std::string, fctptr> cbmap;
    std::map<std::string, fctptr> chmap;
+
+   /** Main loop callbacks dictionary */
+   std::map<std::string, mlptr> ml_chmap;
 
    int last_nconn;
    std::vector<std::string> last_connlist;

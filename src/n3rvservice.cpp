@@ -313,6 +313,12 @@ namespace n3rv {
        }
 
        this->hkloop();      
+
+       for (auto& kv: this->ml_chmap) {
+          //runs main_registered callbacks.
+          (*kv.second)(this);
+       }
+
     }
 
   }
@@ -355,6 +361,18 @@ namespace n3rv {
 
   void service::hkloop() {
 
+  }
+
+  void service::register_main(const char* cbid, mlptr cb) {
+    this->ml_chmap[cbid] = cb;
+  }
+
+  int service::unregister_main(const char* cbid) {
+    if (this->ml_chmap.find(cbid) != this->ml_chmap.end() ) {
+          this->ml_chmap.erase(cbid);
+          return 0;
+    }
+    return 1;
   }
 
   int service::attach(qhandler* hdl, fctptr callback) {

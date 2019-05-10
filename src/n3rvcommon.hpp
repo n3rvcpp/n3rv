@@ -69,7 +69,7 @@ namespace n3rv {
         std::vector<binding> bindings;
     } qserv;
 
-    /** Main n3rv callbacks signature.
+    /** n3rv receive callbacks signature.
      *  Each callback used with attach() must have the following signature:
      *  static void* mycallback(void* objref, zmq::message_t* msg)
      *  @param objref: backward reference to calling object, a workarround to static/C++ mangling. 
@@ -77,6 +77,9 @@ namespace n3rv {
      *  @param msg zmq message for which the callback was called. */
     typedef void* (*fctptr)(void*, zmq::message_t*);
 
+    /** Main loop callbacks signature. */
+    typedef void* (*mlptr)(void*);
+ 
 
     /**
      * Generates a random string of length "length"
