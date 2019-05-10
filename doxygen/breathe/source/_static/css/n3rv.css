@@ -228,6 +228,14 @@ a {
   background:rgb(247,152,56);
 }
 
+cite {
+  background:#333333;
+  border-radius: 3px;
+  color: #78d94f;
+  font-style: none!important;
+  padding:2px;
+
+}
 
 
 

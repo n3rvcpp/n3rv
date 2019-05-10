@@ -12,6 +12,7 @@ Technical Overview
   tech_messages
   tech_resolution
   tech_polling
-  tech_topologies
+  tech_svcmainloop
   tech_logging
+  tech_topologies
   tech_httpgateway

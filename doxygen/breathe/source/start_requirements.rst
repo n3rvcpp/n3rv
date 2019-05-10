@@ -21,8 +21,8 @@ skillset to have in order to use the library. Concretely you will need:
 | A complete video tutorial on C++ concurency programming is also available here: https://www.youtube.com/playlist?list=PL1835A90FC78FF8BE
 
 
-OS and tooling
-**************
+OS and tools
+************
 
 n3rv is mainly designed to work on Unix systems, although the windows-native porting effort shouldn't be that hard. 
 Nevertheless, if you plan to use n3rv on Windows environments, i highly recommand that you use 
@@ -34,7 +34,7 @@ So in definitive and in order to build and use n3rv, you will need:
 
 - A Linux/*BSD System or Cygwin env
 - git 
-- A C++ toolchain (most likely g++ or llvm-clang)
+- A C++ compilation toolchain (most likely g++)
 - The cmake build tool
 - The protocol buffer compiler v2 (optional)
 
@@ -42,7 +42,18 @@ So in definitive and in order to build and use n3rv, you will need:
 library dependancies
 ********************
 
+The n3rv framework mainly depends on libzmq-dev to work, though it may have extra dependancies if
+you plan to use them. The list is the following:
+
 - libzmq 4.2+
-- pthread
-- libevent (Optional, if using n3rv::httpservice)
+- libevent 2.1+ (Optional, if using n3rv::httpservice)
 - protobuf v2+ (Optional, if using protobuf serialization)
+
+Important Note: n3rv also needs cppzmq (/usr/include/zmq.hpp). On Debian-like systems, 
+libzmq-dev directly embedds cppzmq but that may not be the case for your system. In this situation, 
+run the following command as sudo/root:
+
+.. code-block:: console
+
+  sudo wget -qO/usr/include/zmq.hpp https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp
+

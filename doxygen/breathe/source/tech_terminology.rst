@@ -30,8 +30,8 @@ should behave:
 Concretely, a service class is a C++ class definition that inherits from the `n3rv::service` 
 superclass. 
 
-Node
-****
+Node or Service Instance
+************************
 
 The main building block of a n3rv architecture, a node is the running version 
 of a service class, once it has been instanciated. You can of course run multiple 
