@@ -10,6 +10,7 @@ Technical Overview
   tech_serviceclass
   tech_servicecontroller
   tech_messages
+  tech_qhandler
   tech_resolution
   tech_polling
   tech_svcmainloop

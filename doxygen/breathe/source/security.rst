@@ -6,7 +6,7 @@ mechanism for nodes authentication and data exchange, and probably never will.
 Therefore the use of multiple hosts inside a n3rv cluster necessarly implies **A TRUSTED NETWORK (LAN/VPN)**.
 
 Knowing this, if you plan to use multiple n3rv nodes over the Internet, i HIGHLY RECOMMAND that you use it on 
-top of L2TP/IPSEC, OpenVPN, SSH Tunnels or similar solution.
+top of L2TP/IPSEC, GRE/IPSEC, OpenVPN, SSH Tunnels or similar solution.
 
 Also you can feel free to implement your own security mechanisms on top of n3rv, no problem.
 

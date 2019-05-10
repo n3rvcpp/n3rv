@@ -189,10 +189,10 @@ namespace n3rv {
      * @return a dictionary of uid/qhandler* key/values */
     std::map<std::string, qhandler*> load_topology(topology* topo);
 
-    /** Retrieves a service connection from the internal connections list.
+    /** Retrieves a RAW ZMQ socket from the internal connections list.
      *  @param hdl n3rv connection handler.
      *  @return the related connection object. */
-    n3rv::qconn& get_connection(qhandler& hdl);
+    zmq::socket_t* get_zsocket(qhandler* hdl);
 
     /** Conveniency function to send string data on a specified connection. 
      *  @param hdl n3rv connection handler to send data to.

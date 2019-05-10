@@ -502,8 +502,8 @@ namespace n3rv {
   }
 
 
-  n3rv::qconn& service::get_connection(qhandler& hdl) {
-     return this->connections[hdl.cid];
+  zmq::socket_t* service::get_zsocket(qhandler* hdl) {
+     return this->connections[hdl->cid].socket;
   }
 
 

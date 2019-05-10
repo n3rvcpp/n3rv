@@ -23,14 +23,14 @@ which has the following format:
 
 This structure was choosen because it is in my opinion able to handle a wide variety of use cases.
 Nevertheless if you need extra fields for your own usage, it is easilly modifiable in both 
-*src/n3rvproto.hpp* and *src/protocol/<PROTO_SERIALIZING_METHOD>*
+`src/n3rvproto.hpp` and `src/protocol/(json|protobuf)`
 
 Serialization / Deserialization
 -------------------------------
 
 As you may be already aware of, n3rv is able to encapsulate its messages either in JSON or Google Protocol Buffer
 format. To be able to support both of these serialization methods, the n3rv messages handler has an
-abstraction layer which is described in *src/n3rvproto.hpp*
+abstraction layer which is described in `src/n3rvproto.hpp`
 
 .. code-block:: c++
 

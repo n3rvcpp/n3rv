@@ -8,13 +8,15 @@ added to the framework in order to always find the element you want to connect t
 General Principle
 -----------------
 
-Each time a node calls its own connect(const char* uid, int ZMQ_TYPE) method, it will parse the uid
-string passed as argument. connect() expects uids in one of the following formats:
+Each time a node calls its own `connect(const char* uid, int ZMQ_TYPE)` method, it will parse the uid
+string passed as argument. `service::connect()` expects uids in one of the following formats:
 
-- namespace.service_class.node_name.binding_name
-- service_class.node_name.binding_name
-- node_name.binding_name
-- binding_name (basically useless, means that the node wants to connect to itself)
+- `namespace.service_class.node_name.binding_name`
+- `service_class.node_name.binding_name`
+- `node_name.binding_name`
+- `binding_name`
+
+Note: the last one is basically useless, it means that a node wants to connect to itself.
 
 .. code-block:: c++
 
@@ -26,7 +28,7 @@ string passed as argument. connect() expects uids in one of the following format
   n3rv::qhandler* h1 = s1.connect("com.sc2.node2.binding1", ZMQ_CLIENT);
 
 Note: When parts of the uid are missing, the node will use its own namespace/service class/node_name 
-values to perform the lookup, thus restraining the scope.
+values to complete the lookup, thus restraining the scope.
 
 
 The node will then look at its internal nodes/bindings directory and try to find 
@@ -38,7 +40,7 @@ in case the resolution becomes ok later.
 Wildcard (*) Resolutions
 ------------------------
 
-Since a n3rv cluster can have hundreds of referenced bindings, a basic lookup mechanism 
+Since a n3rv cluster can have hundreds of registred bindings, a basic lookup mechanism 
 would not be enough. This is why connect() also supports wildcards resolutions in its uid parameters.
 
 .. code-block:: c++

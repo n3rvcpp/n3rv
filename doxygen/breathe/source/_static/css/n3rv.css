@@ -1,7 +1,7 @@
 body {
 font-family: "Open Sans",Arial,sans-serif!important;
 background:#202020;
-color:#888888;
+color:#999999;
 font-size:15px;
 
 }
@@ -163,6 +163,7 @@ a {
 
 #doc-leftmenu ul li a {
   color:#78d94f;
+  font-size:15px!important;
 }
 
 #doc-leftmenu ul li a:hover {
@@ -183,7 +184,7 @@ a {
 }
 
 .highlight .s {
-  color: blue;
+  color: #ffaaee;
 
 }
 
@@ -231,10 +232,10 @@ a {
 cite {
   background:#333333;
   border-radius: 3px;
-  color: #78d94f;
-  font-style: none!important;
+  color: #c6afe9;
+  font-style: normal!important;
   padding:2px;
-
+  font-weight: bold;
 }
 
 
