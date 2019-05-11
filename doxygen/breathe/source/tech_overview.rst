@@ -9,8 +9,9 @@ Technical Overview
   tech_terminology
   tech_serviceclass
   tech_servicecontroller
-  tech_messages
   tech_qhandler
+  tech_bindconnect
+  tech_messages
   tech_resolution
   tech_polling
   tech_svcmainloop

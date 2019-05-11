@@ -102,7 +102,7 @@ namespace n3rv {
 
 
 
-  qhandler* service::connect(const char* name, int connection_type, qhandler* hdlref) {
+  qhandler* service::connect(const char* lookup, int connection_type, qhandler* hdlref) {
 
     qhandler* hdl;
     
@@ -115,7 +115,7 @@ namespace n3rv {
       hdl = hdlref;
     }
     
-    std::string fullname = this->add_scope(name);
+    std::string fullname = this->add_scope(lookup);
 
     this->ll->log(LOGLV_NOTICE,"connecting to " + fullname);
     binding* b =  blookup(this->directory, fullname);

@@ -122,7 +122,7 @@ namespace n3rv {
      * @param hdlref optional, used for internal purpose when we have to reconnect using existing qhandler object.
      * @return n3rv connection handler.
      */
-    qhandler* connect(const char* name, int connection_type, qhandler* hdlref = nullptr);
+    qhandler* connect(const char* lookup, int connection_type, qhandler* hdlref = nullptr);
 
     /**
      * Binds A NEW ZMQ TCP Socket (main endpoint type supported by n3rv)

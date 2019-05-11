@@ -28,7 +28,7 @@ Whenever you want to log something, you will have to use the method `n3rv::logge
 
 .. code-block:: c++
 
-   /** Adds str to log buffer and flushes it.     
+   /** Adds str to log buffer and flushes it. */    
    void logger::log(int log_level, std::string str);
 
 if log_level is lesser than or equal to the calling logger's log level, 

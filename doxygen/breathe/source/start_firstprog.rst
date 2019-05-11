@@ -215,6 +215,12 @@ Now that we wrote our program, it's time to compile and run it:
    g++ hello.cpp -o hello -ln3rv -lzmq -lpthread && ./hello
 
 
+If compiling succeded, here's what you should see: 
+
+.. image:: ./_static/img/hello_screen.png
+   :scale: 100 %
+
+
 
 
 
