@@ -417,6 +417,18 @@ namespace n3rv {
 
   std::map<std::string, qhandler*> service::load_topology(topology* t) {
 
+    //clears main loop registered callbacks
+    this->ml_chmap.clear();
+
+    //clears already registerred receive callbacks (except service ctrl callbacks)
+    std::map<std::string, fctptr> nchmap;
+    for (auto& kv: this->chmap) {
+      if (kv.first == this->ctlr_ch1->cid || kv.first == this->ctlr_ch2->cid ) {
+         nchmap[kv.first] = kv.second;
+      }
+    }
+    this->chmap = nchmap;
+    
     std::map<std::string, qhandler*> res;  
     std::map<std::string, int> zmq_sockmap;
 
@@ -451,9 +463,15 @@ namespace n3rv {
           res[c.uid] = h;
         }
 
-        for (auto& cb: n.callbacks) {
+        for (auto& cb: n.receive_callbacks) {
           this->attach(res[cb.uid], cb.callback_name);
         }
+
+        for (auto& cb: n.ml_callbacks) {
+          this->register_main(cb.uid.c_str(), cb.callback_name.c_str());
+        }
+
+
         break;
       }
     }

@@ -48,7 +48,11 @@ namespace n3rv {
             std::vector<jconnection> connections;
             /** List of [connection, callback] attacchement, 
              *  which declare how to process messages. */
-            std::vector<jcallback> callbacks;
+            std::vector<jcallback> receive_callbacks;
+
+            std::vector<jcallback> ml_callbacks;
+
+
     } jservice_class ;
 
     /** This class is meant to store and manimulate topology representations, 

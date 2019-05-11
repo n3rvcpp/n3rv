@@ -63,13 +63,14 @@ class genericservice: public n3rv::service {
 
 int main(int argc, char* argv[]) {
 
+    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
+    ll->add_dest("stdout");
+
     std::string sclass = argv[1];
 
     if (sclass == "ping" || sclass == "pong") {
-         genericservice sc("127.0.0.1", 10001);
+         genericservice sc("127.0.0.1", 10001,ll);
          sc.set_uid(("com." + sclass + "." + sclass + "1").c_str());
-         sc.ll->add_dest("stdout");
-         sc.ll->set_loglevel(4);
          sc.initialize();
 
          //We fetch the topology data from service controller to 
@@ -80,12 +81,10 @@ int main(int argc, char* argv[]) {
 
     else if (sclass == "ctl") {
           std::cout << "STARTING CTRL!!" << std::endl;
-          n3rv::servicecontroller sc1("0.0.0.0",10001);
+          n3rv::servicecontroller sc1("0.0.0.0",10001,ll);
           
           //We load a topology file in the service controller.
           sc1.load_topology("topology.json");
-          sc1.ll->set_loglevel(4);
-          sc1.ll->add_dest("stdout");
           sc1.run();
     }
 

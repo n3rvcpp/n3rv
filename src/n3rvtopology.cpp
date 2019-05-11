@@ -8,7 +8,8 @@
 #define topo_ "topology"
 #define binds_ "binds" 
 #define conn_ "connects"
-#define cb_ "callbacks"
+#define rcb_  "receive_callbacks"
+#define mlcb_ "ml_callbacks"
 
 namespace n3rv {
 
@@ -70,14 +71,23 @@ namespace n3rv {
 
             }
 
-            assert(d[topo_][i][cb_].IsArray());
-            for (int j=0;j< d[topo_][i][cb_].Size();j++ ) {
+            assert(d[topo_][i][rcb_].IsArray());
+            for (int j=0;j< d[topo_][i][rcb_].Size();j++ ) {
 
                 jcallback c;
-                c.uid = d[topo_][i][cb_][j][0].GetString();
-                c.callback_name = d[topo_][i][cb_][j][1].GetString();
-                svc.callbacks.emplace_back(c);
+                c.uid = d[topo_][i][rcb_][j][0].GetString();
+                c.callback_name = d[topo_][i][rcb_][j][1].GetString();
+                svc.receive_callbacks.emplace_back(c);
 
+            }
+
+            assert(d[topo_][i][mlcb_].IsArray());
+            for (int j=0;j< d[topo_][i][mlcb_].Size();j++ ) {
+
+                jcallback c;
+                c.uid = d[topo_][i][mlcb_][j][0].GetString();
+                c.callback_name = d[topo_][i][mlcb_][j][1].GetString();
+                svc.ml_callbacks.emplace_back(c);
             }
 
             t1->svclasses[d[topo_][i]["service_class"].GetString()] = svc;
@@ -138,10 +148,10 @@ namespace n3rv {
             }
             writer.EndArray();
 
-            writer.String(cb_);
+            writer.String(rcb_);
 
             writer.StartArray();
-            for ( auto call_: n.callbacks) {
+            for ( auto call_: n.receive_callbacks) {
                 writer.StartArray();            
                 writer.String(call_.uid.c_str());       
                 writer.String(call_.callback_name.c_str());
@@ -149,6 +159,17 @@ namespace n3rv {
             }
             writer.EndArray();
         
+            writer.String(mlcb_);
+
+            writer.StartArray();
+            for ( auto call_: n.ml_callbacks) {
+                writer.StartArray();            
+                writer.String(call_.uid.c_str());       
+                writer.String(call_.callback_name.c_str());
+                writer.EndArray();
+            }
+            writer.EndArray();
+
             writer.EndObject();
 
         }
