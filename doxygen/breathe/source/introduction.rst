@@ -8,12 +8,12 @@ n3rv is a C++ library that leverages the power of ZeroMQ to create multiservices
 Using ZMQ as core communication mechanism, n3rv basically provides all the components that 
 modern services development requires, meaning:
 
-- A Services Directory & subscribing mechanism.
-- An events handler.
-- Messages encapsulation methods.
-- Logging.
-- An HTTP/ZeroMQ gateway.
-- Dynamic architecture reconfiguration.
+ - A Services Directory & subscribing mechanism.
+ - An events handler.
+ - Messages encapsulation methods.
+ - Logging.
+ - An HTTP/ZeroMQ gateway.
+ - Dynamic architecture reconfiguration.
 
 Actually it is quite similar to `Facebook's fbzmq <https://github.com/facebook/fbzmq/>`_, 
 but easier to use and with more features.

@@ -42,9 +42,10 @@ You will find below an example of JSON topology definition:
 			],
 
 			"connects": [],
-			"callbacks": [
+			"receive_callbacks": [
 				["pong", "ping_received"]
-			]
+			],
+			"ml_callbacks": [["00_mainloop","mloop"]]
 
 		},
 
@@ -56,7 +57,8 @@ You will find below an example of JSON topology definition:
                            "lookup": "com.pong.*.pong", 
                            "type": "ZMQ_REQ"} ],
 
-			"callbacks": [["pong_conn","pong_received"]]
+			"receive_callbacks": [["pong_conn","pong_received"]],
+			"ml_callbacks": []
 
 		}
 	 ]
@@ -120,8 +122,43 @@ A smarter way is to use the service controller to distribute topologies:
 Note about `load_topology()` and `fetch_topologies()` return values: the key string inside the map
 correspond respectively to the "uid" value of connects objects, and the "name" field of binds objects.
 
-Callbacks => strings Mapping
-----------------------------
+Callbacks Preregistering
+------------------------
+
+As you may have noticed, receive_callbacks and ml_callbacks contains arrays of string couples.
+As there is no convenient mechanism in C++ to get a static method pointer given its string name, 
+callbacks ( both receive and main loop ones) need to be "pre-registered" by your service classes, meaning
+mapped to strings for the topology to find them.
+
+In order to do that, `n3rv::service` has 2 methods: `register_rcb(char*, n3rv::fctptr)` 
+and `register_mlcb(char*, n3rv::mlptr)`
+
+Usually called at the `initialize()` phase of your service classes, these methods will allow
+the topology parser to effectively find the callbacks referenced in the JSON.
+
+.. code-block:: c++
+
+  class example: public n3rv::service {
+	  using n3rv::service::service;
+
+      public:
+
+	    /*let's say that we declare 1 receive callback */
+	    static void* recv(void* objref, zmq::message_t* msg) {}
+
+	    /* And then 1 Main loop Callback */
+	    static void* ml(void* objref) {}
+
+	    int initialize() {
+
+		  /* To make the 2 previously defined callbacks available for topologies,
+		   we need to "preregister" them both: */
+
+		  this->register_rcb("recv",recv);
+		  this->register_mlcb("ml",ml)
+		
+	    }
+  };
 
 
 

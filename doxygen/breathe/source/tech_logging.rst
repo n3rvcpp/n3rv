@@ -6,6 +6,59 @@ behaviour of your different nodes. All the logging is handled through the `n3rv:
 Each service instance or service controller has its own internal `n3rv::logger` object, which member is
 `n3rv::service::ll`
 
+
+Log Levels
+----------
+
+In n3rv the log levels are basically the same as Syslog:
+
+.. list-table:: Available log levels
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - Level
+     - Name
+     - n3rv Name
+  
+   * - 0
+     - PANIC
+     - LOGLV_PANIC
+
+   * - 1
+     - ALERT
+     - LOGLV_ALERT
+    
+   * - 2
+     - CRITICAL
+     - LOGLV_CRIT
+
+   * - 3
+     - ERROR
+     - LOGLV_ERR
+
+   * - 4
+     - WARNING
+     - LOGLV_WARN
+
+   * - 5
+     - NOTICE
+     - LOGLV_NOTICE
+
+   * - 6
+     - INFO
+     - LOGLV_INFO
+
+   * - 7
+     - DEBUG
+     - LOGLV_DEBUG
+
+| 
+| Note that when you instanciate a new `n3rv::logger` object, you must specify as argument the 
+| maximum log level you want your logger to output.
+
+
+
+
 Logging Destinations
 --------------------
 
