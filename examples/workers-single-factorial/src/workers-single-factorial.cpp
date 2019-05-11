@@ -83,9 +83,7 @@ class vent: public n3rv::service {
     n3rv::qhandler* ventiler;
 
     int initialize() {
-
-      this->map_callbacks();
-
+      
       srand(time(NULL));
 
       this->ll->log(n3rv::LOGLV_NOTICE, "binding service..");

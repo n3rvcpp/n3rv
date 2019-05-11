@@ -14,15 +14,14 @@ class genericservice: public n3rv::service {
 
     bool plock;
 
-    int initialize() {      
-       this->map_callbacks();
+    int initialize() {   
+       this->register_rcb("ping_received", ping_received);
+       this->register_rcb("pong_received", pong_received);
+          
        this->plock = false;
     }
 
-    void map_callbacks() {
-        this->cbmap["ping_received"] = ping_received;
-        this->cbmap["pong_received"] = pong_received;
-    }
+  
 
     void hkloop() {
         if (this->service_class == "ping") {

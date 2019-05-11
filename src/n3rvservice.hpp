@@ -104,6 +104,9 @@ namespace n3rv {
       * @param cb callback function pointer.
       */
      void register_main(const char* cbid, mlptr cb);
+
+     /** Registers main loop callback for preregistered mlcb identifier. */
+     void register_main(const char* cbid, const char* cbstr);
      
      /**
       *  used to unregister a previously regestered main loop callback
@@ -111,11 +114,6 @@ namespace n3rv {
       *  @return 0 if unregister was succesful, >0 otherwise.*/
      int unregister_main(const char* cbid);
 
-
-    /** This method is used essentially to map callback function pointers to an identifier string.
-     *  Can be very useful for text-defined topologies.
-     */     
-    virtual void map_callbacks();
 
     /**
      * starts a new connection (zmq_socket) to a remote service available inside the directory.
@@ -228,6 +226,18 @@ namespace n3rv {
      * was not yet in directory, and tries to establish connection. */
     int check_deferred();
 
+    /** Registers a Receive Callback for later use through topologies 
+     *  @param cbid callback id.
+     *  @param cb callback function pointer.
+    */
+    void register_rcb(const char* cbid, fctptr cb);
+    
+    /** Registers a Main Loop Callback for later use through topologies
+     *  @param cbid callback id.
+     *  @param cb callback function pointer. */    
+    void register_mlcb(const char* cbid, mlptr cb);
+
+
     /** Sets the main ZMQ polling timeout, if required 
      *  @param poll_timeout time (in ms) the poller must wait before returning.
      */
@@ -262,11 +272,18 @@ namespace n3rv {
     zmq::context_t zctx;
 
 
-   std::map<std::string, fctptr> cbmap;
    std::map<std::string, fctptr> chmap;
 
    /** Main loop callbacks dictionary */
    std::map<std::string, mlptr> ml_chmap;
+
+
+  /** Available receive callbacks list (mainly for topologies)*/
+  std::map<std::string, fctptr> rcb_map;
+
+  /** Available main loop callbacks list (mainly for topologies) */
+  std::map<std::string, mlptr> mlcb_map;
+
 
    int last_nconn;
    std::vector<std::string> last_connlist;

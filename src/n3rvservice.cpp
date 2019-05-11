@@ -244,11 +244,6 @@ namespace n3rv {
 
   }
 
-  void service::map_callbacks() {
-
-  }
-
-
   zmq::pollitem_t* service::refresh_pollitems() {
 
     if (this == nullptr) return nullptr;
@@ -367,6 +362,10 @@ namespace n3rv {
     this->ml_chmap[cbid] = cb;
   }
 
+  void service::register_main(const char* cbid, const char* cbstr) {
+    this->ml_chmap[cbid] = this->mlcb_map[cbstr];
+  }
+
   int service::unregister_main(const char* cbid) {
     if (this->ml_chmap.find(cbid) != this->ml_chmap.end() ) {
           this->ml_chmap.erase(cbid);
@@ -380,7 +379,7 @@ namespace n3rv {
   }
 
   int service::attach(qhandler* hdl, std::string callback_name) {
-    this->chmap[hdl->cid] = this->cbmap[callback_name];
+    this->chmap[hdl->cid] = this->rcb_map[callback_name];
   }
 
 
@@ -586,6 +585,16 @@ namespace n3rv {
 
     return res;
   }
+
+
+  void service::register_rcb(const char* cbid, fctptr cb) {
+    this->rcb_map[cbid] = cb;
+  }
+
+  void service::register_mlcb(const char* cbid, mlptr cb) {
+     this->mlcb_map[cbid] = cb;
+  }
+
 
   void service::set_poll_timeout(int poll_timeout) {
     this->poll_timeout = poll_timeout;
