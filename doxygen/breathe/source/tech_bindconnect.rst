@@ -1,5 +1,5 @@
-bind() & connect()
-==================
+bind & connect
+==============
 
 `service::bind()` and `service::connect()` are the base methods to establish connections
 between your nodes. These methods are directly linked to `zmq::socket_t->bind()` and 
