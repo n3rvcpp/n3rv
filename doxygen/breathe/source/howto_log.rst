@@ -46,7 +46,7 @@ In `/etc/kibana/kibana.yml`, set the follwing parameters:
 
 Finally you can start Kibana:
 
- .. code-block:: console
+.. code-block:: console
 
    /etc/init.d/kibana start
 
