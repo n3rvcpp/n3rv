@@ -147,7 +147,7 @@ namespace n3rv {
     else {
       this->ll->log(LOGLV_WARN,"peer not found in directory, deferring connection..");
       n3rv::qdef cqd;
-      cqd.name = name;
+      cqd.name = fullname;
       cqd.socket_type = connection_type;
       cqd.hdl  = hdl;
       this->deferred.emplace_back(cqd);
