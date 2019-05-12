@@ -22,6 +22,12 @@ A: You can contact me by mail at clement.game[__at__]gmail.com, or via twitter (
 Architecture
 ------------
 
+Q: What happens when a service controller goes down ?
+*****************************************************
+A: Not much actually, you running nodes will keep going as if nothing happened. 
+The only problem is that new nodes and node bindings won't be able to register, therefore
+the other nodes will not be aware of them.
+
 Q: Can i attach multiple receive callbacks to a single ZMQ socket ?
 *******************************************************************
 A: No, you can't. If you call `service::attach()` more than once on the same qhandler*, the last attached callback will win! 

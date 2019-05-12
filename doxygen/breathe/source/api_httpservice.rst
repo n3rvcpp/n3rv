@@ -1,4 +1,4 @@
-HTTPService Class
+n3rv::httpservice
 =================
 
 .. doxygenclass:: n3rv::httpservice

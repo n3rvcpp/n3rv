@@ -17,7 +17,7 @@ namespace n3rv {
   
   /**
    * The main class of the n3rv framework. 
-   * Each microservice inside a n3rv infrastructure inherits the service class,
+   * Each node inside a n3rv infrastructure inherits the service class,
    * and therefore benefits from its functionalities.   
    */
   class service {
@@ -25,8 +25,9 @@ namespace n3rv {
    public:
 
     /** service class constructor.
-     *  @controller_host the ip/hostname of the controller.
-     *  @controller_port the port number on which the controller is listening (ch1). 
+     *  @param controller_host the ip/hostname of the controller.
+     *  @param controller_port the port number on which the controller is listening (ch1). 
+     *  @param ll (optional), logger object pointer to use for service logging.
      */
     service(const char* controller_host, 
             int controller_port,
@@ -105,7 +106,11 @@ namespace n3rv {
       */
      void register_main(const char* cbid, mlptr cb);
 
-     /** Registers main loop callback for preregistered mlcb identifier. */
+     /**
+      * Alternate version of register_main, for preregistered callbacks with register_mlcb
+      * @param cbid callback identifier
+      * @param cbstr callback preregistration key
+      */
      void register_main(const char* cbid, const char* cbstr);
      
      /**

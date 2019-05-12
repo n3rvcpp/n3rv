@@ -46,10 +46,10 @@ namespace n3rv {
             /** List of connections to remote endpoints 
              *  a service class must establish. */
             std::vector<jconnection> connections;
-            /** List of [connection, callback] attacchement, 
+            /** List of [connection, callback] attacchements, 
              *  which declare how to process messages. */
             std::vector<jcallback> receive_callbacks;
-
+            /** List of callbacks to run inside the service main loop. */
             std::vector<jcallback> ml_callbacks;
 
 

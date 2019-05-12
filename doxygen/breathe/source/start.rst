@@ -11,6 +11,8 @@ The following guide explains how to get started with the n3rv framework from the
   start_requirements
   start_buildinstall
   start_firstprog
+  start_examples
+  
     
 
 

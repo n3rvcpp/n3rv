@@ -18,6 +18,7 @@ to get the best of the framework, and produce fast and reliable multiservices ar
    api_logger
    api_servicecontroller
    api_topology
+   api_httpservice
 
 Classes List
 -------------

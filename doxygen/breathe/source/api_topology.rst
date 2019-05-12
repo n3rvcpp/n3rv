@@ -6,5 +6,5 @@ n3rv::topology
   :protected-members:
   :private-members:
 
-.. doxygenstruct:: n3rv::node_
+.. doxygenstruct:: n3rv::jservice_class_
   :members:
