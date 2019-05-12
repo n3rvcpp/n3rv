@@ -9,6 +9,7 @@ Introduction
    self
    start
    tech_overview
+   howtos
    api
    security
    faq
