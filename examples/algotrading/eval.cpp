@@ -84,7 +84,7 @@ int main() {
     eval e0("127.0.0.1", 10001);
     e0.set_uid("quotek.eval.eval1");
 
-    e0.ll->set_loglevel(4);
+    e0.ll->set_loglevel(n3rv::LOGLV_DEBUG);
     e0.ll->add_dest("stdout");
 
     e0.initialize();

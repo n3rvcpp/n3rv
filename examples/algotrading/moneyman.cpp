@@ -151,7 +151,7 @@ int main() {
     moneyman mm0("127.0.0.1", 10001);
     mm0.set_uid("quotek.moneyman.moneyman1");
 
-    mm0.ll->set_loglevel(4);
+    mm0.ll->set_loglevel(n3rv::LOGLV_DEBUG);
     mm0.ll->add_dest("stdout");
     mm0.initialize();
     mm0.run();

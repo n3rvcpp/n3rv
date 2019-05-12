@@ -40,7 +40,6 @@ namespace n3rv {
 
             /** Namespace of the service class. */
             std::string namespace_;
-
             /** List of bindings the service class must create. */
             std::vector<jbinding> bindings;
             /** List of connections to remote endpoints 
