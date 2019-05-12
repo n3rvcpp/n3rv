@@ -61,6 +61,11 @@ of your services:
 
 After that, you just need to instanciate your defined service classes to let the magics begin !
 
+.. figure:: ./_static/img/algorun.png
+   :scale: 100 %
+   :alt: 
+   
+   Running example of a proto-algotrading solution using a n3rv multinodal architecture
 
 Get n3rv
 --------
