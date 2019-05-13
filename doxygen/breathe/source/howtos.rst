@@ -9,6 +9,7 @@ You will in this section a series of tutorials for the n3rv framework.
    
    howto_ububuild
    howto_log
+   howto_messages
 
 | 
 | 
