@@ -14,7 +14,21 @@
 
 namespace n3rv {
 
-  
+     /** Connction handler returned by connect() 
+      *  or bind(), used for send() operations. */
+    class qhandler {
+        public:
+            /** randomly generated connection id */
+            std::string cid;
+            /** full peer node uid after lookup (filled only for connect() operations )*/
+            std::string peer_uid;
+
+            qhandler() {
+                this->cid = randstr(4) + "-" + randstr(4) + "-" + randstr(6);
+            }
+
+    };
+
   /**
    * The main class of the n3rv framework. 
    * Each node inside a n3rv infrastructure inherits the service class,

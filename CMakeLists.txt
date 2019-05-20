@@ -40,29 +40,15 @@ add_library(
 set(LIBS zmq pthread)
 endif(WITH_PROTOBUF)
 
-
-add_library(
-  n3rvhttp SHARED
-  src/n3rvhttpservice.cpp
-)
-
-
 target_link_libraries(
   n3rv
   ${LIBS}
-)
-
-target_link_libraries(
-   n3rvhttp
-   n3rv
-   ${LIBS}
 )
 
 find_library (PTHREAD pthread)
 find_library (ZMQ zmq)
 
 install (TARGETS n3rv DESTINATION /usr/local/lib)
-install (TARGETS n3rvhttp DESTINATION /usr/local/lib)
 install (FILES src/n3rvcommon.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvservice.hpp DESTINATION /usr/local/include/n3rv)
 install (FILES src/n3rvhttpservice.hpp DESTINATION /usr/local/include/n3rv)

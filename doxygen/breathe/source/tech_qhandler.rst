@@ -4,21 +4,22 @@ Qhandlers
 `n3rv::qhandler` objects are producted whenever a service creates a new binding or `connect()` to one.
 Concretely, it is an overlying layer which "hides" ZMQ sockets under the hood.
 
-The qhandler object structure is really simple:
+The qhandler object def is really simple:
 
 .. code-block:: c++
 
   /** Connction handler returned by connect() 
    * or bind(), used for send() and attach() operations. */
 
-  typedef struct qhandler_ {
+  class qhandler {
 
-        /** randomly generated connection id */
-        std::string cid;
+        public: 
+          /** randomly generated connection id */
+          std::string cid;
 
-        /** full peer node uid after lookup (filled only for connect() operations ) */
-        std::string peer_uid;
-    } qhandler;
+          /** full peer node uid after lookup (filled only for connect() operations ) */
+          std::string peer_uid;
+    };
 
 
 qhandlers are the objects which make the link with ZMQ sockets in n3rv, and `service::send()` and 

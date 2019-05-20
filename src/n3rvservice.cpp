@@ -41,9 +41,6 @@ namespace n3rv {
         this->ctlr_ch1 = new qhandler();
         this->ctlr_ch2 = new qhandler();
 
-        this->ctlr_ch1->cid = randstr(10);
-        this->ctlr_ch2->cid = randstr(10);
-
         this->connections[this->ctlr_ch1->cid].socket = new zmq::socket_t(this->zctx,ZMQ_REQ);
         this->connections[this->ctlr_ch2->cid].socket = new zmq::socket_t(this->zctx,ZMQ_SUB);
 
@@ -108,7 +105,6 @@ namespace n3rv {
     
     if (hdlref == nullptr) {
       hdl = new qhandler();
-      hdl->cid = randstr(9);
     }
 
     else {
@@ -160,7 +156,6 @@ namespace n3rv {
   qhandler* service::zbind(const char* bind_name, const char* endpoint, int bind_type ) { 
     
      qhandler* hdl = new qhandler();
-     hdl->cid = randstr(8);
 
     this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
     this->connections[hdl->cid].socket->bind(endpoint);
@@ -199,8 +194,6 @@ namespace n3rv {
     }
     
     qhandler* hdl = new qhandler();
-    hdl->cid = randstr(8);
-
     
     this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
     this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER,0);
@@ -566,7 +559,10 @@ namespace n3rv {
       if (b != nullptr) {
         
         this->ll->log(n3rv::LOGLV_NOTICE,"reconnecting to " + def.name);
-        this->connect(def.name.c_str(), def.socket_type,def.hdl);
+
+        qhandler* qdef = static_cast<qhandler*>(def.hdl);
+
+        this->connect(def.name.c_str(), def.socket_type,qdef);
         this->deferred.erase(this->deferred.begin() + res);
 
         res++;

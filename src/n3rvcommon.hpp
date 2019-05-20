@@ -8,15 +8,6 @@
 
 namespace n3rv {
 
-     /** Connction handler returned by connect() 
-      *  or bind(), used for send() operations. */
-    typedef struct qhandler_ {
-        /** randomly generated connection id */
-        std::string cid;
-        /** full peer node uid after lookup (filled only for connect() operations )*/
-        std::string peer_uid;
-    } qhandler;
-
     /** stores deffered connections for later use, 
      *  when service becomes available in directory.
      */
@@ -26,7 +17,7 @@ namespace n3rv {
         /** socket type of connection to defer. */
         int socket_type;
         /** n3rv connection handler ref. */
-        qhandler* hdl;
+        void* hdl;
     } qdef;
 
     /** qconn aims to store information about 

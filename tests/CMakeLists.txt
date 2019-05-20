@@ -18,14 +18,12 @@ add_executable(
 target_link_libraries(
   tests
   n3rv
-  n3rvhttp
   zmq
   pthread
   event
 )
 
 find_library (N3RV n3rv)
-find_library (N3RVHTTP n3rvhttp)
 find_library (ZMQ zmq)
 find_library (PTHREAD pthread)
 find_library (EVENT event)
