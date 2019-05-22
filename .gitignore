@@ -14,6 +14,7 @@ examples/algotrading/exec
 examples/algotrading/moneyman
 examples/topology-load/topology-load
 examples/topology-fetch/topology-fetch
+examples/httpserv/httpserv
 examples/hello/hello
 tests/tests
 tests/n3rvtest.log

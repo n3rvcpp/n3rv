@@ -22,7 +22,7 @@ int test_topology_serialize() {
     n3rv::jcallback cb;
     cb.uid="foo";
     cb.callback_name="fb_callback";
-    svc.callbacks.emplace_back(cb);
+    svc.receive_callbacks.emplace_back(cb);
 
     t.svclasses["foo_class"] = svc;
 
