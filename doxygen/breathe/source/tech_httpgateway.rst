@@ -13,7 +13,7 @@ the exact same features but with extra http service capacities.
 Initializing HTTP Service
 *************************
 
-the httpservice class has 2 methods that you need to call to enable http service: `init_http()`
+the `httpservice` class has 2 methods that you need to call to enable http service: `init_http()`
 and then `run_http_async()`:
 
 .. code-block:: c++
@@ -28,8 +28,8 @@ and then `run_http_async()`:
     hs1.run_http_async();
 
 
-Distribute content: Attach URI to Callback 
-******************************************
+Attach URI to Callback 
+**********************
 
 `n3rv::httpservice` uses libevent as underlying mechanism for http serving. libevent's 
 inner mechanism requires binding an HTTP URI with a callback function that will produce 
@@ -78,9 +78,15 @@ A typical HTTP callback implementation is as follows:
         evhttp_send_reply(req, HTTP_OK, "", out_buff);
     }
 
+
+Serve static files/directories from Filesystem
+**********************************************
+
+the `httpservice` class offers the possibility to serve static files coming from your local filesystem. To do this,
+you have to 
+
+
 Extra linking
 -------------
 
-Important: Given that `n3rv::httpservice` uses libevent, two extra libraries are required by the linker in
-order to correctly build your programs containing references to httpservice. these two libs are
-`-ln3rvhttp` and `-levent`
+ Important: Given that `n3rv::httpservice` uses libevent, whenever you use this class you need to link your generated binary with `-levent`

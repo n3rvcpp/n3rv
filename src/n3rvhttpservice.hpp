@@ -25,7 +25,7 @@ namespace n3rv {
     public:
     
       /** Opens file on host and retrieves its content.
-       *  @param path: file's path.
+       *  @param path File's path.
        *  @return file's content and & bool indicating if file was found.
        */
       fserve_res serve_file(const char* path) {
@@ -45,9 +45,11 @@ namespace n3rv {
       }
 
       /** 
-       * Callback for serving directories *
+       * General purpose callback, mainly stands for file serving.
+       * @param req libevent's request pointer.
+       * @param objref *this* backward pointer.
        */
-      static void http_dir_callback(evhttp_request *req, void * objref) {
+      static void http_gen_callback(evhttp_request *req, void * objref) {
 
         auto *out_buff = evhttp_request_get_output_buffer(req);
         if (!out_buff) return;
@@ -93,7 +95,8 @@ namespace n3rv {
 
       }
 
-       /** default HTTP callback (for testing and example)
+      /**
+       * Default HTTP callback (for testing and example)
        * @param req request object coming from libevent.
        * @param objref Calling object's back ref.
        */
@@ -109,9 +112,11 @@ namespace n3rv {
 
       }
 
-      /** initializes http service on listen_addr:port
-       *  @param http_listen_addr IP to bind http service on.
-       *  @param http_listen_port TCP port to bind http service on.
+      /** 
+       * Initializes http service on listen_addr:port.
+       * @param http_listen_addr IP to bind http service on.
+       * @param http_listen_port TCP port to bind http service on.
+       * @return 0 if HTTP init went fine, -1 otherwise.
        */ 
       int init_http(std::string http_listen_addr, int http_listen_port) {
 
@@ -131,10 +136,14 @@ namespace n3rv {
           return -1;
         }
 
-        evhttp_set_gencb(this->ev_server, http_dir_callback , this);
+        evhttp_set_gencb(this->ev_server, httpservice::http_gen_callback , this);
       }
 
-      /** Starts the http service once initialized */          
+      /** 
+       * Starts the http service once initialized. 
+       * @return 0 if run was succesful, -1 otherwise.
+       * WARNING: run_http is blocking. 
+       */          
       int run_http() {
 
         auto* bound_sock = evhttp_bind_socket_with_handle(this->ev_server,
@@ -155,7 +164,10 @@ namespace n3rv {
         }
       }
 
-      /** Starts the http service, in a dedicated thread */
+      /** 
+       * Starts the http service, in a dedicated thread. 
+       * @return The created thread pointer. 
+       */
       std::thread* run_http_async() {
         std::thread* t = new std::thread( [this] {
             this->run_http();
@@ -165,16 +177,18 @@ namespace n3rv {
         return t;
       }
 
-      /** HTTP URI Callback binding method
-        * @param uri: URI address to attach callback to
-        * @param cb callback pointer
-        */
-      int attach_http(std::string uri, httpcb cb) {
-       
+      /** HTTP URI Callback binding method.
+        * @param uri URI address to attach callback to.
+        * @param cb callback pointer. */
+      int attach_http(std::string uri, httpcb cb) {      
         evhttp_set_cb(this->ev_server, uri.c_str(), cb, this);
         return 0;
       }
 
+      /** Adds a new FS directory to recursively serve files that are inside.
+       *  @param uri root URI of files to serve.
+       *  @param path Filesystem path of directory to serve.
+       *  @return 0 if registering went fine, < 0 otherwise. */
       int register_dir(std::string uri, std::string path) {
         this->uri_dir_map[uri] = path;
         return 0;
