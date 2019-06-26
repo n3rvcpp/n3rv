@@ -96,7 +96,7 @@ you can add it by running the following command:
 
 .. code-block:: console
 
-  sudo wget -qO/usr/include/zmq.hpp https://raw.githubusercontent.com/zeromq/cppzmq/master/zmq.hpp
+  sudo wget -qO/usr/include/zmq.hpp https://raw.githubusercontent.com/zeromq/cppzmq/v<ZMQ_VERSION>/zmq.hpp
 
 
 Undefined reference to getnameinfo / NI_MAXHOST / NI_NUMERICSERV
