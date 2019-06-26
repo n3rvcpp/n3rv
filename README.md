@@ -60,6 +60,13 @@ https://n3rvcpp.github.io
 Changelog
 ---------
 
+### v0.25:
+
+* Added Support for static files serving in n3rv::httpservice.
+* httpservice is now header-only, thus removing the need for libn3rvhttp.
+* Small improvements in documentation.
+
+
 ### v0.2:
 
 * Added support for protcol buffers messages exchange.

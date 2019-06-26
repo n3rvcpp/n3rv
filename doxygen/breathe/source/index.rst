@@ -83,6 +83,14 @@ Changelog
 
 You will find below the changelog for the different versions of n3rv framework.
 
+
+v0.25:
+******
+
+- Added Support for static files serving in n3rv::httpservice.
+- httpservice is now header-only, thus removing the need for libn3rvhttp.
+- Small improvements in documentation.
+
 v0.2:
 *****
 
