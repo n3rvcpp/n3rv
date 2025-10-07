@@ -22,93 +22,80 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <sys/types.h>
-#include <sys/socket.h>
+#pragma once
+
+#include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <netdb.h>
-
-#ifndef __N3RV_ZMQ__
-#define __N3RV_ZMQ__
+#include <sys/socket.h>
+#include <sys/types.h>
 
 #if defined _WIN32
 #include "windows.hpp"
 #endif
 
-namespace zmq
-{
+namespace zmq {
 #ifdef ZMQ_HAVE_WINDOWS
 #if defined _MSC_VER && _MSC_VER <= 1400
 ///< \todo zmq.h uses SOCKET unconditionally, so probably VS versions before
 /// VS2008 are unsupported anyway. Apart from that, this seems to depend on
 /// the Windows SDK version rather than the VS version.
 typedef UINT_PTR fd_t;
-enum
-{
-    retired_fd = (fd_t) (~0)
-};
+enum { retired_fd = (fd_t)(~0) };
 #else
 typedef SOCKET fd_t;
 enum
 #if _MSC_VER >= 1800
-  : fd_t
+    : fd_t
 #endif
 {
-    retired_fd = INVALID_SOCKET
+  retired_fd = INVALID_SOCKET
 };
 #endif
 #else
 typedef int fd_t;
-enum
-{
-    retired_fd = -1
-};
+enum { retired_fd = -1 };
 #endif
 
-int get_peer_ip_address (fd_t sockfd_, std::string &ip_addr_)
-{
-    int rc;
-    struct sockaddr_storage ss;
+int get_peer_ip_address(fd_t sockfd_, std::string &ip_addr_) {
+  int rc;
+  struct sockaddr_storage ss;
 
-#if defined ZMQ_HAVE_HPUX || defined ZMQ_HAVE_WINDOWS                          \
-  || defined ZMQ_HAVE_VXWORKS
-    int addrlen = static_cast<int> (sizeof ss);
+#if defined ZMQ_HAVE_HPUX || defined ZMQ_HAVE_WINDOWS ||                       \
+    defined ZMQ_HAVE_VXWORKS
+  int addrlen = static_cast<int>(sizeof ss);
 #else
-    socklen_t addrlen = sizeof ss;
+  socklen_t addrlen = sizeof ss;
 #endif
-    rc = getpeername (sockfd_, reinterpret_cast<struct sockaddr *> (&ss),
-                      &addrlen);
+  rc = getpeername(sockfd_, reinterpret_cast<struct sockaddr *>(&ss), &addrlen);
 #ifdef ZMQ_HAVE_WINDOWS
-    if (rc == SOCKET_ERROR) {
-        const int last_error = WSAGetLastError ();
-        wsa_assert (last_error != WSANOTINITIALISED && last_error != WSAEFAULT
-                    && last_error != WSAEINPROGRESS
-                    && last_error != WSAENOTSOCK);
-        return 0;
-    }
+  if (rc == SOCKET_ERROR) {
+    const int last_error = WSAGetLastError();
+    wsa_assert(last_error != WSANOTINITIALISED && last_error != WSAEFAULT &&
+               last_error != WSAEINPROGRESS && last_error != WSAENOTSOCK);
+    return 0;
+  }
 #else
-    if (rc == -1) {
-        return 0;
-    }
+  if (rc == -1) {
+    return 0;
+  }
 #endif
 
-    char host[NI_MAXHOST];
-    rc = getnameinfo (reinterpret_cast<struct sockaddr *> (&ss), addrlen, host,
-                      sizeof host, NULL, 0, NI_NUMERICHOST);
-    if (rc != 0)
-        return 0;
+  char host[NI_MAXHOST];
+  rc = getnameinfo(reinterpret_cast<struct sockaddr *>(&ss), addrlen, host,
+                   sizeof host, NULL, 0, NI_NUMERICHOST);
+  if (rc != 0)
+    return 0;
 
-    ip_addr_ = host;
+  ip_addr_ = host;
 
-    union
-    {
-        struct sockaddr sa;
-        struct sockaddr_storage sa_stor;
-    } u;
+  union {
+    struct sockaddr sa;
+    struct sockaddr_storage sa_stor;
+  } u;
 
-    u.sa_stor = ss;
-    return static_cast<int> (u.sa.sa_family);
+  u.sa_stor = ss;
+  return static_cast<int>(u.sa.sa_family);
 }
 
-}
-#endif
+} // namespace zmq
