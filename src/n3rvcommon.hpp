@@ -12,6 +12,9 @@
 
 namespace n3rv {
 
+template <typename T>
+using nullable_ref = std::optional<std::reference_wrapper<T>>;
+
 /** stores deffered connections for later use,
  *  when service becomes available in directory.
  */
@@ -98,9 +101,10 @@ std::string randstr(size_t length);
  * parameters, if multiple nodes are found then nlookup() picks one of them
  * randomly.
  */
-std::optional<std::reference_wrapper<qserv>>
-nlookup(std::vector<qserv> &dir, std::string service_class,
-        std::string node_name, std::string namespace_ = "*");
+nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
+                                std::string service_class,
+                                std::string node_name,
+                                std::string namespace_ = "*");
 
 /**
  * Tries to Resolve node from directory provided as argument, given full node
@@ -112,8 +116,8 @@ nlookup(std::vector<qserv> &dir, std::string service_class,
  * Note about nodes lookup: addr supports glob expressions (*) for each term,
  * if multiple nodes are found then nlookup() picks one of them randomly.
  */
-std::optional<std::reference_wrapper<qserv>>
-nlookup(const std::vector<qserv> &dir, const std::string &addr);
+nullable_ref<qserv> node_lookup(const std::vector<qserv> &dir,
+                                const std::string &addr);
 
 /**
  * Tries to resolve binding from full address.
@@ -125,7 +129,7 @@ nlookup(const std::vector<qserv> &dir, const std::string &addr);
  * Note about bindings lookup: addr supports glob expressions (*) for each term,
  * if multiple bindings are found then blookup() picks one of them randomly.
  */
-std::optional<std::reference_wrapper<binding>>
-blookup(const std::vector<qserv> &dir, const std::string &addr);
+nullable_ref<binding> binding_lookup(const std::vector<qserv> &dir,
+                                     const std::string &addr);
 
 } // namespace n3rv

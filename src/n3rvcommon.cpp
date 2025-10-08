@@ -11,8 +11,8 @@ std::string randstr(const std::size_t length) {
   return result;
 }
 
-std::optional<std::reference_wrapper<qserv>> nlookup(std::vector<qserv> &dir,
-                                                     const std::string &addr) {
+nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
+                                const std::string &addr) {
 
   std::regex rgx("\\*");
 
@@ -40,17 +40,15 @@ std::optional<std::reference_wrapper<qserv>> nlookup(std::vector<qserv> &dir,
   return std::nullopt;
 }
 
-std::optional<std::reference_wrapper<qserv>> nlookup(std::vector<qserv> &dir,
-                                                     std::string service_class,
-                                                     std::string node_name,
-                                                     std::string namespace_) {
-
+nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
+                                std::string service_class,
+                                std::string node_name, std::string namespace_) {
   std::string lookup_str = namespace_ + "." + service_class + "." + node_name;
-  return nlookup(dir, lookup_str);
+  return node_lookup(dir, lookup_str);
 }
 
-std::optional<std::reference_wrapper<binding>>
-blookup(const std::vector<qserv> &dir, const std::string &addr) {
+nullable_ref<binding> binding_lookup(const std::vector<qserv> &dir,
+                                     const std::string &addr) {
 
   // extracts binding name
   std::size_t bpos = addr.find(".");
@@ -62,7 +60,7 @@ blookup(const std::vector<qserv> &dir, const std::string &addr) {
   std::string naddr = addr.substr(0, bpos);
   std::string bname = addr.substr(bpos + 1, addr.length() - bpos);
 
-  auto s = nlookup(dir, naddr);
+  auto s = node_lookup(dir, naddr);
 
   if (std::nullopt == s) {
     return std::nullopt;

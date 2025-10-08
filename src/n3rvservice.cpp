@@ -109,7 +109,7 @@ qhandler *service::connect(const char *lookup, int connection_type,
   std::string fullname = this->add_scope(lookup);
 
   this->ll->log(LOGLV_NOTICE, "connecting to " + fullname);
-  auto binding = blookup(this->directory, fullname);
+  auto binding = binding_lookup(this->directory, fullname);
 
   if (std::nullopt != binding) {
 
@@ -529,7 +529,7 @@ int service::check_deferred() {
   int res = 0;
   for (auto def : deferred_iter) {
 
-    auto binding = blookup(this->directory, def.name);
+    auto binding = binding_lookup(this->directory, def.name);
     if (std::nullopt != binding) {
 
       this->ll->log(n3rv::LOGLV_NOTICE, "reconnecting to " + def.name);

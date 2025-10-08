@@ -81,8 +81,8 @@ void servicecontroller::run() {
         b.port = atoi(m.args[4].c_str());
 
         // tries to lookup qserv before creating a new one.
-        std::optional<std::reference_wrapper<n3rv::qserv>> nserv =
-            nlookup(this->directory, m.args[1], m.args[2]);
+        n3rv::nullable_ref<n3rv::qserv> nserv =
+            node_lookup(this->directory, m.args[1], m.args[2]);
 
         // we found node, we just add binding
         if (std::nullopt != nserv) {
