@@ -190,7 +190,7 @@ public:
     return 0;
   }
 
-  std::map<std::string, std::string> uri_dir_map;
+  std::unordered_map<std::string, std::string> uri_dir_map;
 
 protected:
   std::string http_listen_addr;

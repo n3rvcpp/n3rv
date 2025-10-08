@@ -4,6 +4,7 @@
 #include <regex>
 #include <string>
 #include <syslog.h>
+#include <unordered_map>
 #include <vector>
 
 namespace n3rv {
@@ -56,8 +57,8 @@ public:
   /** class destructor */
   ~logger();
 
-  static std::map<int, std::string> ll_map;
-  static std::map<std::string, int> fac_map;
+  static std::unordered_map<int, std::string> ll_map;
+  static std::unordered_map<std::string, int> fac_map;
 
 protected:
   std::vector<std::string> dests;
