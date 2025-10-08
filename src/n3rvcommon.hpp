@@ -1,7 +1,13 @@
 #pragma once
 
+#include <algorithm>
+#include <functional>
+#include <iostream>
+#include <optional>
+#include <random>
 #include <regex>
 #include <vector>
+
 #include <zmq.hpp>
 
 namespace n3rv {
@@ -9,30 +15,33 @@ namespace n3rv {
 /** stores deffered connections for later use,
  *  when service becomes available in directory.
  */
-typedef struct qdef_ {
+struct qdef {
   /** name/lookup of the binding to defer. */
   std::string name;
   /** socket type of connection to defer. */
   int socket_type;
   /** n3rv connection handler ref. */
+  /* TODO: Replace this by unique_ptr (at least)*/
   void *hdl;
-} qdef;
+};
 
 /** qconn aims to store information about
  *  connections and manages zmq sockets. */
-typedef struct qconn_ {
+struct qconn {
   int type;
-  zmq::socket_t *socket;
+  std::unique_ptr<zmq::socket_t> socket;
   int socket_type;
   std::vector<std::string> peers;
-} qconn;
+};
 
 /**
  * binding structure aims to store configuration for a zmq socket.
  * (socket_type is a direct allusion to zmq socket types.)
  */
-typedef struct binding_ {
-  /** n3rv::qserv* parent, stored as void* pointer (to avoid circular refs.) */
+struct binding {
+  /** n3rv::qserv* parent,
+   * stored as void* pointer (to avoid circular refs.)
+   TODO: Remove this naked PTR */
   void *parent;
   /** Name of the binding */
   std::string name;
@@ -40,12 +49,12 @@ typedef struct binding_ {
   unsigned int port;
   /** ZMQ Socket type for the binding. */
   unsigned int socket_type;
-} binding;
+};
 
 /**
  * This struct aims to store the subscribed nodes inside the main directory.
  */
-typedef struct qserv_ {
+struct qserv {
   /** Namespace of the node. */
   std::string namespace_;
   /** Service Class of the node. */
@@ -56,7 +65,7 @@ typedef struct qserv_ {
   std::string ip;
   /** List of subscribed bindings so far for the node. */
   std::vector<binding> bindings;
-} qserv;
+};
 
 /** n3rv receive callbacks signature.
  *  Each callback used with attach() must have the following signature:
@@ -89,20 +98,22 @@ std::string randstr(size_t length);
  * parameters, if multiple nodes are found then nlookup() picks one of them
  * randomly.
  */
-qserv *nlookup(std::vector<qserv_> &dir, std::string service_class,
-               std::string node_name, std::string namespace_ = "*");
+std::optional<std::reference_wrapper<qserv>>
+nlookup(std::vector<qserv> &dir, std::string service_class,
+        std::string node_name, std::string namespace_ = "*");
 
 /**
  * Tries to Resolve node from directory provided as argument, given full node
  * addr.
  * @param dir Directory map object to look in.
  * @param addr Node address in format "namespace_.service_class.node_name".
- * @return Directory Node pointer if found, nullptr otherwise.
+ * @return Directory Node pointer if found, std::nullopt otherwise.
  *
  * Note about nodes lookup: addr supports glob expressions (*) for each term,
  * if multiple nodes are found then nlookup() picks one of them randomly.
  */
-qserv *nlookup(std::vector<qserv_> &dir, std::string addr);
+std::optional<std::reference_wrapper<qserv>>
+nlookup(const std::vector<qserv> &dir, const std::string &addr);
 
 /**
  * Tries to resolve binding from full address.
@@ -114,6 +125,7 @@ qserv *nlookup(std::vector<qserv_> &dir, std::string addr);
  * Note about bindings lookup: addr supports glob expressions (*) for each term,
  * if multiple bindings are found then blookup() picks one of them randomly.
  */
-binding *blookup(std::vector<qserv> &dir, std::string addr);
+std::optional<std::reference_wrapper<binding>>
+blookup(const std::vector<qserv> &dir, const std::string &addr);
 
 } // namespace n3rv

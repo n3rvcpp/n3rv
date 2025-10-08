@@ -1,617 +1,590 @@
 #include "n3rvservice.hpp"
-#include <thread>
-#include <regex>
 #include <iostream>
+#include <regex>
+#include <thread>
 #include <unistd.h>
 
 namespace n3rv {
 
+service::service(const char *controller_host, int controller_port, logger *ll) {
 
-  service::service(                
-                   const char* controller_host, 
-                   int controller_port,
-                   logger* ll) {
+  this->ll = (ll == nullptr) ? new logger(LOGLV_NOTICE) : ll;
 
-        this->ll = (ll == nullptr) ? new logger(LOGLV_NOTICE) :ll;
-        
-        srand(time(nullptr));
+  srand(time(nullptr));
 
-        this->namespace_ = "";
-        this->service_class = "";
-        this->name = "";
+  this->namespace_ = "";
+  this->service_class = "";
+  this->name = "";
 
-        this->running = false;
+  this->running = false;
 
-        this->poll_timeout = 1000;
-        this->zctx = zmq::context_t(1);
-        this->controller_host = std::string(controller_host);
-        this->controller_port = controller_port;
+  this->poll_timeout = 1000;
+  this->zctx = zmq::context_t(1);
+  this->controller_host = std::string(controller_host);
+  this->controller_port = controller_port;
 
-        this->connect_controller();
+  this->connect_controller();
+}
+
+int service::connect_controller() {
+
+  // Controller has 2 I/O channels: 1 for req/resp and one for multicast
+  // (the later mostly for directory updates). Therefore, each service must
+  // connect to the 2 of them.
+
+  this->ctlr_ch1 = new qhandler();
+  this->ctlr_ch2 = new qhandler();
+
+  this->connections[this->ctlr_ch1->cid].socket =
+      std::make_unique<zmq::socket_t>(this->zctx, ZMQ_REQ);
+  this->connections[this->ctlr_ch2->cid].socket =
+      std::make_unique<zmq::socket_t>(this->zctx, ZMQ_SUB);
+
+  // Connects to controller on both channels.
+  std::stringstream ss;
+  ss << "tcp://" << controller_host << ":" << controller_port;
+
+  this->ll->log(LOGLV_NOTICE, "Connecting to " + std::string(controller_host) +
+                                  " controller..");
+  this->connections[this->ctlr_ch1->cid].socket->connect(ss.str().c_str());
+
+  std::stringstream ss2;
+  ss2 << "tcp://" << controller_host << ":" << (controller_port + 1);
+  this->connections[this->ctlr_ch2->cid].socket.get()->connect(
+      ss2.str().c_str());
+  this->connections[this->ctlr_ch2->cid].socket.get()->setsockopt(ZMQ_SUBSCRIBE,
+                                                                  "", 0);
+
+  // Attaches controller's channel 2 to directory updater callback.
+  this->attach(this->ctlr_ch2, this->directory_update);
+}
+
+service::~service() {
+  this->stop();
+  this->terminate();
+}
+
+void service::set_uid(const char *namespace_, const char *service_class,
+                      const char *name) {
+
+  this->namespace_ = std::string(namespace_);
+  this->service_class = std::string(service_class);
+  this->name = std::string(name);
+}
+
+void service::set_uid(const char *uid) {
+
+  std::string suid = std::string(uid);
+
+  std::vector<std::string> uid_parts;
+  std::regex dotsplit("\\.");
+  std::sregex_token_iterator iter(suid.begin(), suid.end(), dotsplit, -1);
+  std::sregex_token_iterator end;
+  for (; iter != end; ++iter)
+    uid_parts.emplace_back(*iter);
+
+  if (uid_parts.size() != 3) {
+    this->ll->log(LOGLV_CRIT, "cannot set UID: Invalid string");
+    return;
+  }
+
+  this->namespace_ = uid_parts[0];
+  this->service_class = uid_parts[1];
+  this->name = uid_parts[2];
+}
+
+qhandler *service::connect(const char *lookup, int connection_type,
+                           qhandler *hdlref) {
+
+  qhandler *hdl;
+
+  if (hdlref == nullptr) {
+    hdl = new qhandler();
+  }
+
+  else {
+    hdl = hdlref;
+  }
+
+  std::string fullname = this->add_scope(lookup);
+
+  this->ll->log(LOGLV_NOTICE, "connecting to " + fullname);
+  auto binding = blookup(this->directory, fullname);
+
+  if (std::nullopt != binding) {
+
+    auto serv = (qserv *)(binding->get().parent);
+
+    // we create a new socket but only if it is null (for hdlref)
+    if (this->connections[hdl->cid].socket == nullptr)
+      this->connections[hdl->cid].socket =
+          std::make_unique<zmq::socket_t>(this->zctx, connection_type);
+
+    std::stringstream ep;
+    ep << "tcp://" << serv->ip << ":" << binding->get().port;
+    this->connections[hdl->cid].socket->connect(ep.str().c_str());
+
+    // Adds sockopt if zmq socket type is ZMQ_SUB
+    if (connection_type == ZMQ_SUB) {
+      this->connections[hdl->cid].socket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
+    }
+
+    hdl->peer_uid = serv->namespace_ + "." + serv->service_class + "." +
+                    serv->node_name + "." + binding->get().name;
 
   }
 
-
-  int service::connect_controller() {
-
-        // Controller has 2 I/O channels: 1 for req/resp and one for multicast 
-        // (the later mostly for directory updates). Therefore, each service must 
-        // connect to the 2 of them.
-
-        this->ctlr_ch1 = new qhandler();
-        this->ctlr_ch2 = new qhandler();
-
-        this->connections[this->ctlr_ch1->cid].socket = new zmq::socket_t(this->zctx,ZMQ_REQ);
-        this->connections[this->ctlr_ch2->cid].socket = new zmq::socket_t(this->zctx,ZMQ_SUB);
-
-        // Connects to controller on both channels.
-        std::stringstream ss;
-        ss << "tcp://" << controller_host << ":" << controller_port;
-
-        this->ll->log(LOGLV_NOTICE, "Connecting to " + std::string(controller_host) + " controller.." );
-        this->connections[this->ctlr_ch1->cid].socket->connect(ss.str().c_str());
-
-        std::stringstream ss2;
-        ss2 << "tcp://" << controller_host << ":" << (controller_port + 1);
-        this->connections[this->ctlr_ch2->cid].socket->connect(ss2.str().c_str());
-        this->connections[this->ctlr_ch2->cid].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
-        
-        // Attaches controller's channel 2 to directory updater callback. 
-        this->attach(this->ctlr_ch2,this->directory_update);
+  else {
+    this->ll->log(LOGLV_WARN,
+                  "peer not found in directory, deferring connection..");
+    n3rv::qdef cqd;
+    cqd.name = fullname;
+    cqd.socket_type = connection_type;
+    cqd.hdl = hdl;
+    this->deferred.emplace_back(cqd);
   }
 
-  service::~service() {
-    this->stop();
-    this->terminate();
+  return hdl;
+}
+
+qhandler *service::zbind(const char *bind_name, const char *endpoint,
+                         int bind_type) {
+
+  qhandler *hdl = new qhandler();
+
+  this->connections[hdl->cid].socket =
+      std::make_unique<zmq::socket_t>(this->zctx, bind_type);
+  this->connections[hdl->cid].socket->bind(endpoint);
+  this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER, 0);
+
+  return hdl;
+}
+
+void service::zsockopt(qhandler *hdl, int option_name, const void *option_value,
+                       size_t option_len) {
+
+  if (option_len == -1)
+    option_len = sizeof(int);
+
+  if (nullptr != this->connections[hdl->cid].socket)
+    this->connections[hdl->cid].socket.get()->setsockopt(
+        option_name, option_value, option_len);
+}
+
+qhandler *service::bind(const char *bind_name, const char *ip, int bind_type,
+                        int port) {
+
+  if (this->namespace_ == "" || this->service_class == "" || this->name == "") {
+    this->ll->log(
+        LOGLV_CRIT,
+        "Cannot create binding: Please ensure to call set_uid() beforehand.");
+    return nullptr;
   }
 
-  void service::set_uid(const char* namespace_, const char* service_class, const char* name) {
-
-    this->namespace_ = std::string(namespace_);
-    this->service_class = std::string(service_class);
-    this->name = std::string(name);
-
+  if (bind_name == "") {
+    this->ll->log(LOGLV_CRIT, "Cannot bind with an empty name");
+    return nullptr;
   }
 
-  void service::set_uid(const char* uid) {
+  qhandler *hdl = new qhandler();
 
-    std::string suid = std::string(uid);
+  this->connections[hdl->cid].socket =
+      std::make_unique<zmq::socket_t>(this->zctx, bind_type);
+  this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER, 0);
 
-    std::vector<std::string> uid_parts;
-    std::regex dotsplit("\\.");
-    std::sregex_token_iterator iter(suid.begin(),
-    suid.end(),
-    dotsplit,
-    -1);
-    std::sregex_token_iterator end;
-    for ( ; iter != end; ++iter) uid_parts.emplace_back(*iter);
+  // Port Autobinding (if 0)
+  if (port == 0) {
 
-    if (uid_parts.size() != 3) {
-      this->ll->log(LOGLV_CRIT, "cannot set UID: Invalid string");
-      return;
-    }
+    /*we use a binding range of 40000-50000 to mitigate collision
+      possibilities */
+    port = (rand() % 10001) + 40000;
 
-    this->namespace_ = uid_parts[0];
-    this->service_class = uid_parts[1];
-    this->name = uid_parts[2];
-
-  }
-
-
-
-  qhandler* service::connect(const char* lookup, int connection_type, qhandler* hdlref) {
-
-    qhandler* hdl;
-    
-    if (hdlref == nullptr) {
-      hdl = new qhandler();
-    }
-
-    else {
-      hdl = hdlref;
-    }
-    
-    std::string fullname = this->add_scope(lookup);
-
-    this->ll->log(LOGLV_NOTICE,"connecting to " + fullname);
-    binding* b =  blookup(this->directory, fullname);
-
-    if (b != nullptr) {
-      
-      qserv* s = (qserv*) b->parent;
-
-      //we create a new socket but only if it is null (for hdlref)
-      if ( this->connections[hdl->cid].socket == nullptr) 
-           this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, connection_type );
-           
-      std::stringstream ep;
-      ep << "tcp://" << s->ip << ":" << b->port;
-      this->connections[hdl->cid].socket->connect(ep.str().c_str());
-
-      //Adds sockopt if zmq socket type is ZMQ_SUB
-      if (connection_type == ZMQ_SUB) {
-        this->connections[hdl->cid].socket->setsockopt(ZMQ_SUBSCRIBE,"",0);
-      }
-
-      hdl->peer_uid = s->namespace_ + "." + 
-                      s->service_class + "." + 
-                      s->node_name + "." +
-                      b->name;
-                      
-    }
-
-    else {
-      this->ll->log(LOGLV_WARN,"peer not found in directory, deferring connection..");
-      n3rv::qdef cqd;
-      cqd.name = fullname;
-      cqd.socket_type = connection_type;
-      cqd.hdl  = hdl;
-      this->deferred.emplace_back(cqd);
-    }
-
-    return hdl;
-
-  }
-
-  qhandler* service::zbind(const char* bind_name, const char* endpoint, int bind_type ) { 
-    
-     qhandler* hdl = new qhandler();
-
-    this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
-    this->connections[hdl->cid].socket->bind(endpoint);
-    this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER,0);
-
-    return hdl;
-
-  }
-
-  void service::zsockopt(qhandler* hdl, 
-                        int option_name, 
-                        const void* option_value, 
-                        size_t option_len) {
-      
-      if (option_len == -1) option_len = sizeof(int);
-      zmq::socket_t* sock = this->connections[hdl->cid].socket;
-      if (sock != nullptr) sock->setsockopt(option_name,option_value, option_len);
-
-  }
-
-
-
-  qhandler* service::bind(const char* bind_name, const char* ip , int bind_type, int port ) {
-
-  
-    if (this->namespace_ == "" || 
-        this->service_class == "" || 
-        this->name == "") {
-      this->ll->log(LOGLV_CRIT, "Cannot create binding: Please ensure to call set_uid() beforehand.");
-      return nullptr;
-    }
-
-    if (bind_name == "") {
-       this->ll->log(LOGLV_CRIT, "Cannot bind with an empty name");
-      return nullptr;
-    }
-    
-    qhandler* hdl = new qhandler();
-    
-    this->connections[hdl->cid].socket = new zmq::socket_t(this->zctx, bind_type);
-    this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER,0);
-
-    //Port Autobinding (if 0) 
-    if (port == 0) {
-
-      /*we use a binding range of 40000-50000 to mitigate collision 
-        possibilities */
-      port = (rand() % 10001 ) + 40000;
-
-      try {
-        std::stringstream ep;
-        ep << "tcp://" << ip << ":" << port;
-        this->connections[hdl->cid].socket->bind(ep.str().c_str());
-      }
-
-      catch(const zmq::error_t& e) {
-
-        if (e.num() == 98) {
-          std::stringstream ss;
-          ss << "Port " << port << " is already bound, trying another one..";
-          this->ll->log(LOGLV_WARN, ss.str());
-          return this->bind(bind_name, ip, bind_type, 0);
-        }
-      }
-    }
-
-    else {
+    try {
       std::stringstream ep;
       ep << "tcp://" << ip << ":" << port;
       this->connections[hdl->cid].socket->bind(ep.str().c_str());
     }
-     
-    this->subscribe(bind_name, port);
-    return hdl;
 
+    catch (const zmq::error_t &e) {
+
+      if (e.num() == 98) {
+        std::stringstream ss;
+        ss << "Port " << port << " is already bound, trying another one..";
+        this->ll->log(LOGLV_WARN, ss.str());
+        return this->bind(bind_name, ip, bind_type, 0);
+      }
+    }
   }
 
-  int service::initialize() {
-
+  else {
+    std::stringstream ep;
+    ep << "tcp://" << ip << ":" << port;
+    this->connections[hdl->cid].socket->bind(ep.str().c_str());
   }
 
-  zmq::pollitem_t* service::refresh_pollitems() {
+  this->subscribe(bind_name, port);
+  return hdl;
+}
 
-    if (this == nullptr) return nullptr;
+int service::initialize() {}
 
-    this->last_nconn = this->connections.size();
-    this->last_connlist.clear();    
+zmq::pollitem_t *service::refresh_pollitems() {
 
-    zmq::pollitem_t* items  = (zmq::pollitem_t*) malloc(sizeof(zmq::pollitem_t) * this->last_nconn );
+  if (this == nullptr)
+    return nullptr;
 
-    int i = 0;
-    for(std::map<std::string, n3rv::qconn>::iterator iter = this->connections.begin(); 
-        iter != this->connections.end(); 
-        ++iter) {
+  this->last_nconn = this->connections.size();
+  this->last_connlist.clear();
 
-      if (i >= last_nconn - 1 ) break;
+  zmq::pollitem_t *items =
+      (zmq::pollitem_t *)malloc(sizeof(zmq::pollitem_t) * this->last_nconn);
 
-      std::string k = iter->first;
-      zmq::socket_t* s = iter->second.socket;
+  int i = 0;
+  for (auto iter = this->connections.begin(); iter != this->connections.end();
+       ++iter) {
 
-      if (k == this->ctlr_ch1->cid || s == nullptr ) continue;
+    if (i >= last_nconn - 1)
+      break;
 
-      this->last_connlist.emplace_back(k);
-      
-      //JEEEZZZZZ, that sucks !
-      items[i].socket = static_cast<void*> (*s);
-      items[i].fd = 0;
-      items[i].events = ZMQ_POLLIN;
-      items[i].revents = 0;
-      i++;
+    std::string const k = iter->first;
 
+    if (k == this->ctlr_ch1->cid || nullptr == iter->second.socket)
+      continue;
+
+    this->last_connlist.push_back(k);
+
+    // JEEEZZZZZ, that sucks !
+    items[i].socket = static_cast<void *>(iter->second.socket.get());
+    items[i].fd = 0;
+    items[i].events = ZMQ_POLLIN;
+    items[i].revents = 0;
+    i++;
+  }
+
+  return items;
+}
+
+int service::run() {
+
+  zmq::message_t message;
+
+  this->running = true;
+  /** Main service loop, listens to open connections and forwards
+   * the data to the correct handler.
+   */
+  while (this->running) {
+
+    zmq::pollitem_t *items = this->refresh_pollitems();
+    try {
+      zmq::poll(items, this->last_connlist.size(), this->poll_timeout);
+    } catch (const zmq::error_t &e) {
     }
 
-    return items;
+    for (int j = 0; j < this->last_connlist.size(); j++) {
 
-  }
+      if (items[j].revents & ZMQ_POLLIN) {
 
-
-  int service::run() {
-
-    zmq::message_t message;
- 
-    this->running = true;
-    /** Main service loop, listens to open connections and forwards 
-     * the data to the correct handler.
-     */
-    while(this->running) {
-
-      zmq::pollitem_t* items = this->refresh_pollitems(); 
-      try {
-        zmq::poll (items,this->last_connlist.size(), this->poll_timeout);
+        this->connections[this->last_connlist[j]].socket->recv(&message);
+        n3rv::fctptr p = this->chmap[this->last_connlist[j]];
+        if (p != nullptr)
+          (*p)(this, &message);
       }
-      catch(const zmq::error_t& e) {}
-
-       for (int j=0;j < this->last_connlist.size(); j++) {
-         
-         if (items[j].revents & ZMQ_POLLIN) {
-
-            this->connections[this->last_connlist[j]].socket->recv(&message);
-            n3rv::fctptr p = this->chmap[this->last_connlist[j]];
-            if (p != nullptr) (*p)(this, &message);        
-         }
-       }
-
-       this->hkloop();      
-
-       for (auto& kv: this->ml_chmap) {
-          //runs main_registered callbacks.
-          (*kv.second)(this);
-       }
-
     }
 
-  }
+    this->hkloop();
 
-  std::thread* service::run_async() {
-
-    std::thread* t = new std::thread([this]() { this->run(); });
-    t->detach();
-    return t;
-
-  }
-
-  void service::stop() {
-    this->running = false;
-  }
-
-  int service::terminate() {
-
-      for (auto n3sock: this->connections) {
-
-        try {
-          n3sock.second.socket->close();
-        }
-        catch (const zmq::error_t& e) {
-          std::cout << e.what() << std::endl;
-        }        
-      }
-
-      /*
-      try {
-          this->zctx.close();
-      }
-      catch (const zmq::error_t& e) {
-        std::cout << e.what() << std::endl;
-      }*/
-
-      
-  }
-
-
-  void service::hkloop() {
-
-  }
-
-  void service::register_main(const char* cbid, mlptr cb) {
-    this->ml_chmap[cbid] = cb;
-  }
-
-  void service::register_main(const char* cbid, const char* cbstr) {
-    this->ml_chmap[cbid] = this->mlcb_map[cbstr];
-  }
-
-  int service::unregister_main(const char* cbid) {
-    if (this->ml_chmap.find(cbid) != this->ml_chmap.end() ) {
-          this->ml_chmap.erase(cbid);
-          return 0;
+    for (auto &kv : this->ml_chmap) {
+      // runs main_registered callbacks.
+      (*kv.second)(this);
     }
+  }
+}
+
+std::thread *service::run_async() {
+
+  std::thread *t = new std::thread([this]() { this->run(); });
+  t->detach();
+  return t;
+}
+
+void service::stop() { this->running = false; }
+
+int service::terminate() {
+
+  for (auto &n3sock : this->connections) {
+
+    try {
+      n3sock.second.socket->close();
+    } catch (const zmq::error_t &e) {
+      std::cout << e.what() << std::endl;
+    }
+  }
+
+  /*
+  try {
+      this->zctx.close();
+  }
+  catch (const zmq::error_t& e) {
+    std::cout << e.what() << std::endl;
+  }*/
+}
+
+void service::hkloop() {}
+
+void service::register_main(const char *cbid, mlptr cb) {
+  this->ml_chmap[cbid] = cb;
+}
+
+void service::register_main(const char *cbid, const char *cbstr) {
+  this->ml_chmap[cbid] = this->mlcb_map[cbstr];
+}
+
+int service::unregister_main(const char *cbid) {
+  if (this->ml_chmap.find(cbid) != this->ml_chmap.end()) {
+    this->ml_chmap.erase(cbid);
+    return 0;
+  }
+  return 1;
+}
+
+int service::attach(qhandler *hdl, fctptr callback) {
+  this->chmap[hdl->cid] = callback;
+}
+
+int service::attach(qhandler *hdl, std::string callback_name) {
+  this->chmap[hdl->cid] = this->rcb_map[callback_name];
+}
+
+std::unordered_map<std::string, qhandler *> service::fetch_topology() {
+
+  std::unordered_map<std::string, qhandler *> res;
+
+  n3rv::message m;
+  m.action = "topology";
+  m.payload = "";
+  this->send(this->ctlr_ch1, m, 0);
+
+  // fetches response
+  zmq::message_t r1;
+  this->connections[this->ctlr_ch1->cid].socket->recv(&r1);
+
+  char *rawmsg = (char *)calloc(r1.size() + 1, sizeof(char));
+  memcpy(rawmsg, r1.data(), r1.size());
+  std::string topo_resp = rawmsg;
+  std::cout << topo_resp << std::endl;
+
+  if (topo_resp != "ERR: NO TOPOLOGY") {
+    topology *t = topology::parse(topo_resp);
+    res = this->load_topology(t);
+  }
+  return res;
+}
+
+std::unordered_map<std::string, qhandler *>
+service::load_topology(std::string path) {
+  topology *t = topology::load(path);
+  return this->load_topology(t);
+}
+
+std::unordered_map<std::string, qhandler *>
+service::load_topology(topology *t) {
+
+  // clears main loop registered callbacks
+  this->ml_chmap.clear();
+
+  // clears already registerred receive callbacks (except service ctrl
+  // callbacks)
+  std::unordered_map<std::string, fctptr> nchmap;
+  for (auto &kv : this->chmap) {
+    if (kv.first == this->ctlr_ch1->cid || kv.first == this->ctlr_ch2->cid) {
+      nchmap[kv.first] = kv.second;
+    }
+  }
+  this->chmap = nchmap;
+
+  std::unordered_map<std::string, qhandler *> res;
+  std::unordered_map<std::string, int> zmq_sockmap;
+
+  zmq_sockmap["ZMQ_PUB"] = ZMQ_PUB;
+  zmq_sockmap["ZMQ_SUB"] = ZMQ_SUB;
+  zmq_sockmap["ZMQ_REQ"] = ZMQ_REQ;
+  zmq_sockmap["ZMQ_REP"] = ZMQ_REP;
+  zmq_sockmap["ZMQ_XPUB"] = ZMQ_XPUB;
+  zmq_sockmap["ZMQ_XSUB"] = ZMQ_XSUB;
+  zmq_sockmap["ZMQ_XREQ"] = ZMQ_XREQ;
+  zmq_sockmap["ZMQ_XREP"] = ZMQ_XREP;
+  zmq_sockmap["ZMQ_PULL"] = ZMQ_PULL;
+  zmq_sockmap["ZMQ_PUSH"] = ZMQ_PUSH;
+  zmq_sockmap["ZMQ_DEALER"] = ZMQ_DEALER;
+  zmq_sockmap["ZMQ_ROUTER"] = ZMQ_ROUTER;
+  zmq_sockmap["ZMQ_PAIR"] = ZMQ_PAIR;
+
+  for (auto &nmap : t->svclasses) {
+
+    auto &key = nmap.first;
+    auto &n = nmap.second;
+
+    if (n.namespace_ == this->namespace_ && key == this->service_class) {
+
+      for (auto &b : n.bindings) {
+        qhandler *h = this->bind(b.binding_name.c_str(), "0.0.0.0",
+                                 zmq_sockmap[b.type], b.port);
+        res[b.binding_name] = h;
+      }
+
+      for (auto c : n.connections) {
+        qhandler *h = this->connect(c.lookup.c_str(), zmq_sockmap[c.type]);
+        res[c.uid] = h;
+      }
+
+      for (auto &cb : n.receive_callbacks) {
+        this->attach(res[cb.uid], cb.callback_name);
+      }
+
+      for (auto &cb : n.ml_callbacks) {
+        this->register_main(cb.uid.c_str(), cb.callback_name.c_str());
+      }
+
+      break;
+    }
+  }
+
+  return res;
+}
+
+int service::subscribe(const char *binding_name, int port) {
+
+  if (this->connections[this->ctlr_ch1->cid].socket == nullptr) {
+    std::cout << "CRIRICAL: Controller socket is null" << std::endl;
     return 1;
   }
 
-  int service::attach(qhandler* hdl, fctptr callback) {
-    this->chmap[hdl->cid]  = callback;
-  }
+  n3rv::message m;
 
-  int service::attach(qhandler* hdl, std::string callback_name) {
-    this->chmap[hdl->cid] = this->rcb_map[callback_name];
-  }
+  m.sender = this->name;
+  m.action = "subscribe";
+  m.args.emplace_back(this->namespace_);
+  m.args.emplace_back(this->service_class);
+  m.args.emplace_back(this->name);
 
+  m.args.emplace_back(std::string(binding_name));
 
-  std::map<std::string, qhandler*> service::fetch_topology() {
+  std::stringstream ss;
+  ss << port;
 
-      std::map<std::string, qhandler*> res;
+  m.args.emplace_back(ss.str());
+  m.payload = "";
 
-      n3rv::message m;  
-      m.action = "topology";
-      m.payload = "";
-      this->send(this->ctlr_ch1,m,0);
+  std::string to_send = serialize_msg(m);
 
-      //fetches response
-      zmq::message_t r1;
-      this->connections[this->ctlr_ch1->cid].socket->recv(&r1);
+  zmq::message_t req(to_send.size());
+  memcpy(req.data(), to_send.data(), to_send.size());
 
-      char * rawmsg = (char*) calloc(r1.size()+1, sizeof(char)   );
-      memcpy(rawmsg, r1.data(), r1.size() );
-      std::string topo_resp = rawmsg;
-      std::cout << topo_resp << std::endl;
-      
-      if (topo_resp != "ERR: NO TOPOLOGY") {
-        topology* t = topology::parse(topo_resp);
-        res = this->load_topology(t);
-      }
-      return res;
-  }
+  this->connections[this->ctlr_ch1->cid].socket->send(req);
 
-
-
-  std::map<std::string, qhandler*> service::load_topology(std::string path) {
-    topology* t = topology::load(path);
-    return this->load_topology(t);
-  }
-
-  std::map<std::string, qhandler*> service::load_topology(topology* t) {
-
-    //clears main loop registered callbacks
-    this->ml_chmap.clear();
-
-    //clears already registerred receive callbacks (except service ctrl callbacks)
-    std::map<std::string, fctptr> nchmap;
-    for (auto& kv: this->chmap) {
-      if (kv.first == this->ctlr_ch1->cid || kv.first == this->ctlr_ch2->cid ) {
-         nchmap[kv.first] = kv.second;
-      }
-    }
-    this->chmap = nchmap;
-    
-    std::map<std::string, qhandler*> res;  
-    std::map<std::string, int> zmq_sockmap;
-
-    zmq_sockmap["ZMQ_PUB"] = ZMQ_PUB;
-    zmq_sockmap["ZMQ_SUB"] = ZMQ_SUB;
-    zmq_sockmap["ZMQ_REQ"] = ZMQ_REQ;
-    zmq_sockmap["ZMQ_REP"] = ZMQ_REP;
-    zmq_sockmap["ZMQ_XPUB"] = ZMQ_XPUB;
-    zmq_sockmap["ZMQ_XSUB"] = ZMQ_XSUB;
-    zmq_sockmap["ZMQ_XREQ"] = ZMQ_XREQ;
-    zmq_sockmap["ZMQ_XREP"] = ZMQ_XREP;
-    zmq_sockmap["ZMQ_PULL"] = ZMQ_PULL;
-    zmq_sockmap["ZMQ_PUSH"] = ZMQ_PUSH;
-    zmq_sockmap["ZMQ_DEALER"] = ZMQ_DEALER;
-    zmq_sockmap["ZMQ_ROUTER"] = ZMQ_ROUTER;
-    zmq_sockmap["ZMQ_PAIR"] = ZMQ_PAIR;
-
-    for (auto& nmap : t->svclasses) {
-
-      auto& key = nmap.first;
-      auto& n = nmap.second;
-
-      if ( n.namespace_ == this->namespace_ && key == this->service_class  ) {
-
-        for (auto& b: n.bindings) {
-          qhandler* h = this->bind(b.binding_name.c_str(), "0.0.0.0", zmq_sockmap[b.type], b.port );
-          res[b.binding_name] = h;
-        }
-
-        for (auto c: n.connections) {
-          qhandler* h = this->connect(c.lookup.c_str(), zmq_sockmap[c.type]);
-          res[c.uid] = h;
-        }
-
-        for (auto& cb: n.receive_callbacks) {
-          this->attach(res[cb.uid], cb.callback_name);
-        }
-
-        for (auto& cb: n.ml_callbacks) {
-          this->register_main(cb.uid.c_str(), cb.callback_name.c_str());
-        }
-
-
-        break;
-      }
-    }
-
-    return res;
-  }
-
-
-
-  int service::subscribe(const char* binding_name, int port) {
-
-      if (this->connections[this->ctlr_ch1->cid].socket == nullptr) {
-        std::cout << "CRIRICAL: Controller socket is null" << std::endl;
-        return 1;
-      }
-
-      n3rv::message m;
-      
-      m.sender = this->name;
-      m.action = "subscribe";
-      m.args.emplace_back(this->namespace_);
-      m.args.emplace_back(this->service_class);
-      m.args.emplace_back(this->name);
-      
-      m.args.emplace_back(std::string(binding_name));
-
-      std::stringstream ss;
-      ss << port;
-
-      m.args.emplace_back(ss.str());
-      m.payload = "";
-
-      std::string to_send = serialize_msg(m);
-
-      zmq::message_t req (to_send.size());
-      memcpy (req.data(), to_send.data() , to_send.size());
-
-      this->connections[this->ctlr_ch1->cid].socket->send(req);
-
-      //Waits for response
-      zmq::message_t *r1 = new zmq::message_t;
-      this->connections[this->ctlr_ch1->cid].socket->recv(r1);
-      return 0;
-
-  }
-
-
-  zmq::socket_t* service::get_zsocket(qhandler* hdl) {
-     return this->connections[hdl->cid].socket;
-  }
-
-
-  int service::send(qhandler* hdl, std::string& data, int flags = 0) {
-
-    zmq::message_t msg(data.size());
-    memcpy(msg.data(), data.data(), data.size());
-    this->connections[hdl->cid].socket->send(msg);
-
-    return 0;
-
-  }
-
-  int service::send(qhandler* hdl, void* data, size_t size, int flags = 0) {
-
-    zmq::message_t msg(size);
-    memcpy(msg.data(), data, size);
-    this->connections[hdl->cid].socket->send(msg);
-
-    return 0;
-
-  }
-
-  int service::send(qhandler* hdl, message& msg, int flags=0) {
-    if (msg.sender == "") msg.sender = this->name;
-    std::string msg_ser = serialize_msg(msg);
-    return this->send(hdl,msg_ser, flags);
-  }
-
-  int service::send(qhandler* hdl, zmq::message_t* zmsg, int flags =0) {
-    this->connections[hdl->cid].socket->send(*zmsg);
-  }
-
-  int service::check_deferred() {
-
-    this->ll->log(n3rv::LOGLV_DEBUG,"checking deferred list..");
-    std::vector<n3rv::qdef> deferred_iter(this->deferred);
-
-    int res = 0;
-    for (auto def: deferred_iter) {
-
-      binding* b = blookup(this->directory,def.name);
-      if (b != nullptr) {
-        
-        this->ll->log(n3rv::LOGLV_NOTICE,"reconnecting to " + def.name);
-
-        qhandler* qdef = static_cast<qhandler*>(def.hdl);
-
-        this->connect(def.name.c_str(), def.socket_type,qdef);
-        this->deferred.erase(this->deferred.begin() + res);
-
-        res++;
-      }
-
-    }
-    return res;
-  }
-
-
-  void* service::directory_update(void* objref, zmq::message_t* dirmsg) {
-
-    service* self = (service*) objref;
-
-    self->ll->log(LOGLV_DEBUG,"updating Directory..");
-    std::string dirstring(static_cast<char*>(dirmsg->data()), dirmsg->size());
-    self->directory = parse_directory(dirstring);   
-    self->check_deferred();
-
-  }
-
-  std::string service::add_scope(const char* name) {
-
-    std::string res = std::string(name);
-    int n_dots = 0;
-
-    for(auto& c: res) {
-      if (c == '.') n_dots++;
-    }
-
-    if (n_dots < 1) res = this->name + "." + res;
-    if (n_dots < 2) res = this->service_class + "." + res;
-    if (n_dots < 3) res = this->namespace_ + "." + res;
-
-    return res;
-  }
-
-
-  void service::register_rcb(const char* cbid, fctptr cb) {
-    this->rcb_map[cbid] = cb;
-  }
-
-  void service::register_mlcb(const char* cbid, mlptr cb) {
-     this->mlcb_map[cbid] = cb;
-  }
-
-
-  void service::set_poll_timeout(int poll_timeout) {
-    this->poll_timeout = poll_timeout;
-  }
-
+  // Waits for response
+  zmq::message_t *r1 = new zmq::message_t;
+  this->connections[this->ctlr_ch1->cid].socket->recv(r1);
+  return 0;
 }
+
+std::unique_ptr<zmq::socket_t> &service::get_zsocket(qhandler *hdl) {
+  return this->connections[hdl->cid].socket;
+}
+
+int service::send(qhandler *hdl, std::string &data, int flags = 0) {
+
+  zmq::message_t msg(data.size());
+  memcpy(msg.data(), data.data(), data.size());
+  this->connections[hdl->cid].socket->send(msg);
+
+  return 0;
+}
+
+int service::send(qhandler *hdl, void *data, size_t size, int flags = 0) {
+
+  zmq::message_t msg(size);
+  memcpy(msg.data(), data, size);
+  this->connections[hdl->cid].socket->send(msg);
+
+  return 0;
+}
+
+int service::send(qhandler *hdl, message &msg, int flags = 0) {
+  if (msg.sender == "")
+    msg.sender = this->name;
+  std::string msg_ser = serialize_msg(msg);
+  return this->send(hdl, msg_ser, flags);
+}
+
+int service::send(qhandler *hdl, zmq::message_t *zmsg, int flags = 0) {
+  this->connections[hdl->cid].socket->send(*zmsg);
+}
+
+int service::check_deferred() {
+
+  this->ll->log(n3rv::LOGLV_DEBUG, "checking deferred list..");
+  std::vector<n3rv::qdef> deferred_iter(this->deferred);
+
+  int res = 0;
+  for (auto def : deferred_iter) {
+
+    auto binding = blookup(this->directory, def.name);
+    if (std::nullopt != binding) {
+
+      this->ll->log(n3rv::LOGLV_NOTICE, "reconnecting to " + def.name);
+
+      qhandler *qdef = static_cast<qhandler *>(def.hdl);
+
+      this->connect(def.name.c_str(), def.socket_type, qdef);
+      this->deferred.erase(this->deferred.begin() + res);
+
+      res++;
+    }
+  }
+  return res;
+}
+
+void *service::directory_update(void *objref, zmq::message_t *dirmsg) {
+
+  service *self = (service *)objref;
+
+  self->ll->log(LOGLV_DEBUG, "updating Directory..");
+  std::string dirstring(static_cast<char *>(dirmsg->data()), dirmsg->size());
+  self->directory = parse_directory(dirstring);
+  self->check_deferred();
+}
+
+std::string service::add_scope(const char *name) {
+
+  std::string res = std::string(name);
+  int n_dots = 0;
+
+  for (auto &c : res) {
+    if (c == '.')
+      n_dots++;
+  }
+
+  if (n_dots < 1)
+    res = this->name + "." + res;
+  if (n_dots < 2)
+    res = this->service_class + "." + res;
+  if (n_dots < 3)
+    res = this->namespace_ + "." + res;
+
+  return res;
+}
+
+void service::register_rcb(const char *cbid, fctptr cb) {
+  this->rcb_map[cbid] = cb;
+}
+
+void service::register_mlcb(const char *cbid, mlptr cb) {
+  this->mlcb_map[cbid] = cb;
+}
+
+void service::set_poll_timeout(int poll_timeout) {
+  this->poll_timeout = poll_timeout;
+}
+
+} // namespace n3rv

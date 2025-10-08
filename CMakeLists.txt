@@ -1,13 +1,17 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(n3rv)
-
 option(WITH_PROTOBUF "With Protobuf" OFF)
+
+SET (CMAKE_CXX_EXTENSIONS OFF)
+SET (CMAKE_CXX_STANDARD 23)
+
+#add_compile_options(-Wall -Wextra -Wpedantic -Wdouble-promotion -Warray-bounds)
 
 SET (CMAKE_CXX_COMPILER     "/usr/bin/g++")
 SET (CMAKE_C_COMPILER       "/usr/bib/gcc")
-SET (CMAKE_CXX_FLAGS        "-g -std=c++1y -fPIC")
-SET (CMAKE_LINKER_FLAGS    "-rdynamic")
+#SET (CMAKE_CXX_FLAGS        "-g -fPIC")
+#SET (CMAKE_LINKER_FLAGS    "-rdynamic")
 
 ### PB BUILD ###
 if(WITH_PROTOBUF)

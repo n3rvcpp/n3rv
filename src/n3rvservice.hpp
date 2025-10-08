@@ -1,9 +1,9 @@
 #pragma once
 
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <thread>
+#include <unordered_map>
 
 #include "n3rvcommon.hpp"
 #include "n3rvlogger.hpp"
@@ -208,22 +208,23 @@ public:
    * available automatically bind ports, connects to remote endpoints and attach
    * callbacks.
    * @return a dictionary of uid/qhandler* key/values*/
-  std::map<std::string, qhandler *> fetch_topology();
+  std::unordered_map<std::string, qhandler *> fetch_topology();
 
   /** Loads a topology file and automatically bind ports,
    * connects to remote endpoints and attach callbacks
    * @return a dictionary of uid/qhandler* key/values*/
-  std::map<std::string, qhandler *> load_topology(std::string topology_file);
+  std::unordered_map<std::string, qhandler *>
+  load_topology(std::string topology_file);
 
   /** Uses a previously defined topology object to automatically bind ports,
    * connects to remote endpoints and attach callbacks.
    * @return a dictionary of uid/qhandler* key/values */
-  std::map<std::string, qhandler *> load_topology(topology *topo);
+  std::unordered_map<std::string, qhandler *> load_topology(topology *topo);
 
   /** Retrieves a RAW ZMQ socket from the internal connections list.
    *  @param hdl n3rv connection handler.
    *  @return the related connection object. */
-  zmq::socket_t *get_zsocket(qhandler *hdl);
+  std::unique_ptr<zmq::socket_t> &get_zsocket(qhandler *hdl);
 
   /** Conveniency function to send string data on a specified connection.
    *  @param hdl n3rv connection handler to send data to.
@@ -299,19 +300,19 @@ protected:
   std::string controller_host;
   int controller_port;
   std::vector<n3rv::qserv> directory;
-  std::map<std::string, n3rv::qconn> connections;
+  std::unordered_map<std::string, n3rv::qconn> connections;
   zmq::context_t zctx;
 
-  std::map<std::string, fctptr> chmap;
+  std::unordered_map<std::string, fctptr> chmap;
 
   /** Main loop callbacks dictionary */
-  std::map<std::string, mlptr> ml_chmap;
+  std::unordered_map<std::string, mlptr> ml_chmap;
 
   /** Available receive callbacks list (mainly for topologies)*/
-  std::map<std::string, fctptr> rcb_map;
+  std::unordered_map<std::string, fctptr> rcb_map;
 
   /** Available main loop callbacks list (mainly for topologies) */
-  std::map<std::string, mlptr> mlcb_map;
+  std::unordered_map<std::string, mlptr> mlcb_map;
 
   int last_nconn;
   std::vector<std::string> last_connlist;

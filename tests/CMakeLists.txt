@@ -1,11 +1,14 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.5)
 
 project(tests)
 
+SET (CMAKE_CXX_EXTENSIONS OFF)
+SET (CMAKE_CXX_STANDARD 23)
+
 SET (CMAKE_CXX_COMPILER     "/usr/bin/g++")
 SET (CMAKE_C_COMPILER       "/usr/bib/gcc")
-SET (CMAKE_CXX_FLAGS        "-g -std=c++1y -fPIC")
-SET (CMAKE_LINKER_FLAGS    "-rdynamic")
+#SET (CMAKE_CXX_FLAGS        "-g -std=c++1y -fPIC")
+#SET (CMAKE_LINKER_FLAGS    "-rdynamic")
 
 add_definitions(-DQATE_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
