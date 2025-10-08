@@ -33,7 +33,7 @@ public:
    * "stdout", or "syslog:name:facility" Note: available syslog facilities are
    * "local0" to "local7", and "user"
    */
-  void add_dest(const char *dest);
+  void add_dest(const std::string &dest);
 
   /** >> Operator overloading, allows to write content directly to buffer.
    *  Note: If buffer encounters std::endl then if is flushed to destinations.
@@ -44,7 +44,7 @@ public:
    *  @param log_level log level of the string to log.
    *  @param str string to log.
    */
-  void log(int log_level, std::string str);
+  void log(int log_level, const std::string &str);
 
   /** Changes current logger's log level.
    *  @param lvl log level to set, from 0 to 4.

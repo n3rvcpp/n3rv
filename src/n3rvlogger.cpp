@@ -39,31 +39,28 @@ logger::~logger() {
     closelog();
 }
 
-void logger::add_dest(const char *dest) {
+void logger::add_dest(const std::string &dest) {
 
-  std::string dst = std::string(dest);
+  this->dests.emplace_back(dest);
 
-  this->dests.emplace_back(dst);
-
-  if (dst.substr(0, 7) == "file://") {
-    std::string dpath = std::regex_replace(dst, std::regex("file:\\/\\/"), "");
-    std::ofstream *out = new std::ofstream();
-    out->open(dpath);
-    this->dest_buffers.emplace_back(out->rdbuf());
+  if (dest.substr(0, 7) == "file://") {
+    std::string dpath = std::regex_replace(dest, std::regex("file:\\/\\/"), "");
+    std::ofstream out{dpath};
+    this->dest_buffers.push_back(out.rdbuf());
   }
 
-  else if (dst == "stdout") {
-    this->dest_buffers.emplace_back(std::cout.rdbuf());
+  else if (dest == "stdout") {
+    this->dest_buffers.push_back(std::cout.rdbuf());
   }
 
-  else if (dst.substr(0, 7) == "syslog:") {
+  else if (dest.substr(0, 7) == "syslog:") {
 
     std::vector<std::string> syslog_args;
     std::regex dotsplit(":");
-    std::sregex_token_iterator iter(dst.begin(), dst.end(), dotsplit, -1);
+    std::sregex_token_iterator iter(dest.begin(), dest.end(), dotsplit, -1);
     std::sregex_token_iterator end;
     for (; iter != end; ++iter)
-      syslog_args.emplace_back(*iter);
+      syslog_args.push_back(*iter);
     // invalid syslog dest
     if (syslog_args.size() != 3)
       return;
@@ -77,7 +74,7 @@ void logger::add_dest(const char *dest) {
   }
 }
 
-void logger::log(int log_level, std::string str) {
+void logger::log(int log_level, const std::string &str) {
 
   auto t = std::time(nullptr);
   auto tm = *std::localtime(&t);
@@ -90,7 +87,7 @@ void logger::log(int log_level, std::string str) {
     }
 
     // files or stdout
-    for (auto &dest : this->dest_buffers) {
+    for (const auto dest : this->dest_buffers) {
       std::ostream out(dest);
       out << "[" << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << "]"
           << "[" << this->ll_map[log_level] << "] " << str << std::endl;
