@@ -2,26 +2,22 @@
 
 namespace n3rv {
 
-servicecontroller::servicecontroller(const char *binding_addr,
-                                     unsigned int binding_port, logger *ll) {
-
-  this->ll = (ll == nullptr) ? new logger(LOGLV_NOTICE) : ll;
-
+servicecontroller::servicecontroller(const std::string &binding_addr,
+                                     unsigned int binding_port,
+                                     nullable_ref<logger> ll) {
   this->running = false;
-
+  this->ll = ll;
   this->zctx = zmq::context_t(2);
-  this->zmsock = new zmq::socket_t(this->zctx, ZMQ_REP);
-  this->zmsock_pub = new zmq::socket_t(this->zctx, ZMQ_PUB);
+  this->zmsock = std::make_unique<zmq::socket_t>(this->zctx, ZMQ_REP);
+  this->zmsock_pub = std::make_unique<zmq::socket_t>(this->zctx, ZMQ_PUB);
 
   this->binding_addr = std::string(binding_addr);
   this->binding_port = binding_port;
 
-  this->topo_ = nullptr;
-
   std::stringstream ss;
   ss << "tcp://" << this->binding_addr << ":" << this->binding_port;
-  this->ll->log(LOGLV_NOTICE,
-                "binding service Controller on " + ss.str() + "..");
+  this->ll->get().log(LOGLV_NOTICE,
+                      "binding service Controller on " + ss.str() + "..");
 
   zmsock->bind(ss.str().c_str());
   // zmsock->setsockopt(ZMQ_RCVTIMEO,1);
@@ -30,15 +26,14 @@ servicecontroller::servicecontroller(const char *binding_addr,
   ss.clear();
 
   ss << "tcp://" << this->binding_addr << ":" << (this->binding_port + 1);
-  this->ll->log(LOGLV_NOTICE,
-                "binding service Controller on " + ss.str() + "..");
+  this->ll->get().log(LOGLV_NOTICE,
+                      "binding service Controller on " + ss.str() + "..");
   zmsock_pub->bind(ss.str().c_str());
 }
 
 servicecontroller::~servicecontroller() { this->terminate(); }
 
 std::string servicecontroller::peer_ip(zmq::message_t *zmsg) {
-
   std::string ip;
   int fd = zmq_msg_get((zmq_msg_t *)zmsg, ZMQ_SRCFD);
   zmq::get_peer_ip_address(fd, ip);
@@ -46,18 +41,16 @@ std::string servicecontroller::peer_ip(zmq::message_t *zmsg) {
 }
 
 int servicecontroller::load_topology(std::string path) {
-  this->topo_ = topology::load(path);
+  this->topo = topology::load(path);
 }
 
 std::thread *servicecontroller::run_async() {
-
   std::thread *res = new std::thread([this] { this->run(); });
   res->detach();
   return res;
 }
 
 void servicecontroller::run() {
-
   zmq::message_t query;
   this->running = true;
   while (this->running) {
@@ -72,7 +65,7 @@ void servicecontroller::run() {
           zmq::message_t reply(3);
           memcpy(reply.data(), "ERR", 3);
           zmsock->send(reply);
-          this->ll->log(LOGLV_DEBUG, "subscription error: missing arg");
+          this->ll->get().log(LOGLV_DEBUG, "subscription error: missing arg");
           continue;
         }
 
@@ -106,7 +99,7 @@ void servicecontroller::run() {
         memcpy(reply.data(), "OK", 2);
         zmsock->send(reply);
 
-        this->ll->log(LOGLV_DEBUG, "subscription ok");
+        this->ll->get().log(LOGLV_DEBUG, "subscription ok");
 
         sleep(1);
         std::string newdict = serialize_directory(this->directory);
@@ -116,7 +109,8 @@ void servicecontroller::run() {
         memcpy(to_send.data(), newdict.data(), newdict.size());
         std::stringstream ss;
         ss << (char *)to_send.data();
-        this->ll->log(LOGLV_DEBUG, "sending directory update:" + ss.str());
+        this->ll->get().log(LOGLV_DEBUG,
+                            "sending directory update:" + ss.str());
         zmsock_pub->send(to_send);
 
       }
@@ -124,15 +118,15 @@ void servicecontroller::run() {
       else if (m.action == "topology") {
 
         std::string resp = "";
-        if (this->topo_ != nullptr) {
-          resp = this->topo_->serialize();
+        if (std::nullopt != this->topo) {
+          resp = this->topo->serialize();
         } else {
           resp = "ERR: NO TOPOLOGY";
         }
 
         zmq::message_t to_send(resp.size());
         memcpy(to_send.data(), resp.data(), resp.size());
-        this->ll->log(LOGLV_DEBUG, "sending topology..");
+        this->ll->get().log(LOGLV_DEBUG, "sending topology..");
         zmsock->send(to_send);
       }
     }
@@ -142,7 +136,6 @@ void servicecontroller::run() {
 void servicecontroller::stop() { this->running = false; }
 
 void servicecontroller::terminate() {
-
   this->zmsock->close();
   this->zmsock_pub->close();
 }

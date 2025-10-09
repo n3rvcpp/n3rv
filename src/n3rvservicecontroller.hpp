@@ -28,8 +28,8 @@ public:
    * listen all)
    *  @param binding_port TCP port to bind controller on.
    */
-  servicecontroller(const char *binding_addr, unsigned int binding_port,
-                    logger *ll = nullptr);
+  servicecontroller(const std::string &binding_addr, unsigned int binding_port,
+                    nullable_ref<logger> = std::nullopt);
 
   ~servicecontroller();
 
@@ -49,7 +49,7 @@ public:
   /** Stops the binding of CH1/CH2 sockets. */
   void terminate();
 
-  n3rv::logger *ll;
+  nullable_ref<logger> ll;
 
   /* In case the service controller port was automatically allocated. */
   int get_port();
@@ -63,20 +63,18 @@ protected:
   std::string binding_addr;
   unsigned int binding_port;
   zmq::context_t zctx;
-  zmq::socket_t *zmsock;
-  zmq::socket_t *zmsock_pub;
+  std::unique_ptr<zmq::socket_t> zmsock;
+  std::unique_ptr<zmq::socket_t> zmsock_pub;
   std::vector<n3rv::qserv> directory;
-  topology *topo_;
+  std::optional<topology> topo{std::nullopt};
 
   int init_bindings(int binding_port);
 };
 
-typedef struct scioctl_ {
-
+struct scioctl {
   std::thread *th;
   servicecontroller *ctl;
-
-} scioctl;
+};
 
 /** Conveniency function that runs a service controller instance inside its own
  * thread, so you can embed a service controller along with another service
@@ -91,7 +89,7 @@ typedef struct scioctl_ {
  * running thread ref.
  */
 scioctl *start_controller(const char *binding_addr, unsigned int binding_port,
-                          logger *ll = nullptr) {
+                          nullable_ref<logger> ll = std::nullopt) {
 
   scioctl *res = new scioctl;
 

@@ -374,20 +374,20 @@ std::unordered_map<std::string, qhandler *> service::fetch_topology() {
   std::cout << topo_resp << std::endl;
 
   if (topo_resp != "ERR: NO TOPOLOGY") {
-    topology *t = topology::parse(topo_resp);
-    res = this->load_topology(t);
+    topology t = topology::parse(topo_resp);
+    res = this->load_topology(std::move(t));
   }
   return res;
 }
 
 std::unordered_map<std::string, qhandler *>
 service::load_topology(std::string path) {
-  topology *t = topology::load(path);
-  return this->load_topology(t);
+  topology t = topology::load(path);
+  return this->load_topology(std::move(t));
 }
 
 std::unordered_map<std::string, qhandler *>
-service::load_topology(topology *t) {
+service::load_topology(const topology &&t) {
 
   // clears main loop registered callbacks
   this->ml_chmap.clear();
@@ -419,7 +419,7 @@ service::load_topology(topology *t) {
   zmq_sockmap["ZMQ_ROUTER"] = ZMQ_ROUTER;
   zmq_sockmap["ZMQ_PAIR"] = ZMQ_PAIR;
 
-  for (auto &nmap : t->svclasses) {
+  for (auto &nmap : t.svclasses) {
 
     auto &key = nmap.first;
     auto &n = nmap.second;

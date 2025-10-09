@@ -219,7 +219,8 @@ public:
   /** Uses a previously defined topology object to automatically bind ports,
    * connects to remote endpoints and attach callbacks.
    * @return a dictionary of uid/qhandler* key/values */
-  std::unordered_map<std::string, qhandler *> load_topology(topology *topo);
+  std::unordered_map<std::string, qhandler *>
+  load_topology(const topology &&topo);
 
   /** Retrieves a RAW ZMQ socket from the internal connections list.
    *  @param hdl n3rv connection handler.

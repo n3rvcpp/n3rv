@@ -1,39 +1,36 @@
 #pragma once
 
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace n3rv {
 
-typedef struct jbinding_ {
+struct jbinding {
 
 public:
   std::string binding_name;
   int port;
   std::string type;
+};
 
-} jbinding;
-
-typedef struct jconnection_ {
+struct jconnection {
 public:
   std::string uid;
   std::string lookup;
   std::string type;
+};
 
-} jconnection;
-
-typedef struct jcallback_ {
+struct jcallback {
 public:
   std::string uid;
   std::string callback_name;
-
-} jcallback;
+};
 
 /** service_class struc allows to describe a full service class,
  *  with all its binding, connections and callback fucntions.
  */
-typedef struct jservice_class_ {
+struct jservice_class {
 
 public:
   /** Namespace of the service class. */
@@ -48,8 +45,7 @@ public:
   std::vector<jcallback> receive_callbacks;
   /** List of callbacks to run inside the service main loop. */
   std::vector<jcallback> ml_callbacks;
-
-} jservice_class;
+};
 
 /** This class is meant to store and manimulate topology representations,
  *  in order to help services dynamically know which endpoints to bind or
@@ -58,18 +54,18 @@ class topology {
 
 public:
   /** Map of available service classes inside topology. */
-  std::map<std::string, jservice_class> svclasses;
+  std::unordered_map<std::string, jservice_class> svclasses;
 
   /** Loads a topology from a JSON-formatted topology file.
    *  @param topology_file Path of the topology file to load.
    *  @returns a topology object.
    */
-  static topology *load(std::string topology_file);
+  static topology load(const std::string &topology_file);
   /** Parses a JSON-formatted string into a topology object.
    *  @param topology_def JSON-serialized Topology String.
    *  @returns a topology object.
    */
-  static topology *parse(std::string &topology_def);
+  static topology parse(const std::string &topology_def);
 
   /** Serializes current topology object to a JSON-string
    *  @returns JSON-serialized topology object.
