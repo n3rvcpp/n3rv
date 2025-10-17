@@ -23,3 +23,5 @@ doc
 doxygen/breathe/build
 src/protocol/protobuf/n3rvproto.pb.cc
 src/protocol/protobuf/n3rvproto.pb.h
+build
+build_*
