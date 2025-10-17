@@ -32,7 +32,7 @@ struct qdef {
  *  connections and manages zmq sockets. */
 struct qconn {
   int type;
-  std::unique_ptr<zmq::socket_t> socket;
+  std::shared_ptr<zmq::socket_t> socket;
   int socket_type;
   std::vector<std::string> peers;
 };
@@ -102,9 +102,9 @@ std::string randstr(size_t length);
  * randomly.
  */
 nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
-                                std::string service_class,
-                                std::string node_name,
-                                std::string namespace_ = "*");
+                                const std::string &service_class,
+                                const std::string &node_name,
+                                const std::string &namespace_ = "*");
 
 /**
  * Tries to Resolve node from directory provided as argument, given full node
@@ -116,7 +116,7 @@ nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
  * Note about nodes lookup: addr supports glob expressions (*) for each term,
  * if multiple nodes are found then nlookup() picks one of them randomly.
  */
-nullable_ref<qserv> node_lookup(const std::vector<qserv> &dir,
+nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
                                 const std::string &addr);
 
 /**
@@ -129,7 +129,7 @@ nullable_ref<qserv> node_lookup(const std::vector<qserv> &dir,
  * Note about bindings lookup: addr supports glob expressions (*) for each term,
  * if multiple bindings are found then blookup() picks one of them randomly.
  */
-nullable_ref<binding> binding_lookup(const std::vector<qserv> &dir,
+nullable_ref<binding> binding_lookup(std::vector<qserv> &dir,
                                      const std::string &addr);
 
 } // namespace n3rv

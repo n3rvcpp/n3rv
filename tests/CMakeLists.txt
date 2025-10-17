@@ -7,8 +7,6 @@ SET (CMAKE_CXX_STANDARD 23)
 
 SET (CMAKE_CXX_COMPILER     "/usr/bin/g++")
 SET (CMAKE_C_COMPILER       "/usr/bib/gcc")
-#SET (CMAKE_CXX_FLAGS        "-g -std=c++1y -fPIC")
-#SET (CMAKE_LINKER_FLAGS    "-rdynamic")
 
 add_definitions(-DQATE_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 

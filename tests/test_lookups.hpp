@@ -1,77 +1,84 @@
 #include "fixtures.hpp"
 #include <map>
 
-int test_nlookup_direct() {
+inline int test_nlookup_direct() {
 
-    auto dir = directory();
-    n3rv::qserv* s = n3rv::nlookup(dir, "com.class.node1");
+  auto dir = directory();
+  n3rv::nullable_ref<n3rv::qserv> s = n3rv::node_lookup(dir, "com.class.node1");
 
-    //error, lookup should be ok
-    if ( s == nullptr ) return 1;
+  // error, lookup should be ok
+  if (std::nullopt == s)
+    return 1;
 
-    s = n3rv::nlookup(dir, "com.class.ZjxsS" );
+  s = n3rv::node_lookup(dir, "com.class.ZjxsS");
 
-    //lookup should return null
-    if (s != nullptr ) return 2;
+  // lookup should return null
+  if (std::nullopt != s)
+    return 2;
 
-    std::vector<n3rv::qserv_> zerodir;
+  std::vector<n3rv::qserv> zerodir;
 
-    //tests nlookup with zero-sized directory
-    s = n3rv::nlookup(zerodir, "com.class.node1");
+  // tests nlookup with zero-sized directory
+  s = n3rv::node_lookup(zerodir, "com.class.node1");
 
-    //lookup should return null
-    if (s != nullptr ) return 3;
+  // lookup should return null
+  if (std::nullopt != s)
+    return 3;
 
-    return 0;
+  return 0;
 }
 
-int test_nlookup_glob() {
+inline int test_nlookup_glob() {
 
-    auto dir = directory();
-    n3rv::qserv* s = n3rv::nlookup(dir, "com.class.*");
+  auto dir = directory();
+  n3rv::nullable_ref<n3rv::qserv> s = n3rv::node_lookup(dir, "com.class.*");
 
-    //error, lookup should be ok
-    if ( s == nullptr ) return 1;
+  // error, lookup should be ok
+  if (std::nullopt == s)
+    return 1;
 
-    s = n3rv::nlookup(dir, "com.dkQlks.*");
+  s = n3rv::node_lookup(dir, "com.dkQlks.*");
 
-    //lookup should return null
-    if (s != nullptr) return 1;
+  // lookup should return null
+  if (std::nullopt != s)
+    return 1;
 
-    return 0;
+  return 0;
 }
 
+inline int test_blookup_direct() {
+  auto dir = directory();
+  n3rv::nullable_ref<n3rv::binding> b =
+      n3rv::binding_lookup(dir, "com.class.node1.binding1");
 
-int test_blookup_direct() {
-    auto dir = directory();
-    n3rv::binding* b = n3rv::blookup(dir, "com.class.node1.binding1");
+  // error, lookup should be ok
+  if (std::nullopt == b)
+    return 1;
 
-    //error, lookup should be ok
-    if ( b == nullptr ) return 1;
+  b = n3rv::binding_lookup(dir, "com.class.node1.dkldslkds");
 
-    b = n3rv::blookup(dir, "com.class.node1.dkldslkds");
+  // lookup should return null
+  if (std::nullopt == b)
+    return 1;
 
-    //lookup should return null
-    if (b != nullptr) return 1;
-
-    return 0;
+  return 0;
 }
 
-int test_blookup_glob() {
+inline int test_blookup_glob() {
 
-    auto dir = directory();
-    n3rv::binding* b = n3rv::blookup(dir, "com.*.*.binding1");
+  auto dir = directory();
+  n3rv::nullable_ref<n3rv::binding> b =
+      n3rv::binding_lookup(dir, "com.*.*.binding1");
 
-    //error, lookup should be ok
-    if ( b == nullptr ) return 1;
+  // error, lookup should be ok
+  if (std::nullopt == b)
+    return 1;
 
-    b = n3rv::blookup(dir, "com.fddfsf.*.binding1");
+  b = n3rv::binding_lookup(dir, "com.fddfsf.*.binding1");
 
-    //lookup should return null
-    if (b != nullptr) return 2;
+  // lookup should return null
+  if (std::nullopt != b)
+    return 2;
 
-    return 0;
-
-
+  return 0;
 }
-

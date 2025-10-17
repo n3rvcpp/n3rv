@@ -40,14 +40,14 @@ public:
    *  @param ll (optional), logger object pointer to use for service logging.
    */
   service(const char *controller_host, int controller_port,
-          logger *ll = nullptr);
+          nullable_ref<logger> ll = std::nullopt);
 
   /** service class destructor,
    *  closes all open zmq sockets and zmq context.
    */
   ~service();
 
-  logger *ll;
+  nullable_ref<logger> ll;
 
   /** Service class initializer. Empty for base service class, but inheriting
    * classes can use it to initialize new connections and make attachements.
@@ -225,7 +225,7 @@ public:
   /** Retrieves a RAW ZMQ socket from the internal connections list.
    *  @param hdl n3rv connection handler.
    *  @return the related connection object. */
-  std::unique_ptr<zmq::socket_t> &get_zsocket(qhandler *hdl);
+  std::shared_ptr<zmq::socket_t> &get_zsocket(qhandler *hdl);
 
   /** Conveniency function to send string data on a specified connection.
    *  @param hdl n3rv connection handler to send data to.

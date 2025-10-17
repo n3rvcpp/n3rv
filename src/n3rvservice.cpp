@@ -6,9 +6,10 @@
 
 namespace n3rv {
 
-service::service(const char *controller_host, int controller_port, logger *ll) {
+service::service(const char *controller_host, int controller_port,
+                 nullable_ref<logger> ll) {
 
-  this->ll = (ll == nullptr) ? new logger(LOGLV_NOTICE) : ll;
+  this->ll = ll;
 
   srand(time(nullptr));
 
@@ -44,8 +45,9 @@ int service::connect_controller() {
   std::stringstream ss;
   ss << "tcp://" << controller_host << ":" << controller_port;
 
-  this->ll->log(LOGLV_NOTICE, "Connecting to " + std::string(controller_host) +
-                                  " controller..");
+  this->ll->get().log(LOGLV_NOTICE, "Connecting to " +
+                                        std::string(controller_host) +
+                                        " controller..");
   this->connections[this->ctlr_ch1->cid].socket->connect(ss.str().c_str());
 
   std::stringstream ss2;
@@ -84,7 +86,7 @@ void service::set_uid(const char *uid) {
     uid_parts.emplace_back(*iter);
 
   if (uid_parts.size() != 3) {
-    this->ll->log(LOGLV_CRIT, "cannot set UID: Invalid string");
+    this->ll->get().log(LOGLV_CRIT, "cannot set UID: Invalid string");
     return;
   }
 
@@ -108,7 +110,7 @@ qhandler *service::connect(const char *lookup, int connection_type,
 
   std::string fullname = this->add_scope(lookup);
 
-  this->ll->log(LOGLV_NOTICE, "connecting to " + fullname);
+  this->ll->get().log(LOGLV_NOTICE, "connecting to " + fullname);
   auto binding = binding_lookup(this->directory, fullname);
 
   if (std::nullopt != binding) {
@@ -118,7 +120,7 @@ qhandler *service::connect(const char *lookup, int connection_type,
     // we create a new socket but only if it is null (for hdlref)
     if (this->connections[hdl->cid].socket == nullptr)
       this->connections[hdl->cid].socket =
-          std::make_unique<zmq::socket_t>(this->zctx, connection_type);
+          std::make_shared<zmq::socket_t>(this->zctx, connection_type);
 
     std::stringstream ep;
     ep << "tcp://" << serv->ip << ":" << binding->get().port;
@@ -135,8 +137,8 @@ qhandler *service::connect(const char *lookup, int connection_type,
   }
 
   else {
-    this->ll->log(LOGLV_WARN,
-                  "peer not found in directory, deferring connection..");
+    this->ll->get().log(LOGLV_WARN,
+                        "peer not found in directory, deferring connection..");
     n3rv::qdef cqd;
     cqd.name = fullname;
     cqd.socket_type = connection_type;
@@ -175,21 +177,21 @@ qhandler *service::bind(const char *bind_name, const char *ip, int bind_type,
                         int port) {
 
   if (this->namespace_ == "" || this->service_class == "" || this->name == "") {
-    this->ll->log(
+    this->ll->get().log(
         LOGLV_CRIT,
         "Cannot create binding: Please ensure to call set_uid() beforehand.");
     return nullptr;
   }
 
   if (bind_name == "") {
-    this->ll->log(LOGLV_CRIT, "Cannot bind with an empty name");
+    this->ll->get().log(LOGLV_CRIT, "Cannot bind with an empty name");
     return nullptr;
   }
 
   qhandler *hdl = new qhandler();
 
   this->connections[hdl->cid].socket =
-      std::make_unique<zmq::socket_t>(this->zctx, bind_type);
+      std::make_shared<zmq::socket_t>(this->zctx, bind_type);
   this->connections[hdl->cid].socket->setsockopt(ZMQ_LINGER, 0);
 
   // Port Autobinding (if 0)
@@ -210,7 +212,7 @@ qhandler *service::bind(const char *bind_name, const char *ip, int bind_type,
       if (e.num() == 98) {
         std::stringstream ss;
         ss << "Port " << port << " is already bound, trying another one..";
-        this->ll->log(LOGLV_WARN, ss.str());
+        this->ll->get().log(LOGLV_WARN, ss.str());
         return this->bind(bind_name, ip, bind_type, 0);
       }
     }
@@ -488,7 +490,7 @@ int service::subscribe(const char *binding_name, int port) {
   return 0;
 }
 
-std::unique_ptr<zmq::socket_t> &service::get_zsocket(qhandler *hdl) {
+std::shared_ptr<zmq::socket_t> &service::get_zsocket(qhandler *hdl) {
   return this->connections[hdl->cid].socket;
 }
 
@@ -523,7 +525,7 @@ int service::send(qhandler *hdl, zmq::message_t *zmsg, int flags = 0) {
 
 int service::check_deferred() {
 
-  this->ll->log(n3rv::LOGLV_DEBUG, "checking deferred list..");
+  this->ll->get().log(n3rv::LOGLV_DEBUG, "checking deferred list..");
   std::vector<n3rv::qdef> deferred_iter(this->deferred);
 
   int res = 0;
@@ -532,7 +534,7 @@ int service::check_deferred() {
     auto binding = binding_lookup(this->directory, def.name);
     if (std::nullopt != binding) {
 
-      this->ll->log(n3rv::LOGLV_NOTICE, "reconnecting to " + def.name);
+      this->ll->get().log(n3rv::LOGLV_NOTICE, "reconnecting to " + def.name);
 
       qhandler *qdef = static_cast<qhandler *>(def.hdl);
 
@@ -549,7 +551,7 @@ void *service::directory_update(void *objref, zmq::message_t *dirmsg) {
 
   service *self = (service *)objref;
 
-  self->ll->log(LOGLV_DEBUG, "updating Directory..");
+  self->ll->get().log(LOGLV_DEBUG, "updating Directory..");
   std::string dirstring(static_cast<char *>(dirmsg->data()), dirmsg->size());
   self->directory = parse_directory(dirstring);
   self->check_deferred();

@@ -9,9 +9,9 @@ n3rv::servicecontroller *fix_svctl() {
   return sc1;
 }
 
-std::vector<n3rv::qserv_> directory() {
-  std::vector<n3rv::qserv_> res;
-  n3rv::qserv_ q1;
+std::vector<n3rv::qserv> directory() {
+  std::vector<n3rv::qserv> res;
+  n3rv::qserv q1;
 
   q1.namespace_ = "com";
   q1.service_class = "class";
@@ -21,8 +21,8 @@ std::vector<n3rv::qserv_> directory() {
   b1.name = "binding1";
   b1.port = 0, b1.socket_type = ZMQ_REP;
 
-  q1.bindings.emplace_back(b1);
-  res.emplace_back(q1);
+  q1.bindings.push_back(b1);
+  res.push_back(q1);
 
   return res;
 }

@@ -79,7 +79,7 @@ public:
             self->serve_file(std::string(real_path + c_rest).c_str());
         if (sf.found) {
           evbuffer_add(out_buff, sf.data.data(), sf.data.size());
-          self->ll->log(LOGLV_DEBUG, "sending back http reply (200)");
+          self->ll->get().log(LOGLV_DEBUG, "sending back http reply (200)");
           evhttp_send_reply(req, HTTP_OK, "", out_buff);
           return;
         }
@@ -89,7 +89,7 @@ public:
 
     evbuffer_add_printf(out_buff,
                         "<html><body><h1>404 Not Found</h1></body></html>");
-    self->ll->log(LOGLV_DEBUG, "sending back http reply (404)");
+    self->ll->get().log(LOGLV_DEBUG, "sending back http reply (404)");
     evhttp_send_reply(req, HTTP_NOTFOUND, "", out_buff);
   }
 
@@ -105,7 +105,7 @@ public:
     if (!out_buff)
       return;
 
-    self->ll->log(LOGLV_DEBUG, "sending back http reply");
+    self->ll->get().log(LOGLV_DEBUG, "sending back http reply");
     evbuffer_add_printf(out_buff, "<html><body>Hello World!</body></html>");
     evhttp_send_reply(req, HTTP_OK, "", out_buff);
   }
@@ -123,14 +123,14 @@ public:
     this->evb = event_base_new();
 
     if (!this->evb) {
-      this->ll->log(LOGLV_CRIT, "failed to load libevent");
+      this->ll->get().log(LOGLV_CRIT, "failed to load libevent");
       return -1;
     }
 
     this->ev_server = evhttp_new(this->evb);
 
     if (!ev_server) {
-      this->ll->log(LOGLV_CRIT, "failed to init http server!");
+      this->ll->get().log(LOGLV_CRIT, "failed to init http server!");
       return -1;
     }
 
@@ -148,16 +148,16 @@ public:
         this->ev_server, this->http_listen_addr.c_str(),
         this->http_listen_port);
 
-    this->ll->log(LOGLV_DEBUG, "running httpd message loop");
+    this->ll->get().log(LOGLV_DEBUG, "running httpd message loop");
 
     int res = event_base_dispatch(this->evb);
     if (res == -1) {
-      this->ll->log(LOGLV_CRIT, "failed to run httpd message loop");
+      this->ll->get().log(LOGLV_CRIT, "failed to run httpd message loop");
       return -1;
     }
 
     else if (res == 1) {
-      this->ll->log(LOGLV_CRIT, "no events to listen to!");
+      this->ll->get().log(LOGLV_CRIT, "no events to listen to!");
       return -1;
     }
   }

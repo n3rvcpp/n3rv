@@ -25,7 +25,7 @@ nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
         dir[i].namespace_ + "." + dir[i].service_class + "." + dir[i].node_name;
 
     if (regex_search(absname, std::regex(lookup_str))) {
-      rrlist.push_back(dir[i]);
+      rrlist.push_back(std::ref(dir[i]));
     }
   }
 
@@ -41,13 +41,15 @@ nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
 }
 
 nullable_ref<qserv> node_lookup(std::vector<qserv> &dir,
-                                std::string service_class,
-                                std::string node_name, std::string namespace_) {
-  std::string lookup_str = namespace_ + "." + service_class + "." + node_name;
+                                const std::string &service_class,
+                                const std::string &node_name,
+                                const std::string &namespace_) {
+  const std::string lookup_str =
+      namespace_ + "." + service_class + "." + node_name;
   return node_lookup(dir, lookup_str);
 }
 
-nullable_ref<binding> binding_lookup(const std::vector<qserv> &dir,
+nullable_ref<binding> binding_lookup(std::vector<qserv> &dir,
                                      const std::string &addr) {
 
   // extracts binding name
