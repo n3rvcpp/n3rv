@@ -96,7 +96,7 @@ Then we will declare a simple receiver class which has the following behaviour:
           helloreceive* self = (helloreceive*) objref;      
           n3rv::message msg = n3rv::parse_msg(zmsg);
           /* We log received data */
-          self->ll->log(n3rv::LOGLV_NOTICE, msg.payload + " from " + self->hello->peer_uid);
+          self->ll->get().log(n3rv::LOGLV_NOTICE, msg.payload + " from " + self->hello->peer_uid);
       }
     };
 
@@ -114,7 +114,7 @@ node, along with a service controller and let them all `run()`
        n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
 
        /* Then we tell it to perform stdout display */
-       ll->add_dest("stdout");
+       ll->get().add_dest("stdout");
 
        /* We asynchronously start a new service controller */
        n3rv::start_controller("0.0.0.0",10001,ll);
@@ -183,7 +183,7 @@ The full hello.cpp code source is then the following:
       static void* hello_recv(void* objref, zmq::message_t* zmsg) {
           helloreceive* self = (helloreceive*) objref;      
           n3rv::message msg = n3rv::parse_msg(zmsg);
-          self->ll->log(n3rv::LOGLV_NOTICE, msg.payload + " from " + self->hello->peer_uid);
+          self->ll->get().log(n3rv::LOGLV_NOTICE, msg.payload + " from " + self->hello->peer_uid);
       }
 
     };
@@ -191,7 +191,7 @@ The full hello.cpp code source is then the following:
     int main() {
 
        n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
-       ll->add_dest("stdout");
+       ll->get().add_dest("stdout");
 
        n3rv::start_controller("0.0.0.0",10001,ll);
 

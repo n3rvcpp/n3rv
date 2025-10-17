@@ -69,7 +69,7 @@ A typical HTTP callback implementation is as follows:
         auto *out_buff = evhttp_request_get_output_buffer(req);
         if (!out_buff) return;
 
-        self->ll->log(LOGLV_DEBUG, "sending back http reply");
+        self->ll->get().log(LOGLV_DEBUG, "sending back http reply");
 
         /* We fill the buffer */
         evbuffer_add_printf(out_buff, "<html><body>Hello World!</body></html>");

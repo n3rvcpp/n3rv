@@ -105,7 +105,7 @@ n3rv logger objects:
 
        n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_DEBUG);
        /* We tell the logger to use syslog as dest. */
-       ll->add_dest("syslog:svc:user");
+       ll->get().add_dest("syslog:svc:user");
 
        n3rv::start_controller("0.0.0.0",10001,ll);
        n3rv::service svc1("127.0.0.1",10001,ll);

@@ -18,7 +18,7 @@ settings to your internal service logger:
    n3rv::service s1("127.0.0.1",10001);
 
    /* We set the loglevel for our node logger to WARNING */
-   s1.ll->set_loglevel(n3rv::LOGLV_WARN);
+   s1.ll->get().set_loglevel(n3rv::LOGLV_WARN);
 
 
 Log() function
@@ -40,10 +40,10 @@ the log is made and str is written in destinations, else we discard it.
    n3rv::logger* ll = new n3rv::logger(n3rv::LOGLV_CRIT);
 
    /* this log line will not be used since LOGLV_WARN > LOGLV_CRIT */
-   ll->log(n3rv::LOGLV_WARN,"blabla");
+   ll->get().log(n3rv::LOGLV_WARN,"blabla");
 
    /* On the other hand this one will go to destinations. */
-   ll->log(n3rv::LOGLV_PANIC,"HAAAAAAAA");
+   ll->get().log(n3rv::LOGLV_PANIC,"HAAAAAAAA");
 
 
 Log Levels
@@ -110,7 +110,7 @@ Explicitely enough, setting this destination will display the logs on the standa
   
   n3rv::logger* ll = new n3rv::logger(LOGLV_DEBUG);
   /* tells logger to display its logs on stdout */
-  ll->add_dest("stdout");
+  ll->get().add_dest("stdout");
 
 file://<path>
 *************
@@ -120,7 +120,7 @@ Also quite straightforward, this tells the logger to append its logs in a file.
 .. code-block:: c++
 
   /* tells logger to append its logs in /opt/logs/n3rv.log */
-  ll->add_dest("file:///opt/logs/n3rv.log");
+  ll->get().add_dest("file:///opt/logs/n3rv.log");
 
 syslog:<ident>:<facility>
 *************************
@@ -131,7 +131,7 @@ and thus centralize all your logs on a single remote-syslogd (got logstash ? ;-)
 .. code-block:: c++
 
   /* tells logger to use syslog for logging, with ident "n3rv" and facility "user" */
-  ll->add_dest("syslog:n3rv:user");
+  ll->get().add_dest("syslog:n3rv:user");
 
 Note: Supported syslog facilities are local0..7, and user.
 

@@ -1,5 +1,6 @@
 #include "test_httpservice.hpp"
 #include "test_logger.hpp"
+#include "test_lookups.hpp"
 #include "test_messages.hpp"
 #include "test_service.hpp"
 #include "test_servicecontroller.hpp"
@@ -13,10 +14,10 @@ int main() {
 
   std::unordered_map<std::string, tfctptr> tests_list;
 
-  /*   tests_list["000.test_nlookup_direct"] = test_nlookup_direct;
-    tests_list["001.test_nlookup_glob"] = test_nlookup_glob;
-    tests_list["002.test_blookup_direct"] = test_blookup_direct;
-    tests_list["003.test_blookup_glob"] = test_blookup_glob; */
+  tests_list["000.test_nlookup_direct"] = test_nlookup_direct;
+  tests_list["001.test_nlookup_glob"] = test_nlookup_glob;
+  tests_list["002.test_blookup_direct"] = test_blookup_direct;
+  tests_list["003.test_blookup_glob"] = test_blookup_glob;
 
   tests_list["010.test_servicecontroller_instanciate"] =
       test_servicecontroller_instanciate;
